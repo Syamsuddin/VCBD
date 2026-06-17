@@ -58,8 +58,8 @@ VCBD menyelesaikan kedua masalah ini dengan pendekatan **"Gali & Konfirmasi Dulu
 Berikut adalah daftar 28 dokumen hasil bentukan VCBD yang dikelompokkan berdasarkan klaster fungsinya:
 
 ### 📁 Root Proyek
-* **[CLAUDE.md](references/template-dokumen.md#L151-L188)**: Dokumen instruksi inti selalu-aktif (sangat ringkas, hanya memuat rujukan).
-* **[INDEX.md](references/template-dokumen.md#L190-L224)**: *Router* utama bagi AI untuk memuat dokumen secara spesifik sesuai jenis pekerjaan (*tier loading*).
+* **[CLAUDE.md](references/template-dokumen.md#4-template-claudemd)**: Dokumen instruksi inti selalu-aktif (sangat ringkas, hanya memuat rujukan).
+* **[INDEX.md](references/template-dokumen.md#5-template-indexmd)**: *Router* utama bagi AI untuk memuat dokumen secara spesifik sesuai jenis pekerjaan (*tier loading*).
 
 ### 📁 Folder `docs/`
 #### 🔹 Klaster Strategis (00–03)
@@ -124,3 +124,4 @@ Berikut adalah daftar 28 dokumen hasil bentukan VCBD yang dikelompokkan berdasar
 * [SKILL.md](SKILL.md) — Aturan operasional lengkap dan perilaku agen VCBD.
 * [protokol-wawancara.md](references/protokol-wawancara.md) — Bank pertanyaan K1-K8 dan panduan wawancara.
 * [template-dokumen.md](references/template-dokumen.md) — Spesifikasi template rinci untuk seluruh 28 dokumen.
+* [contoh-keluaran.md](references/contoh-keluaran.md) — Contoh konkret keluaran (*golden output*) potongan dokumen kunci sebagai patokan gaya & kepadatan.

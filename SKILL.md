@@ -1,6 +1,7 @@
 ---
 name: vcbd
-description: 'Drafter blueprint lengkap untuk vibe coding dengan Claude Code: menghasilkan paket 28 dokumen baku (00_EXECUTIVE_SUMMARY sampai 25_RELEASE_CHECKLIST, plus CLAUDE.md inti dan INDEX.md peta konteks). WAJIB digunakan SETIAP KALI pengguna ingin menyusun set dokumen blueprint bernomor 00–25, paket konteks formal/auditable untuk Claude Code, atau menyebut frasa seperti "buatkan 28 dokumen blueprint", "susun paket SPEC bernomor", "siapkan blueprint lengkap untuk aplikasi X", atau "buat CLAUDE.md dan INDEX.md dari blueprint". Input awal cukup nama dan deskripsi umum aplikasi; skill lalu mengajukan wawancara bertahap yang cukup untuk mengisi seluruh 28 dokumen, menyajikan Ringkasan Kebutuhan, dan MENUNGGU konfirmasi eksplisit sebelum menulis. Berbeda dari vibe-blueprint (yang memilih tier ringkas–penuh), VCBD selalu menghasilkan set 28-dokumen baku dengan disiplin tiered-loading, satu sumber kebenaran per fakta, dan anti-kontradiksi antar dokumen.'
+description: 'Menyusun paket 28 dokumen blueprint baku (00_EXECUTIVE_SUMMARY–25_RELEASE_CHECKLIST + CLAUDE.md + INDEX.md) untuk vibe coding dengan Claude Code. Gunakan setiap kali pengguna ingin menyiapkan blueprint atau paket konteks formal sebelum coding, atau menyebut frasa seperti "buatkan 28 dokumen blueprint", "susun paket SPEC bernomor", "siapkan blueprint lengkap untuk aplikasi X", "buat CLAUDE.md dan INDEX.md", atau dalam Bahasa Inggris "generate the full blueprint package", "create the 28-doc context pack", "scaffold CLAUDE.md and INDEX.md". Cukup beri nama + deskripsi aplikasi; skill mewawancarai bertahap, menyajikan Ringkasan Kebutuhan, lalu MENUNGGU konfirmasi eksplisit sebelum menulis. Selalu menghasilkan 28 dokumen dengan tiered-loading, satu fakta satu rumah, dan anti-kontradiksi antar dokumen.'
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion
 ---
 
 # VCBD — Vibe Coding Blueprint Drafter
@@ -38,7 +39,7 @@ Baca `references/protokol-wawancara.md` untuk bank pertanyaan 8 kategori (K1–K
 4. **DILARANG ke Fase 3 sebelum jawaban afirmatif.** Inilah satu-satunya hal yang membedakan skill ini dari "tulis 28 dokumen asal jadi": kebutuhan yang terkonfirmasi.
 
 ### Fase 3 — Generasi
-Baca `references/template-dokumen.md` (TOC, kontrak konsistensi + peta fakta kanonik, rubrik token, 28 template, skema manifest). Lalu:
+Baca `references/template-dokumen.md` (TOC, kontrak konsistensi + peta fakta kanonik, rubrik token, 28 template, skema manifest). Bila butuh anchor gaya/kepadatan konkret, buka `references/contoh-keluaran.md`. Lalu:
 0. **Preflight tulis (wajib — terutama brownfield):** sebelum menulis file apa pun, periksa keberadaan `CLAUDE.md`, `INDEX.md`, dan `docs/` yang sudah ada. Jika ada → JANGAN timpa diam-diam: tampilkan daftar file yang akan tertimpa, lalu tawarkan (a) backup ke `*.bak`, (b) mode merge (pertahankan bagian eksisting yang masih relevan), atau (c) tulis ke subfolder terpisah; minta konfirmasi eksplisit sebelum lanjut. Hukum 1 dan prinsip "friksi sebanding irreversibilitas" berlaku pada langkah TULIS ini, bukan hanya pada wawancara — menimpa konteks agen yang sudah ada adalah operasi high-stakes.
 1. Tulis **_MANIFEST.json** lebih dulu: rekam Ringkasan Kebutuhan terkonfirmasi + peta fakta kanonik. Ini state bersama untuk menjaga konsistensi & memudahkan pembaruan (bukan bagian dari 28 dokumen).
 2. Generate ke-28 dokumen DARI manifest. Patuhi rubrik ekonomi token: **tabel > narasi**, **path eksplisit** (`app/Services/SyncService.php`, bukan "layanan sinkronisasi"), **out-of-scope wajib ≥3 butir**, **blok verifikasi konkret** di acceptance/release.
@@ -74,3 +75,4 @@ Jika pengguna sudah punya paket dari skill ini dan minta perubahan: jangan wawan
 |---|---|
 | `references/protokol-wawancara.md` | Memulai Fase 1 — bank pertanyaan K1–K8, pemetaan ke dokumen, checklist kelengkapan, format Ringkasan Kebutuhan |
 | `references/template-dokumen.md` | Memulai Fase 3 — kontrak konsistensi, peta fakta kanonik, rubrik token, 28 template, skema `_MANIFEST.json` |
+| `references/contoh-keluaran.md` | (Opsional) Fase 3 — butuh anchor konkret: golden output potongan dokumen kunci (manifest, 07, 23, CLAUDE.md) + contoh dokumen turunan yang dikolaps |

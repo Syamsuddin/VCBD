@@ -32,6 +32,8 @@ Hukum 2: **satu fakta, satu rumah.** Tiap fakta ditulis penuh hanya di dokumen p
 | Strategi & cakupan tes | 13 | 23, 24 merujuk |
 | Pola penanganan error | 14 | 16 merujuk |
 | Logging/metrik/observability | 15 | 16 merujuk |
+| Aturan perbaikan bug | 18 | 17 merujuk |
+| Larangan operasional (guardrail) | 20 | 24, CLAUDE.md merujuk |
 | Aturan keamanan | 21 | 06, 20, 22 merujuk |
 | Kebijakan perubahan/git/irreversibilitas | 22 | 25 merujuk |
 | Definition of Done universal | 24 | 23, 25 merujuk |
@@ -49,6 +51,7 @@ Jika sebuah dokumen "ingin" menjelaskan fakta milik dokumen lain → ganti denga
 5. **Zero duplikasi** (Hukum 2).
 6. **Bahasa**: narasi Bahasa Indonesia; identifier, nama file, kode, dan istilah teknis tetap Inggris standar.
 7. **Isi nyata, bukan placeholder.** Celah yang belum pasti ditandai `[ASUMSI]` / `[TERBUKA]`, jangan `{{kosong}}`.
+8. **Dokumen turunan boleh menyusut (Hukum 4 > kelengkapan kosmetik).** Jika sebuah dokumen turunan (16, 17, 19, 23, 25) isinya 100% mengikuti default/konvensi tanpa keputusan atau fakta khusus proyek, tulis sebagai **stub ringkas + pointer** ke pemiliknya (mis. `Ikuti alur baku 19_TASK_TEMPLATE; tak ada penyimpangan proyek.`), bukan halaman penuh. Slot 28 tetap ada — jangan menggemukkan dokumen hanya agar "terlihat lengkap". Pengecualian: 23 yang memuat kriteria terima nyata per-fitur biasanya TIDAK memenuhi syarat kolaps. Contoh stub: lihat `references/contoh-keluaran.md`.
 
 ---
 
@@ -148,7 +151,8 @@ Bagian: Langkah rilis **berurutan** (tes → migrasi tervalidasi → backup → 
 
 ---
 
-## 4. Template CLAUDE.md (root, dibuat PENDEK)
+## 4. Template CLAUDE.md
+Root proyek, dibuat PENDEK (hanya inti + rujukan).
 
 ```
 # CLAUDE.md
@@ -187,7 +191,8 @@ Baca INDEX.md → muat dokumen relevan → konfirmasi scope → vertical slice �
 
 Aturan: jika CLAUDE.md membengkak (mengulang isi dokumen), pangkas — ia hanya memuat inti + rujukan.
 
-## 5. Template INDEX.md (root, router — bukan narasi)
+## 5. Template INDEX.md
+Root proyek, berupa router (bukan narasi).
 
 ```
 # INDEX — Peta Konteks
@@ -223,6 +228,8 @@ CLAUDE.md (inti). Jangan baca ulang sumbernya kecuali butuh detail.
 
 Path dalam rute = `docs/NN_NAME.md`.
 
+> Catatan dua peta: tabel rute di atas adalah **peta pemuatan** (jenis task → dokumen mana yang dibaca agen). Ini sengaja berbeda dari **peta penggalian** di `references/protokol-wawancara.md` (kategori K1–K8 → dokumen mana yang diisi). Satu memetakan *baca-saat-kerja*, satunya *isi-saat-wawancara*; keduanya tidak harus identik.
+
 ## 6. Skema `_MANIFEST.json`
 
 State bersama untuk konsistensi & pembaruan. Ditulis di Fase 3 sebelum dokumen lain.
@@ -250,7 +257,8 @@ State bersama untuk konsistensi & pembaruan. Ditulis di Fase 3 sebelum dokumen l
     "domain_terms": "04", "roles": "05", "business_process": "06", "schema": "07",
     "architecture": "08", "stack": "09", "dev_env": "10", "commands": "11",
     "project_structure": "12", "testing": "13", "error_handling": "14",
-    "observability": "15", "security": "21", "change_policy": "22",
+    "observability": "15", "repair_rules": "18", "guardrails": "20",
+    "security": "21", "change_policy": "22",
     "definition_of_done": "24"
   },
   "assumptions": [],
