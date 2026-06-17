@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/img/header-vcbd.png" alt="VCBD — Vibe Coding Blueprint Drafter" width="100%">
+  <img src="assets/img/header-vcbd.jpg" alt="VCBD — Vibe Coding Blueprint Drafter" width="100%">
 </p>
 
 # VCBD — Vibe Coding Blueprint Drafter
