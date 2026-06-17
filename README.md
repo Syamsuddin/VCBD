@@ -1,8 +1,47 @@
+<p align="center">
+  <img src="assets/img/header-vcbd.png" alt="VCBD — Vibe Coding Blueprint Drafter" width="100%">
+</p>
+
 # VCBD — Vibe Coding Blueprint Drafter
 
 **VCBD (Vibe Coding Blueprint Drafter)** adalah sebuah sistem dan panduan *blueprint* terstruktur yang dirancang khusus untuk mempersiapkan konteks proyek sebelum melakukan *vibe coding* menggunakan agen AI seperti Claude Code. 
 
 Sistem ini membantu Anda merumuskan ide aplikasi menjadi **paket 28 dokumen blueprint baku** (bernomor `00` hingga `25`, plus `CLAUDE.md` dan `INDEX.md`) yang konsisten, hemat token, dan bebas dari kontradiksi internal.
+
+---
+
+## 🧑‍🌾 Untuk Orang Awam (penjelasan sederhana)
+
+> Bayangkan Anda menyuruh tukang (AI seperti Claude Code) membangun rumah. **VCBD adalah pembuat "gambar kerja" rumah itu** — lengkap, rapi, dan tidak saling bertentangan — supaya tukang tidak salah bangun. Tanpa gambar kerja, tukang menebak; menebak = sering salah = bongkar ulang.
+
+**Dua masalah yang dipecahkan:**
+1. **Salah bangun** — sering kita langsung nyuruh AI ngoding padahal kebutuhannya belum jelas, hasilnya jadi tapi bukan yang kita mau. VCBD memaksa *"gali dulu, baru tulis"*.
+2. **Dokumen bertabrakan** — kalau dokumennya banyak, bahayanya bukan kurang dokumen, tapi isinya beda-beda (satu file bilang "pakai MySQL", file lain "pakai Postgres"). AI bingung lalu salah pilih. VCBD memakai prinsip *"satu fakta, satu rumah"* agar tiap info hanya ditulis di satu tempat.
+
+**Keunggulan utama (bahasa sederhana):**
+
+| Fitur | Artinya untuk Anda |
+|---|---|
+| 🚦 Tanya dulu, baru kerja | AI mewawancarai Anda & **menunggu Anda bilang "ya"** sebelum menulis — tidak ada kejutan. |
+| 🗂️ Satu fakta, satu rumah | Tiap info ditulis di **satu file** saja; yang lain cukup menunjuk. Kalau ada perubahan, cukup ubah satu tempat. |
+| 🔦 Buka seperlunya | AI tidak membuka 28 dokumen sekaligus (bikin buyar). Rata-rata cuma **~4 dokumen per pekerjaan** — hemat & fokus. |
+| ✅ Cara uji yang jelas | Bukan "pokoknya jalan", tapi *"jalankan perintah ini, lulus kalau muncul ini"* — AI bisa memeriksa kerjanya sendiri. |
+| 🛡️ Aman menimpa proyek lama | Tidak asal timpa file yang sudah ada; ditawarkan backup/gabung/simpan terpisah dulu. |
+
+**Apa yang baru & lebih baik di v1.1** (hasil pemeriksaan mutu — 6 perbaikan):
+
+| | Sekarang lebih baik karena… |
+|---|---|
+| **R1** | Saat bikin fitur baru, AI sekalian dibukakan cara mengetes — jadi bisa langsung uji hasilnya. |
+| **R2** | Satu dokumen yang tadinya tak pernah dipakai kini diperjelas statusnya — tidak jadi beban sia-sia. |
+| **R3** | Kalau dokumen beda dengan kode asli, **kode asli yang menang** — AI wajib berhenti & lapor, bukan ikut dokumen basi. (penting untuk proyek lama) |
+| **R4** | Ada tempat khusus mencatat **"jebakan"** — hal yang kelihatan benar tapi menyesatkan (sering ada di sistem lama). |
+| **R5** | Daftar perintah penting kini ikut terbuka di setiap pekerjaan yang menghasilkan kode. |
+| **R6** | Ada **batas ukuran** dokumen supaya tetap padat, tidak bertele-tele. |
+
+**Kapan cocok dipakai?** ✅ Proyek yang akan dipelihara, agak besar, banyak peran/tabel, atau memperbaiki sistem lama (di mana salah = mahal). ❌ Kurang cocok untuk corat-coret cepat / prototipe sekali buang (28 dokumen jadi kebanyakan).
+
+> **Intinya:** VCBD membuat AI ngoding jadi **terarah, hemat perhatian, dan tidak gampang salah** — kebutuhan digali dulu, fakta tidak bertabrakan, dan AI selalu tahu *dokumen mana yang dibaca* dan *bagaimana mengeceknya*.
 
 ---
 
