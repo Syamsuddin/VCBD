@@ -21,7 +21,7 @@ Dua alasan menentukan desain skill ini. Pertama, kesalahan termahal dalam vibe c
 
 ### Fase 0 — Triase
 1. Kumpulkan dulu semua yang sudah ada TANPA bertanya: pesan & deskripsi pengguna, file terlampir, isi repo (bila ada akses), preferensi/konteks pengguna yang sudah diketahui. Catat sebagai **fakta diketahui**. `composer.json` menjawab versi Laravel; `pubspec.yaml` menjawab dependensi Flutter — jangan tanya ulang.
-2. Klasifikasikan **greenfield** (dari nol) vs **brownfield** (mengubah sistem berjalan). Brownfield menggeser fokus ke kondisi eksisting dan batas perubahan.
+2. Klasifikasikan **greenfield** (dari nol) vs **brownfield** (mengubah sistem berjalan). Brownfield menggeser fokus ke kondisi eksisting dan batas perubahan. Untuk brownfield, catat juga **jebakan (landmines)**: kejutan sistem eksisting yang bisa menyesatkan agen (skema tak sesuai dokumen, dependensi tersembunyi, perilaku non-obvious). Simpan di field `landmines` manifest; rumahnya `16_DEBUGGING_GUIDE`. Ingat presedensi sumber kebenaran: bila dokumen lama ≠ kode aktual, kode menang.
 3. Konfirmasi input minimum: **nama aplikasi** + **deskripsi umum**. Jika belum ada, minta keduanya sebelum lanjut.
 
 ### Fase 1 — Wawancara Penggalian

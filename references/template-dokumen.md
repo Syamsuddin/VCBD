@@ -32,6 +32,7 @@ Hukum 2: **satu fakta, satu rumah.** Tiap fakta ditulis penuh hanya di dokumen p
 | Strategi & cakupan tes | 13 | 23, 24 merujuk |
 | Pola penanganan error | 14 | 16 merujuk |
 | Logging/metrik/observability | 15 | 16 merujuk |
+| Jebakan/gotchas proyek (brownfield) | 16 | 18 merujuk |
 | Aturan perbaikan bug | 18 | 17 merujuk |
 | Larangan operasional (guardrail) | 20 | 24, CLAUDE.md merujuk |
 | Aturan keamanan | 21 | 06, 20, 22 merujuk |
@@ -39,6 +40,8 @@ Hukum 2: **satu fakta, satu rumah.** Tiap fakta ditulis penuh hanya di dokumen p
 | Definition of Done universal | 24 | 23, 25 merujuk |
 
 Jika sebuah dokumen "ingin" menjelaskan fakta milik dokumen lain → ganti dengan satu kalimat rujukan.
+
+**Presedensi sumber kebenaran (penting untuk brownfield).** Dokumen merekam keadaan yang *diinginkan*. Bila sebuah dokumen (mis. 07_DATA_MODEL) bertentangan dengan **kode/migrasi/skema aktual**, maka **kode menang**: agen WAJIB berhenti, laporkan selisihnya, dan minta keputusan — JANGAN diam-diam mengikuti dokumen yang basi (dokumen basi lebih berbahaya daripada tanpa dokumen). Setelah dikonfirmasi, perbarui dokumen pemiliknya + `_MANIFEST.json`. Aturan ini hanya untuk fakta yang punya padanan di kode (skema, perintah, struktur, stack); untuk niat/scope/aturan, dokumen tetap otoritatif.
 
 ---
 
@@ -52,6 +55,18 @@ Jika sebuah dokumen "ingin" menjelaskan fakta milik dokumen lain → ganti denga
 6. **Bahasa**: narasi Bahasa Indonesia; identifier, nama file, kode, dan istilah teknis tetap Inggris standar.
 7. **Isi nyata, bukan placeholder.** Celah yang belum pasti ditandai `[ASUMSI]` / `[TERBUKA]`, jangan `{{kosong}}`.
 8. **Dokumen turunan boleh menyusut (Hukum 4 > kelengkapan kosmetik).** Jika sebuah dokumen turunan (16, 17, 19, 23, 25) isinya 100% mengikuti default/konvensi tanpa keputusan atau fakta khusus proyek, tulis sebagai **stub ringkas + pointer** ke pemiliknya (mis. `Ikuti alur baku 19_TASK_TEMPLATE; tak ada penyimpangan proyek.`), bukan halaman penuh. Slot 28 tetap ada — jangan menggemukkan dokumen hanya agar "terlihat lengkap". Pengecualian: 23 yang memuat kriteria terima nyata per-fitur biasanya TIDAK memenuhi syarat kolaps. Contoh stub: lihat `references/contoh-keluaran.md`.
+9. **Anggaran ukuran per klaster (tegakkan Hukum 4 saat menulis).** Plafon **lunak**; lampaui hanya bila tiap baris tambahan lulus uji *"jika dihapus, apakah agen keliru?"*.
+
+| Klaster | Plafon lunak per dokumen |
+|---|---|
+| Strategis 00–03 | 00 ≤300 kata; 01–03 ≤1 halaman |
+| Domain 04–07 | 04–06 ≤1 halaman; 07 menyesuaikan jumlah tabel (tak dibatasi kaku) |
+| Fondasi 08–12 | masing-masing ≤1 halaman |
+| Kualitas/Operasi 13–16 | ≤1 halaman; boleh dikolaps/digabung (lihat #8) |
+| Perilaku-Agen 17–22 | generik & ringkas (≤½–1 halaman); 17/19 stub bila tanpa penyimpangan |
+| Gerbang 23–25 | 23 per-fitur; 24/25 ≤1 halaman |
+| CLAUDE.md | ≤ ~40 baris (inti + pointer) |
+| INDEX.md | tabel rute + indeks 1 baris/dokumen; tanpa narasi |
 
 ---
 
@@ -115,8 +130,8 @@ Bagian: Klasifikasi error · Mana yang tampil ke pengguna vs hanya dicatat · Fo
 **15_OBSERVABILITY.md** — Pemilik logging/metrik.
 Bagian: Apa yang dilog & format · Level log · Metrik/monitoring (bila ada; boleh ditunda pasca-MVP dengan `[TERBUKA]`).
 
-**16_DEBUGGING_GUIDE.md** — Diturunkan (09+14+15).
-Bagian: Gejala umum → langkah diagnosa · Lokasi log (rujuk 15) · Perintah diagnosa (rujuk 11).
+**16_DEBUGGING_GUIDE.md** — Diturunkan (09+14+15) + **pemilik catatan jebakan**.
+Bagian: Gejala umum → langkah diagnosa · Lokasi log (rujuk 15) · Perintah diagnosa (rujuk 11) · **Jebakan/gotchas spesifik proyek** (terutama brownfield): hal yang tampak benar tapi salah — mis. tabel legacy tanpa FK, satu kolom dipakai dua makna, endpoint yang tak aman dipanggil paralel. Sumber: field `landmines` di `_MANIFEST.json`. Konten paling padat-nilai untuk agen; isi nyata bila ada, kosongkan bila greenfield bersih.
 
 ### Klaster Perilaku-Agen (17–22)
 
@@ -175,7 +190,7 @@ File ini selalu aktif. Untuk hal di luar ini → buka INDEX.md.
 {2–4 aturan terpenting}
 
 ## Perintah penting  (sumber: docs/11)
-{4 perintah paling sering: run, test, migrasi ⚠️, build}
+{4 perintah paling sering, WAJIB termasuk perintah verifikasi: run, **test**, migrasi ⚠️, build. Rute task pun memuat docs/11 saat menghasilkan kode.}
 
 ## Guardrail inti  (penuh: docs/20, 21, 22)
 {5–7 "JANGAN" terpenting}
@@ -200,20 +215,21 @@ Untuk AI: baca ini sebelum task. Muat hanya dokumen yang ditunjuk. JANGAN muat s
 
 ## Tier 0 — selalu aktif
 CLAUDE.md (inti). Jangan baca ulang sumbernya kecuali butuh detail.
+Esensi 17_AGENT_WORKFLOW (alur per-task) & 19_TASK_TEMPLATE (format task) sudah diringkas di CLAUDE.md — keduanya sengaja TIDAK ada di rute task. Muat dokumen penuhnya hanya saat butuh detail alur/format, bukan tiap task.
 
 ## Rute: jenis task → dokumen
 | Jenis task | Muat | Catatan |
 |---|---|---|
-| Fitur baru (vertical slice) | 01,02,04,06,07,19,23,24 | cek 02 dulu |
-| Ubah skema DB / migrasi | 04,07,22,13,24 | ⚠️ irreversibel; 22 wajib |
-| Perbaikan bug | 16,18,14,13 | jangan lewat scope bug |
-| Endpoint/API baru | 07,08,06,21,13 | 21 bila sensitif |
-| Perubahan keamanan | 21,20,22,15 | ⚠️ gerbang manusia |
+| Fitur baru (vertical slice) | 01,02,04,06,07,11,13,23,24 | cek 02 dulu; +05 bila sentuh peran/izin; 19 utk format task |
+| Ubah skema DB / migrasi | 04,07,11,13,22,24 | ⚠️ irreversibel; 22 wajib; 11 utk migrasi+verifikasi |
+| Perbaikan bug | 11,13,14,16,18 | jangan lewat scope bug; 11 utk repro+tes regresi |
+| Endpoint/API baru | 06,07,08,11,13,21 | 21 bila sensitif |
+| Perubahan keamanan | 15,20,21,22 | ⚠️ gerbang manusia |
 | Tambah peran/izin | 05,06,21 | — |
-| Refactor arsitektur | 08,04,22 | jangan ubah keputusan sengaja |
-| Observability/logging | 15,14,16 | — |
+| Refactor arsitektur | 04,08,22 | jangan ubah keputusan sengaja |
+| Observability/logging | 14,15,16 | — |
 | Setup lingkungan | 09,10,11,12 | — |
-| Rilis | 25,24,22,15 | ⚠️ ikuti 25 berurutan |
+| Rilis | 11,15,22,24,25 | ⚠️ ikuti 25 berurutan |
 | Strategi/scope | 00,01,02,03 | tanpa kode |
 
 ## Indeks lengkap
@@ -224,6 +240,7 @@ CLAUDE.md (inti). Jangan baca ulang sumbernya kecuali butuh detail.
 2. Task irreversibel → wajib baca 22 + minta konfirmasi.
 3. Konflik antar dokumen → berhenti, laporkan, minta keputusan.
 4. Patokan selesai = 23 + 24, bukan kesempurnaan.
+5. Brownfield: dokumen ≠ kode aktual → KODE menang, hentikan & lapor selisih (lihat presedensi sumber kebenaran).
 ```
 
 Path dalam rute = `docs/NN_NAME.md`.
@@ -257,10 +274,11 @@ State bersama untuk konsistensi & pembaruan. Ditulis di Fase 3 sebelum dokumen l
     "domain_terms": "04", "roles": "05", "business_process": "06", "schema": "07",
     "architecture": "08", "stack": "09", "dev_env": "10", "commands": "11",
     "project_structure": "12", "testing": "13", "error_handling": "14",
-    "observability": "15", "repair_rules": "18", "guardrails": "20",
+    "observability": "15", "landmines": "16", "repair_rules": "18", "guardrails": "20",
     "security": "21", "change_policy": "22",
     "definition_of_done": "24"
   },
+  "landmines": [],
   "assumptions": [],
   "open_questions": []
 }
