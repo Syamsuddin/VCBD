@@ -1,6 +1,6 @@
 # Protokol Wawancara VCBD
 
-Tujuan file ini: menyediakan pertanyaan **secukupnya** untuk mengisi 28 dokumen, dipetakan ke dokumen yang diisinya, lengkap dengan usulan default agar pengguna cukup menyetujui/mengoreksi.
+Tujuan file ini: menyediakan pertanyaan **secukupnya** untuk mengisi 29 dokumen, dipetakan ke dokumen yang diisinya, lengkap dengan usulan default agar pengguna cukup menyetujui/mengoreksi.
 
 ## Prinsip wawancara
 
@@ -12,7 +12,7 @@ Tujuan file ini: menyediakan pertanyaan **secukupnya** untuk mengisi 28 dokumen,
 
 ---
 
-## Bank Pertanyaan (K1–K8)
+## Bank Pertanyaan (K1–K9)
 
 ### K1 — Identitas & Tujuan → mengisi 00, 01
 1. Masalah inti apa yang diselesaikan aplikasi ini, dan untuk siapa? (1–2 kalimat)
@@ -61,6 +61,12 @@ Tujuan file ini: menyediakan pertanyaan **secukupnya** untuk mengisi 28 dokumen,
 3. Guardrail operasional untuk agen (larangan keras)? (default: tidak hard-code rahasia; tidak menonaktifkan validasi; tidak menambah dependency tanpa alasan; perbaikan bug tidak melebihi scope)
 4. Langkah rilis berurutan? (default: tes hijau → migrasi tervalidasi → backup → deploy → smoke test → rollback plan)
 
+### K9 — Antarmuka & Pengalaman Pengguna → mengisi 26 *(lewati bila aplikasi tanpa UI — API/CLI/daemon: tulis 26 sebagai stub "Tanpa UI" dan set `"ui": null` di manifest)*
+1. Design system / kerangka komponen antarmuka? (default: ikut ekosistem stack — mis. Blade + Bootstrap 5, atau Filament untuk panel admin; token visual ikut tema default)
+2. Target perangkat & responsivitas? (default: desktop-first, tetap layak di ≤768px; sebutkan bila ada layar yang justru mobile-first)
+3. Layar utama & navigasi? (default: **diusulkan otomatis** dari fitur MVP — 1 layar per alur + menu per peran dari K3; pengguna cukup konfirmasi/koreksi daftar usulan)
+4. Bahasa antarmuka & aksesibilitas? (default: id-ID; aksesibilitas dasar `[TERBUKA]` pasca-MVP)
+
 ---
 
 ## Dokumen turunan (bangun dari default, konfirmasi sekaligus)
@@ -73,11 +79,11 @@ Dokumen ini **tidak butuh pertanyaan terpisah** — bangun dari jawaban di atas 
 | 17 AGENT_WORKFLOW | Template baku + Hukum VCBD + kebijakan perubahan (K8) |
 | 19 TASK_TEMPLATE | Template baku |
 | 22 CHANGE_POLICY | K8 + prinsip friksi-sebanding-irreversibilitas |
-| 23 ACCEPTANCE_CRITERIA | Fitur (K2) + definisi terima (K7) — satu blok per fitur MVP |
+| 23 ACCEPTANCE_CRITERIA | Fitur (K2) + definisi terima (K7) + kriteria antarmuka (K9, bila ber-UI) — satu blok per fitur MVP |
 | 24 DEFINITION_OF_DONE | K7 (default universal) |
 | 25 RELEASE_CHECKLIST | K8 langkah rilis |
-| CLAUDE.md | Sintesis: K5 stack + K5 struktur + K6 perintah + guardrail inti K8 |
-| INDEX.md | Tabel rute baku (lihat template) + daftar 26 dokumen |
+| CLAUDE.md | Sintesis: K5 stack + K5 struktur + K6 perintah + guardrail inti K8 + inti UI K9 (bila ber-UI) |
+| INDEX.md | Tabel rute baku (lihat template) + daftar 27 dokumen bernomor |
 
 ---
 
@@ -98,6 +104,7 @@ Lanjut ke Fase 2 hanya bila tiap baris terisi (jawaban nyata atau `[ASUMSI]` ber
 - [ ] Strategi tes + aturan keamanan wajib (K7)
 - [ ] Definisi terima & selesai (K7)
 - [ ] Kebijakan git + daftar operasi irreversibel (K8)
+- [ ] Design system + daftar layar utama + target perangkat (K9) — atau eksplisit "tanpa UI"
 
 ---
 
@@ -119,6 +126,7 @@ Sajikan sebagai tabel padat, lalu dua daftar terpisah. Contoh kerangka:
 | Data sensitif | … |
 | Stack & versi | … |
 | Arsitektur & integrasi | … |
+| Antarmuka (UI) | … |
 | Lingkungan & perintah | … |
 | Tes & keamanan | … |
 | Definisi terima/selesai | … |
@@ -130,6 +138,6 @@ Sajikan sebagai tabel padat, lalu dua daftar terpisah. Contoh kerangka:
 [TERBUKA] (sengaja ditunda)
 - …
 
-Konfirmasi: generate 28 dokumen blueprint dengan ringkasan di atas?
+Konfirmasi: generate 29 dokumen blueprint dengan ringkasan di atas?
 Jawab "ya" atau koreksi bagian yang salah.
 ```

@@ -1,9 +1,9 @@
-# Template 28 Dokumen VCBD
+# Template 29 Dokumen VCBD
 
 ## Daftar Isi
 1. Kontrak Konsistensi + Peta Fakta Kanonik
 2. Rubrik Ekonomi Token
-3. Template 00–25 (per klaster)
+3. Template 00–26 (per klaster)
 4. Template CLAUDE.md
 5. Template INDEX.md
 6. Skema `_MANIFEST.json`
@@ -38,6 +38,7 @@ Hukum 2: **satu fakta, satu rumah.** Tiap fakta ditulis penuh hanya di dokumen p
 | Aturan keamanan | 21 | 06, 20, 22 merujuk |
 | Kebijakan perubahan/git/irreversibilitas | 22 | 25 merujuk |
 | Definition of Done universal | 24 | 23, 25 merujuk |
+| Desain UI (design system, token, layar, navigasi, states) | 26 | 01, 03, 23 merujuk |
 
 Jika sebuah dokumen "ingin" menjelaskan fakta milik dokumen lain → ganti dengan satu kalimat rujukan.
 
@@ -54,7 +55,7 @@ Jika sebuah dokumen "ingin" menjelaskan fakta milik dokumen lain → ganti denga
 5. **Zero duplikasi** (Hukum 2).
 6. **Bahasa**: narasi Bahasa Indonesia; identifier, nama file, kode, dan istilah teknis tetap Inggris standar.
 7. **Isi nyata, bukan placeholder.** Celah yang belum pasti ditandai `[ASUMSI]` / `[TERBUKA]`, jangan `{{kosong}}`.
-8. **Dokumen turunan boleh menyusut (Hukum 4 > kelengkapan kosmetik).** Jika sebuah dokumen turunan (16, 17, 19, 23, 25) isinya 100% mengikuti default/konvensi tanpa keputusan atau fakta khusus proyek, tulis sebagai **stub ringkas + pointer** ke pemiliknya (mis. `Ikuti alur baku 19_TASK_TEMPLATE; tak ada penyimpangan proyek.`), bukan halaman penuh. Slot 28 tetap ada — jangan menggemukkan dokumen hanya agar "terlihat lengkap". Pengecualian: 23 yang memuat kriteria terima nyata per-fitur biasanya TIDAK memenuhi syarat kolaps. Contoh stub: lihat `references/contoh-keluaran.md`.
+8. **Dokumen turunan boleh menyusut (Hukum 4 > kelengkapan kosmetik).** Jika sebuah dokumen turunan (16, 17, 19, 23, 25) isinya 100% mengikuti default/konvensi tanpa keputusan atau fakta khusus proyek, tulis sebagai **stub ringkas + pointer** ke pemiliknya (mis. `Ikuti alur baku 19_TASK_TEMPLATE; tak ada penyimpangan proyek.`), bukan halaman penuh. Slot 29 tetap ada — jangan menggemukkan dokumen hanya agar "terlihat lengkap". Pengecualian: 23 yang memuat kriteria terima nyata per-fitur biasanya TIDAK memenuhi syarat kolaps. Khusus 26 (pemilik, bukan turunan): boleh kolaps bila memakai design system/template standar tanpa penyimpangan; stub satu baris bila aplikasi tanpa UI. Contoh stub: lihat `references/contoh-keluaran.md`.
 9. **Anggaran ukuran per klaster (tegakkan Hukum 4 saat menulis).** Plafon **lunak**; lampaui hanya bila tiap baris tambahan lulus uji *"jika dihapus, apakah agen keliru?"*.
 
 | Klaster | Plafon lunak per dokumen |
@@ -65,12 +66,13 @@ Jika sebuah dokumen "ingin" menjelaskan fakta milik dokumen lain → ganti denga
 | Kualitas/Operasi 13–16 | ≤1 halaman; boleh dikolaps/digabung (lihat #8) |
 | Perilaku-Agen 17–22 | generik & ringkas (≤½–1 halaman); 17/19 stub bila tanpa penyimpangan |
 | Gerbang 23–25 | 23 per-fitur; 24/25 ≤1 halaman |
+| Antarmuka 26 | ≤1 halaman; stub bila tanpa UI / kolaps bila tanpa penyimpangan template |
 | CLAUDE.md | ≤ ~40 baris (inti + pointer) |
 | INDEX.md | tabel rute + indeks 1 baris/dokumen; tanpa narasi |
 
 ---
 
-## 3. Template 00–25
+## 3. Template 00–26
 
 Tiap template: tujuan (1 baris) → bagian wajib → catatan kepemilikan/ukuran. Isi DARI `_MANIFEST.json`.
 
@@ -155,14 +157,20 @@ Bagian: Alur git/branch · Siapa boleh merge · **Daftar operasi irreversibel + 
 
 ### Klaster Gerbang Selesai (23–25)
 
-**23_ACCEPTANCE_CRITERIA.md** — Diturunkan (01+07).
-Bagian: Per fitur MVP → kriteria terima dalam format Given/When/Then atau checklist · **Blok verifikasi** (perintah + sinyal lulus). Rujuk DoD (24).
+**23_ACCEPTANCE_CRITERIA.md** — Diturunkan (01+07; +26 bila ber-UI).
+Bagian: Per fitur MVP → kriteria terima dalam format Given/When/Then atau checklist · **Blok verifikasi** (perintah + sinyal lulus). Rujuk DoD (24). Fitur ber-UI: sertakan kriteria antarmuka yang dapat diperiksa (state kosong tampil, validasi muncul, layak di breakpoint minimum — pola → rujuk 26).
 
 **24_DEFINITION_OF_DONE.md** — Pemilik DoD universal.
 Bagian: Checklist "selesai" berlaku semua task (kriteria terima terpenuhi · tes hijau · tanpa regresi · sesuai konvensi 12 · tak melanggar guardrail 20/21).
 
 **25_RELEASE_CHECKLIST.md** — Diturunkan (22).
 Bagian: Langkah rilis **berurutan** (tes → migrasi tervalidasi → backup → deploy → smoke test) · Kriteria lulus tiap langkah · Prosedur rollback (rujuk 22).
+
+### Klaster Antarmuka (26)
+
+**26_UI_DESIGN.md** — Pemilik fakta antarmuka. **Sumber kebenaran desain UI.**
+Bagian: Design system & komponen kanonik (kerangka komponen/CSS — versi tetap milik 09; daftar komponen wajib pakai; larangan membuat komponen tandingan) · Token visual ringkas (warna primer + warna status, tipografi, spacing — bila memakai tema/template standar cukup satu baris "ikuti tema default X") · Inventaris layar (tabel: layar | route | peran | tujuan) + struktur navigasi/menu (hak akses → rujuk 05; alur → rujuk 06) · Pola layar baku (list-detail-form, penempatan aksi, aksi destruktif wajib konfirmasi — selaras friksi-irreversibilitas 22) · UI states wajib per layar data (loading · kosong · error · sukses) + UX validasi form (teks pesan → rujuk 14) · Target perangkat & breakpoint minimum · Bahasa antarmuka & aksesibilitas (boleh `[TERBUKA]` pasca-MVP).
+Tanpa UI (API/CLI/daemon) → stub satu baris + `"ui": null` di manifest. Template standar tanpa penyimpangan → boleh kolaps (rubrik #8). 23 merujuk ke sini untuk kriteria antarmuka.
 
 ---
 
@@ -188,6 +196,9 @@ File ini selalu aktif. Untuk hal di luar ini → buka INDEX.md.
 
 ## Struktur & konvensi  (sumber: docs/12)
 {2–4 aturan terpenting}
+
+## UI  (sumber: docs/26; lewati bila tanpa UI)
+{design system + 1–2 aturan antarmuka terpenting}
 
 ## Perintah penting  (sumber: docs/11)
 {4 perintah paling sering, WAJIB termasuk perintah verifikasi: run, **test**, migrasi ⚠️, build. Rute task pun memuat docs/11 saat menghasilkan kode.}
@@ -220,7 +231,8 @@ Esensi 17_AGENT_WORKFLOW (alur per-task) & 19_TASK_TEMPLATE (format task) sudah 
 ## Rute: jenis task → dokumen
 | Jenis task | Muat | Catatan |
 |---|---|---|
-| Fitur baru (vertical slice) | 01,02,04,06,07,11,13,23,24 | cek 02 dulu; +05 bila sentuh peran/izin; 19 utk format task |
+| Fitur baru (vertical slice) | 01,02,04,06,07,11,13,23,24 | cek 02 dulu; +05 bila sentuh peran/izin; +26 bila slice ber-UI; 19 utk format task |
+| Halaman/komponen UI baru | 01,05,06,11,26,23,24 | ikuti pola & states di 26; jangan buat komponen tandingan |
 | Ubah skema DB / migrasi | 04,07,11,13,22,24 | ⚠️ irreversibel; 22 wajib; 11 utk migrasi+verifikasi |
 | Perbaikan bug | 11,13,14,16,18 | jangan lewat scope bug; 11 utk repro+tes regresi |
 | Endpoint/API baru | 06,07,08,11,13,21 | 21 bila sensitif |
@@ -233,7 +245,7 @@ Esensi 17_AGENT_WORKFLOW (alur per-task) & 19_TASK_TEMPLATE (format task) sudah 
 | Strategi/scope | 00,01,02,03 | tanpa kode |
 
 ## Indeks lengkap
-{satu baris per dokumen 00–25}
+{satu baris per dokumen 00–26}
 
 ## Aturan emas
 1. Ragu? Muat paling sedikit dulu, eskalasi bila kurang.
@@ -245,7 +257,7 @@ Esensi 17_AGENT_WORKFLOW (alur per-task) & 19_TASK_TEMPLATE (format task) sudah 
 
 Path dalam rute = `docs/NN_NAME.md`.
 
-> Catatan dua peta: tabel rute di atas adalah **peta pemuatan** (jenis task → dokumen mana yang dibaca agen). Ini sengaja berbeda dari **peta penggalian** di `references/protokol-wawancara.md` (kategori K1–K8 → dokumen mana yang diisi). Satu memetakan *baca-saat-kerja*, satunya *isi-saat-wawancara*; keduanya tidak harus identik.
+> Catatan dua peta: tabel rute di atas adalah **peta pemuatan** (jenis task → dokumen mana yang dibaca agen). Ini sengaja berbeda dari **peta penggalian** di `references/protokol-wawancara.md` (kategori K1–K9 → dokumen mana yang diisi). Satu memetakan *baca-saat-kerja*, satunya *isi-saat-wawancara*; keduanya tidak harus identik.
 
 ## 6. Skema `_MANIFEST.json`
 
@@ -265,6 +277,7 @@ State bersama untuk konsistensi & pembaruan. Ditulis di Fase 3 sebelum dokumen l
     "sensitive_data": [],
     "stack": { "backend": "", "frontend": "", "db": "", "versions": {}, "forbidden": [] },
     "architecture": { "pattern": "", "integrations": [] },
+    "ui": { "design_system": "", "screens": [{ "name": "", "route": "", "roles": [] }], "navigation": "", "states": [], "device_targets": "", "language": "", "accessibility": "" },
     "environment": { "os": "", "services": [], "commands": {} },
     "testing": "", "security": [], "acceptance": "", "definition_of_done": "",
     "change_policy": { "git": "", "irreversible_ops": [], "release_steps": [] }
@@ -276,7 +289,7 @@ State bersama untuk konsistensi & pembaruan. Ditulis di Fase 3 sebelum dokumen l
     "project_structure": "12", "testing": "13", "error_handling": "14",
     "observability": "15", "landmines": "16", "repair_rules": "18", "guardrails": "20",
     "security": "21", "change_policy": "22",
-    "definition_of_done": "24"
+    "definition_of_done": "24", "ui": "26"
   },
   "landmines": [],
   "assumptions": [],

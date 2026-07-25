@@ -6,7 +6,7 @@
 
 **VCBD (Vibe Coding Blueprint Drafter)** adalah sebuah sistem dan panduan *blueprint* terstruktur yang dirancang khusus untuk mempersiapkan konteks proyek sebelum melakukan *vibe coding* menggunakan agen AI seperti Claude Code. 
 
-Sistem ini membantu Anda merumuskan ide aplikasi menjadi **paket 28 dokumen blueprint baku** (bernomor `00` hingga `25`, plus `CLAUDE.md` dan `INDEX.md`) yang konsisten, hemat token, dan bebas dari kontradiksi internal.
+Sistem ini membantu Anda merumuskan ide aplikasi menjadi **paket 29 dokumen blueprint baku** (bernomor `00` hingga `26`, plus `CLAUDE.md` dan `INDEX.md`) yang konsisten, hemat token, dan bebas dari kontradiksi internal.
 
 ---
 
@@ -24,7 +24,7 @@ Sistem ini membantu Anda merumuskan ide aplikasi menjadi **paket 28 dokumen blue
 |---|---|
 | 🚦 Tanya dulu, baru kerja | AI mewawancarai Anda & **menunggu Anda bilang "ya"** sebelum menulis — tidak ada kejutan. |
 | 🗂️ Satu fakta, satu rumah | Tiap info ditulis di **satu file** saja; yang lain cukup menunjuk. Kalau ada perubahan, cukup ubah satu tempat. |
-| 🔦 Buka seperlunya | AI tidak membuka 28 dokumen sekaligus (bikin buyar). Rata-rata cuma **~4 dokumen per pekerjaan** — hemat & fokus. |
+| 🔦 Buka seperlunya | AI tidak membuka 29 dokumen sekaligus (bikin buyar). Rata-rata cuma **~4 dokumen per pekerjaan** — hemat & fokus. |
 | ✅ Cara uji yang jelas | Bukan "pokoknya jalan", tapi *"jalankan perintah ini, lulus kalau muncul ini"* — AI bisa memeriksa kerjanya sendiri. |
 | 🛡️ Aman menimpa proyek lama | Tidak asal timpa file yang sudah ada; ditawarkan backup/gabung/simpan terpisah dulu. |
 
@@ -39,7 +39,13 @@ Sistem ini membantu Anda merumuskan ide aplikasi menjadi **paket 28 dokumen blue
 | **R5** | Daftar perintah penting kini ikut terbuka di setiap pekerjaan yang menghasilkan kode. |
 | **R6** | Ada **batas ukuran** dokumen supaya tetap padat, tidak bertele-tele. |
 
-**Kapan cocok dipakai?** ✅ Proyek yang akan dipelihara, agak besar, banyak peran/tabel, atau memperbaiki sistem lama (di mana salah = mahal). ❌ Kurang cocok untuk corat-coret cepat / prototipe sekali buang (28 dokumen jadi kebanyakan).
+**Apa yang baru di v1.2** (1 rumah baru):
+
+| | Sekarang lebih baik karena… |
+|---|---|
+| **U1** | Desain tampilan (UI) kini punya **rumah resmi**: dokumen `26_UI_DESIGN`. Warna, daftar halaman, navigasi, dan keadaan layar dicatat sekali — AI tidak lagi mengarang tampilan yang berbeda-beda tiap sesi. Aplikasi tanpa tampilan (API/CLI)? Dokumen ini cukup satu baris. |
+
+**Kapan cocok dipakai?** ✅ Proyek yang akan dipelihara, agak besar, banyak peran/tabel, atau memperbaiki sistem lama (di mana salah = mahal). ❌ Kurang cocok untuk corat-coret cepat / prototipe sekali buang (29 dokumen jadi kebanyakan).
 
 > **Intinya:** VCBD membuat AI ngoding jadi **terarah, hemat perhatian, dan tidak gampang salah** — kebutuhan digali dulu, fakta tidak bertabrakan, dan AI selalu tahu *dokumen mana yang dibaca* dan *bagaimana mengeceknya*.
 
@@ -76,7 +82,7 @@ VCBD menyelesaikan kedua masalah ini dengan pendekatan **"Gali & Konfirmasi Dulu
 * Memastikan input minimal tersedia (Nama Aplikasi & Deskripsi Umum).
 
 ### 2. Fase 1 — Wawancara Penggalian
-* Mengajukan pertanyaan bertahap (maksimal 3-4 pertanyaan per ronde) berdasarkan bank pertanyaan **K1–K8** di [protokol-wawancara.md](references/protokol-wawancara.md).
+* Mengajukan pertanyaan bertahap (maksimal 3-4 pertanyaan per ronde) berdasarkan bank pertanyaan **K1–K9** di [protokol-wawancara.md](references/protokol-wawancara.md).
 * Menyertakan usulan default yang cerdas agar pengguna cukup menyetujui atau mengoreksi.
 
 ### 3. Fase 2 — Konfirmasi (Gerbang Keras)
@@ -85,7 +91,7 @@ VCBD menyelesaikan kedua masalah ini dengan pendekatan **"Gali & Konfirmasi Dulu
 
 ### 4. Fase 3 — Generasi
 * Membuat berkas internal `_MANIFEST.json` terlebih dahulu sebagai penyimpan status (*state*).
-* Menulis 28 dokumen terstruktur ke dalam folder `docs/` dengan mematuhi prinsip ekonomi token.
+* Menulis 27 dokumen bernomor ke dalam folder `docs/` (plus `CLAUDE.md` dan `INDEX.md` di root) dengan mematuhi prinsip ekonomi token.
 
 ### 5. Fase 4 — Serah Terima
 * Menyediakan panduan penggunaan dokumen kepada pengguna untuk diumpankan ke sesi baru Claude Code.
@@ -94,7 +100,7 @@ VCBD menyelesaikan kedua masalah ini dengan pendekatan **"Gali & Konfirmasi Dulu
 
 ## 📂 Struktur Dokumen VCBD
 
-Berikut adalah daftar 28 dokumen hasil bentukan VCBD yang dikelompokkan berdasarkan klaster fungsinya:
+Berikut adalah daftar 29 dokumen hasil bentukan VCBD yang dikelompokkan berdasarkan klaster fungsinya:
 
 ### 📁 Root Proyek
 * **[CLAUDE.md](references/template-dokumen.md#4-template-claudemd)**: Dokumen instruksi inti selalu-aktif (sangat ringkas, hanya memuat rujukan).
@@ -139,6 +145,10 @@ Berikut adalah daftar 28 dokumen hasil bentukan VCBD yang dikelompokkan berdasar
 * `24_DEFINITION_OF_DONE.md` — Definisi "Selesai" universal yang berlaku untuk semua tugas.
 * `25_RELEASE_CHECKLIST.md` — Langkah-langkah perilisan produksi berurutan bersyarat konfirmasi manusia.
 
+#### 🔹 Klaster Antarmuka (26)
+
+* `26_UI_DESIGN.md` — Sumber kebenaran desain antarmuka: design system & komponen kanonik, inventaris layar & navigasi, pola layar baku, UI states wajib, target perangkat, bahasa & aksesibilitas. **Stub bila aplikasi tanpa UI.**
+
 #### 🔹 Berkas Pendukung Internal
 * `docs/_MANIFEST.json` — Status internal terstruktur dari kebutuhan yang disepakati untuk keperluan sinkronisasi berkas dokumen.
 
@@ -146,7 +156,7 @@ Berikut adalah daftar 28 dokumen hasil bentukan VCBD yang dikelompokkan berdasar
 
 ## 🛠️ Cara Penggunaan dengan Claude Code
 
-1. Jalankan skill VCBD untuk menghasilkan paket 28 dokumen di atas.
+1. Jalankan skill VCBD untuk menghasilkan paket 29 dokumen di atas.
 2. Ketika dokumen selesai dibuat, buat **sesi Claude Code baru** (menggunakan *context* bersih).
 3. Jalankan prompt awal seperti berikut:
    ```text
@@ -161,6 +171,6 @@ Berikut adalah daftar 28 dokumen hasil bentukan VCBD yang dikelompokkan berdasar
 ## 📋 Dokumen Terkait
 
 * [SKILL.md](SKILL.md) — Aturan operasional lengkap dan perilaku agen VCBD.
-* [protokol-wawancara.md](references/protokol-wawancara.md) — Bank pertanyaan K1-K8 dan panduan wawancara.
-* [template-dokumen.md](references/template-dokumen.md) — Spesifikasi template rinci untuk seluruh 28 dokumen.
+* [protokol-wawancara.md](references/protokol-wawancara.md) — Bank pertanyaan K1-K9 dan panduan wawancara.
+* [template-dokumen.md](references/template-dokumen.md) — Spesifikasi template rinci untuk seluruh 29 dokumen.
 * [contoh-keluaran.md](references/contoh-keluaran.md) — Contoh konkret keluaran (*golden output*) potongan dokumen kunci sebagai patokan gaya & kepadatan.

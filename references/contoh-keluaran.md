@@ -1,6 +1,6 @@
 # Contoh Keluaran VCBD (golden output)
 
-Tujuan file ini: satu contoh **kecil tapi nyata** agar agen punya patokan konkret saat menulis 28 dokumen — bukan menebak dari deskripsi template. Dibaca opsional di Fase 3 ketika butuh anchor gaya/kepadatan. Contoh dipangkas (hanya potongan dokumen kunci), bukan paket 28 lengkap.
+Tujuan file ini: satu contoh **kecil tapi nyata** agar agen punya patokan konkret saat menulis 29 dokumen — bukan menebak dari deskripsi template. Dibaca opsional di Fase 3 ketika butuh anchor gaya/kepadatan. Contoh dipangkas (hanya potongan dokumen kunci), bukan paket 29 lengkap.
 
 Aplikasi contoh: **PRESQU** — pencatatan kehadiran pegawai via scan QR harian. Stack: Laravel 11 + Blade + MySQL 8. Greenfield, 2 peran (admin, pegawai).
 
@@ -22,6 +22,7 @@ Aplikasi contoh: **PRESQU** — pencatatan kehadiran pegawai via scan QR harian.
 | Data sensitif | NIP (PII), foto pegawai → akses per peran; tanpa hard-delete data absensi |
 | Stack & versi | Laravel 11, PHP 8.3, Blade, MySQL 8; Terlarang: jQuery |
 | Arsitektur & integrasi | Monolit modular berlapis (Controller tipis → Service); tanpa integrasi eksternal di MVP |
+| Antarmuka (UI) | Blade + Bootstrap 5 tema default; layar: login, scan (mobile-first), rekap, kelola pegawai; id-ID |
 | Lingkungan & perintah | Ubuntu + Nginx; php artisan serve / test / migrate |
 | Tes & keamanan | Feature test alur scan; semua input divalidasi; otorisasi per peran |
 | Definisi terima/selesai | Kriteria per fitur (lihat 23) + tes hijau + tanpa regresi |
@@ -33,7 +34,7 @@ Aplikasi contoh: **PRESQU** — pencatatan kehadiran pegawai via scan QR harian.
 [TERBUKA] (sengaja ditunda)
 - Notifikasi keterlambatan via WhatsApp — pasca-MVP
 
-Konfirmasi: generate 28 dokumen blueprint dengan ringkasan di atas?
+Konfirmasi: generate 29 dokumen blueprint dengan ringkasan di atas?
 Jawab "ya" atau koreksi bagian yang salah.
 ```
 
@@ -65,11 +66,13 @@ Ditulis lebih dulu di Fase 3; menjadi sumber semua dokumen.
     ],
     "sensitive_data": ["nip (PII)", "foto pegawai"],
     "stack": { "backend": "Laravel 11 / PHP 8.3", "frontend": "Blade", "db": "MySQL 8",
-               "versions": { "laravel": "11", "php": "8.3" }, "forbidden": ["jQuery"] }
+               "versions": { "laravel": "11", "php": "8.3" }, "forbidden": ["jQuery"] },
+    "ui": { "design_system": "Bootstrap 5 (tema default)", "screens": [{ "name": "Scan QR", "route": "/scan", "roles": ["pegawai"] }],
+            "device_targets": "desktop-first; /scan mobile-first", "language": "id-ID" }
   },
   "canonical_owners": {
     "schema": "07", "roles": "05", "commands": "11",
-    "repair_rules": "18", "guardrails": "20", "security": "21"
+    "repair_rules": "18", "guardrails": "20", "security": "21", "ui": "26"
   },
   "assumptions": ["Jendela scan masuk 06:00–09:00, pulang 14:00–18:00 WITA"],
   "open_questions": ["Notifikasi keterlambatan via WhatsApp — pasca-MVP"]
@@ -182,3 +185,30 @@ Tanpa penyimpangan proyek. Gunakan format baku: Judul · Dokumen dimuat · Krite
 ```
 
 Bandingkan: `docs/07` (di atas) **tidak** boleh dikolaps — ia memuat fakta proyek nyata. Kolaps hanya untuk turunan yang 100% default.
+
+---
+
+## G. `docs/26_UI_DESIGN.md` (pemilik fakta antarmuka — padat, table-driven)
+
+```markdown
+# 26 — UI Design
+Sumber kebenaran antarmuka. Versi teknologi → docs/09.
+
+Design system: Bootstrap 5 tema default. Komponen wajib: table, form, alert, badge, modal — JANGAN buat komponen tandingan.
+Token: warna status → hijau=hadir, kuning=terlambat, merah=tidak hadir. Selebihnya ikut default Bootstrap.
+
+| Layar | Route | Peran | Tujuan |
+|---|---|---|---|
+| Login | /login | semua | autentikasi |
+| Scan QR | /scan | pegawai | rekam kehadiran (mobile-first) |
+| Rekap Harian | /admin/rekap | admin | pantau & ekspor CSV |
+| Kelola Pegawai | /admin/employees | admin | CRUD pegawai |
+
+Navigasi: navbar atas; item menu per peran → docs/05.
+Pola: list-detail-form untuk CRUD; aksi destruktif wajib modal konfirmasi (selaras docs/22).
+States wajib layar data: loading · kosong ("Belum ada data") · error (teks → docs/14) · sukses.
+Perangkat: desktop-first, layak ≤768px; khusus /scan mobile-first (dipakai di ponsel).
+Bahasa: id-ID. Aksesibilitas: [TERBUKA] pasca-MVP.
+```
+
+Perhatikan: layar diturunkan dari fitur MVP (bagian A), bukan dikarang; akses menu tidak disalin dari docs/05, hanya dirujuk.
