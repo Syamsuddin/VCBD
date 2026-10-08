@@ -4,7 +4,9 @@ Entri terbaru di atas. Versi tiap skill mengikuti `metadata.version` di `SKILL.m
 
 ---
 
-## Suite 2026.10 — 8 Oktober 2026
+## Suite 2026.10 — 8 Oktober 2026 (tag `v2.6`)
+
+Rilis GitHub: [v2.6](https://github.com/Syamsuddin/VCBD/releases/tag/v2.6) — kode sumber + zip per skill untuk claude.ai.
 
 | Skill | Versi | Sebelumnya | Status |
 |---|---|---|---|

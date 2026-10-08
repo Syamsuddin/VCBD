@@ -87,7 +87,7 @@ Dalam mode headless (`claude -p`), skill lokal butuh izin per pemanggilan, misal
 
 ## claude.ai
 
-Buat satu zip per skill dari root repo:
+Zip per skill siap pakai tersedia di halaman [rilis v2.6](https://github.com/Syamsuddin/VCBD/releases/tag/v2.6) (`vcbd.zip`, `coding-vcbd.zip`, `review-vcbd.zip`, `reverse-vcbd.zip`, `reverse-web-vcbd.zip`). Atau buat sendiri dari root repo:
 
 ```bash
 bash scripts/kemas.sh        # hasil: dist/<skill>.zip — berisi SKILL.md, README.md, LICENSE, references/, scripts/
