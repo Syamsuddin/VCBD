@@ -2,175 +2,81 @@
   <img src="assets/img/header-vcbd.jpg" alt="VCBD — Vibe Coding Blueprint Drafter" width="100%">
 </p>
 
-# VCBD — Vibe Coding Blueprint Drafter
+# VCBD Suite — Vibe Coding Blueprint Drafter
 
-**VCBD (Vibe Coding Blueprint Drafter)** adalah sebuah sistem dan panduan *blueprint* terstruktur yang dirancang khusus untuk mempersiapkan konteks proyek sebelum melakukan *vibe coding* menggunakan agen AI seperti Claude Code. 
+Lima skill Claude Code yang membentuk **satu lingkaran penuh** siklus hidup aplikasi: dari ide atau aplikasi warisan, menjadi blueprint, menjadi kode, lalu kode yang diaudit dan ditambal.
 
-Sistem ini membantu Anda merumuskan ide aplikasi menjadi **paket 29 dokumen blueprint baku** (bernomor `00` hingga `26`, plus `CLAUDE.md` dan `INDEX.md`) yang konsisten, hemat token, dan bebas dari kontradiksi internal.
+```
+  aplikasi web lama ──► reverse-web-vcbd ─┐
+  (hanya peramban)        bedah kotak hitam│
+                                           ▼
+  aplikasi lama ──────► reverse-vcbd ──► vcbd ──► coding-vcbd ──► review-vcbd
+  (ada kode)             bedah &          blueprint   bangun         audit,
+                         buktikan         28+ dok     per slice      uji, tambal
+                                           ▲                            │
+  ide baru ────────────────────────────────┘                            │
+  (greenfield)                       temuan & perubahan ────────────────┘
+                                     (Mode Pembaruan vcbd)
+```
+
+Penulis: Syamsuddin · Bahasa: Indonesia
 
 ---
 
-## 🧑‍🌾 Untuk Orang Awam (penjelasan sederhana)
+## Isi suite
 
-> Bayangkan Anda menyuruh tukang (AI seperti Claude Code) membangun rumah. **VCBD adalah pembuat "gambar kerja" rumah itu** — lengkap, rapi, dan tidak saling bertentangan — supaya tukang tidak salah bangun. Tanpa gambar kerja, tukang menebak; menebak = sering salah = bongkar ulang.
+| Skill | Versi | Peran | Mulai dari sini bila… |
+|---|---|---|---|
+| [`vcbd`](skills/vcbd/) | 2.6 | Menyusun paket blueprint 28+ dokumen dari wawancara bertahap | Aplikasi belum ada, baru ide |
+| [`coding-vcbd`](skills/coding-vcbd/) | 1.2 | Mengeksekusi blueprint menjadi aplikasi, satu vertical slice demi slice, dengan gerbang DoD mesin | Blueprint sudah ada, coding belum mulai |
+| [`review-vcbd`](skills/review-vcbd/) | 1.2 | Mengaudit, menguji, melacak bug, dan menambal terhadap blueprint (Dosir Temuan berbukti `path:baris`) | Kode sudah ada, ingin tahu di mana ia menyimpang |
+| [`reverse-vcbd`](skills/reverse-vcbd/) | 1.0 | Membedah aplikasi brownfield (ada kode) menjadi dosir bukti, lalu mengisi paket blueprint | Aplikasi sudah ada, dokumennya tidak ada |
+| [`reverse-web-vcbd`](skills/reverse-web-vcbd/) | 2.0 | Membedah aplikasi web secara kotak hitam (HAR/HTML dari peramban) menjadi dosir dan draf manifest | Aplikasinya hanya bisa dibuka lewat peramban |
 
-**Dua masalah yang dipecahkan:**
-1. **Salah bangun** — sering kita langsung nyuruh AI ngoding padahal kebutuhannya belum jelas, hasilnya jadi tapi bukan yang kita mau. VCBD memaksa *"gali dulu, baru tulis"*.
-2. **Dokumen bertabrakan** — kalau dokumennya banyak, bahayanya bukan kurang dokumen, tapi isinya beda-beda (satu file bilang "pakai MySQL", file lain "pakai Postgres"). AI bingung lalu salah pilih. VCBD memakai prinsip *"satu fakta, satu rumah"* agar tiap info hanya ditulis di satu tempat.
+## Paket blueprint yang dihasilkan `vcbd`
 
-**Keunggulan utama (bahasa sederhana):**
+**28 dokumen inti**: `docs/00`–`25` + `CLAUDE.md` (inti selalu-aktif) + `INDEX.md` (router konteks), ditambah dua dokumen kondisional:
 
-| Fitur | Artinya untuk Anda |
+- `docs/26_UI_CONVENTIONS.md` — hanya proyek ber-UI: tabel token desain (nilai di luar tabel terlarang), inventaris komponen, peta halaman→pola, breakpoint minimum, empat state wajib, aksesibilitas dasar, larangan UI.
+- `docs/27_API_CONTRACT.md` — hanya mode SPLIT backend/frontend; endpoint dan payload hidup di `kontrak/openapi.yaml`.
+
+Kerangka dokumen ditulis deterministik oleh `scripts/scaffold.py`, dan konsistensinya diuji `scripts/validate.sh` (11 cek). Daftar lengkap dan isi tiap dokumen ada di [`skills/vcbd/references/template-dokumen.md`](skills/vcbd/references/template-dokumen.md).
+
+## Untuk orang awam
+
+> Bayangkan Anda menyuruh tukang (AI seperti Claude Code) membangun rumah. **VCBD adalah pembuat "gambar kerja"** — lengkap, rapi, dan tidak saling bertentangan — supaya tukang tidak salah bangun. Suite ini menambah mandor (`coding-vcbd`) yang memastikan rumah dibangun sesuai gambar, satu ruangan demi satu ruangan, dan pengawas (`review-vcbd`) yang memeriksa hasilnya dengan bukti.
+
+| Prinsip | Artinya untuk Anda |
 |---|---|
-| 🚦 Tanya dulu, baru kerja | AI mewawancarai Anda & **menunggu Anda bilang "ya"** sebelum menulis — tidak ada kejutan. |
-| 🗂️ Satu fakta, satu rumah | Tiap info ditulis di **satu file** saja; yang lain cukup menunjuk. Kalau ada perubahan, cukup ubah satu tempat. |
-| 🔦 Buka seperlunya | AI tidak membuka 29 dokumen sekaligus (bikin buyar). Rata-rata cuma **~4 dokumen per pekerjaan** — hemat & fokus. |
-| ✅ Cara uji yang jelas | Bukan "pokoknya jalan", tapi *"jalankan perintah ini, lulus kalau muncul ini"* — AI bisa memeriksa kerjanya sendiri. |
-| 🛡️ Aman menimpa proyek lama | Tidak asal timpa file yang sudah ada; ditawarkan backup/gabung/simpan terpisah dulu. |
+| Tanya dulu, baru kerja | AI mewawancarai Anda dan **menunggu Anda bilang "ya"** sebelum menulis. |
+| Satu fakta, satu rumah | Tiap info ditulis di satu dokumen saja; yang lain cukup menunjuk. Ubah sekali, beres. |
+| Buka seperlunya | `INDEX.md` menunjuk dokumen mana yang dibaca per pekerjaan — hemat token, fokus. |
+| Gerbang mesin, bukan harapan | "Selesai" berarti perintah uji dijalankan dan lulus (`validate.sh`, `gerbang.sh`, `pindai.py`), bukan "katanya sudah". |
+| Tidak ada klaim tanpa bukti | Temuan membawa `path:baris`; yang belum pasti berlabel `[ASUMSI]`/`[TERBUKA]`. |
 
-**Apa yang baru & lebih baik di v1.1** (hasil pemeriksaan mutu — 6 perbaikan):
+## Pasang
 
-| | Sekarang lebih baik karena… |
-|---|---|
-| **R1** | Saat bikin fitur baru, AI sekalian dibukakan cara mengetes — jadi bisa langsung uji hasilnya. |
-| **R2** | Satu dokumen yang tadinya tak pernah dipakai kini diperjelas statusnya — tidak jadi beban sia-sia. |
-| **R3** | Kalau dokumen beda dengan kode asli, **kode asli yang menang** — AI wajib berhenti & lapor, bukan ikut dokumen basi. (penting untuk proyek lama) |
-| **R4** | Ada tempat khusus mencatat **"jebakan"** — hal yang kelihatan benar tapi menyesatkan (sering ada di sistem lama). |
-| **R5** | Daftar perintah penting kini ikut terbuka di setiap pekerjaan yang menghasilkan kode. |
-| **R6** | Ada **batas ukuran** dokumen supaya tetap padat, tidak bertele-tele. |
+Ringkas (Claude Code, global):
 
-**Apa yang baru di v1.2** (1 rumah baru):
+```bash
+git clone https://github.com/Syamsuddin/VCBD.git
+mkdir -p ~/.claude/skills && cp -r VCBD/skills/* ~/.claude/skills/
+```
 
-| | Sekarang lebih baik karena… |
-|---|---|
-| **U1** | Desain tampilan (UI) kini punya **rumah resmi**: dokumen `26_UI_DESIGN`. Warna, daftar halaman, navigasi, dan keadaan layar dicatat sekali — AI tidak lagi mengarang tampilan yang berbeda-beda tiap sesi. Aplikasi tanpa tampilan (API/CLI)? Dokumen ini cukup satu baris. |
+Kelima folder harus bersebelahan karena beberapa skrip dipakai lintas skill. Panduan lengkap — termasuk unggah ke claude.ai dan kebutuhan luar — ada di [INSTALL.md](INSTALL.md).
 
-**Kapan cocok dipakai?** ✅ Proyek yang akan dipelihara, agak besar, banyak peran/tabel, atau memperbaiki sistem lama (di mana salah = mahal). ❌ Kurang cocok untuk corat-coret cepat / prototipe sekali buang (29 dokumen jadi kebanyakan).
+## Urutan pemakaian yang disarankan
 
-> **Intinya:** VCBD membuat AI ngoding jadi **terarah, hemat perhatian, dan tidak gampang salah** — kebutuhan digali dulu, fakta tidak bertabrakan, dan AI selalu tahu *dokumen mana yang dibaca* dan *bagaimana mengeceknya*.
+- **Aplikasi baru:** `vcbd` → `coding-vcbd` → `review-vcbd`; tiap perubahan besar kembali ke Mode Pembaruan `vcbd` supaya dokumen tidak tertinggal dari kode.
+- **Aplikasi warisan dengan kode:** `reverse-vcbd` → `review-vcbd` (mode pindai) → `coding-vcbd`.
+- **Aplikasi web tanpa akses kode:** `reverse-web-vcbd` → `vcbd` (dari draf manifest) → `coding-vcbd`.
 
----
+Setelah blueprint jadi, buka **sesi Claude Code baru** di root proyek dan mulai dengan: *"Baca CLAUDE.md lalu INDEX.md. Kerjakan [task] dengan memuat hanya dokumen yang ditunjuk INDEX, lalu jalankan verifikasinya."*
 
-## 🎯 Mengapa VCBD?
+## Riwayat & asal-usul
 
-Dalam proses *vibe coding*, dua masalah terbesar yang sering terjadi adalah:
-1. **Membangun hal yang salah** akibat kebutuhan awal yang tidak digali secara mendalam.
-2. **Kontradiksi dokumen (*document drift*)** pada paket dokumen besar, yang membingungkan agen AI dan menurunkan kualitas kode hasil generasi.
+Repo ini dulu berisi satu skill (`vcbd` garis v1.x, format 29 dokumen). Mulai rilis suite ini, isinya adalah **sintesis seluruh sumber** VCBD (garis v1.x repo, garis v2.x, rantai coding/review/reverse, dan paket-paket lokal) dengan garis v2.5 sebagai dasar. Rinciannya — sumber mana dipakai untuk apa, dan apa yang digabungkan dari v1.2 — ada di [CHANGELOG.md](CHANGELOG.md). Versi lama tetap utuh di riwayat git (tag `v1.0`, `v1.1`, `v1.2`).
 
-VCBD menyelesaikan kedua masalah ini dengan pendekatan **"Gali & Konfirmasi Dulu, Baru Tulis"** serta prinsip ketat **"Satu Fakta, Satu Rumah"**.
+## Lisensi
 
----
-
-## ⚖️ Empat Hukum Utama (Tidak Bisa Ditawar)
-
-1. **Tidak Ada Generasi Tanpa Konfirmasi**  
-   Wawancarai pengguna terlebih dahulu, sajikan ringkasan kebutuhan, dan tunggu persetujuan eksplisit sebelum menulis dokumen apa pun.
-2. **Satu Fakta, Satu Rumah**  
-   Setiap fakta teknis atau bisnis hanya ditulis secara detail di satu dokumen pemilik kanoniknya. Dokumen lain hanya merujuk (misalnya: `lihat docs/07_DATA_MODEL.md`), tidak menyalin ulang demi mencegah terjadinya *drift*.
-3. **INDEX Me-rute, CLAUDE.md Inti**  
-   `INDEX.md` berfungsi sebagai *router* penunjuk jalan dokumen mana yang harus dimuat untuk tugas tertentu, sedangkan `CLAUDE.md` di root dibuat sangat ringkas dan berisi informasi selalu-aktif. Hal ini mencegah pembengkakan token.
-4. **Setiap Baris Membayar Dirinya & Dapat Diverifikasi**  
-   Hindari deskripsi kabur seperti "pastikan berfungsi". Setiap kriteria harus konkret dengan perintah uji dan indikator kelulusan yang jelas.
-
----
-
-## 🔄 Alur Kerja 5 Fase
-
-### 1. Fase 0 — Triase
-* Mengumpulkan fakta yang sudah ada dari repository (seperti *stack* dari `composer.json` atau `pubspec.yaml`) tanpa bertanya ulang.
-* Menentukan jenis proyek: **Greenfield** (baru) atau **Brownfield** (sistem berjalan).
-* Memastikan input minimal tersedia (Nama Aplikasi & Deskripsi Umum).
-
-### 2. Fase 1 — Wawancara Penggalian
-* Mengajukan pertanyaan bertahap (maksimal 3-4 pertanyaan per ronde) berdasarkan bank pertanyaan **K1–K9** di [protokol-wawancara.md](references/protokol-wawancara.md).
-* Menyertakan usulan default yang cerdas agar pengguna cukup menyetujui atau mengoreksi.
-
-### 3. Fase 2 — Konfirmasi (Gerbang Keras)
-* Menyajikan **Ringkasan Kebutuhan** yang merangkum hasil wawancara, daftar `[ASUMSI]` (asumsi yang akan digunakan jika tidak dikoreksi), dan daftar `[TERBUKA]` (hal yang ditunda).
-* **Wajib** mendapatkan konfirmasi eksplisit (jawaban "Ya" atau koreksi) sebelum lanjut ke Fase Generasi.
-
-### 4. Fase 3 — Generasi
-* Membuat berkas internal `_MANIFEST.json` terlebih dahulu sebagai penyimpan status (*state*).
-* Menulis 27 dokumen bernomor ke dalam folder `docs/` (plus `CLAUDE.md` dan `INDEX.md` di root) dengan mematuhi prinsip ekonomi token.
-
-### 5. Fase 4 — Serah Terima
-* Menyediakan panduan penggunaan dokumen kepada pengguna untuk diumpankan ke sesi baru Claude Code.
-
----
-
-## 📂 Struktur Dokumen VCBD
-
-Berikut adalah daftar 29 dokumen hasil bentukan VCBD yang dikelompokkan berdasarkan klaster fungsinya:
-
-### 📁 Root Proyek
-* **[CLAUDE.md](references/template-dokumen.md#4-template-claudemd)**: Dokumen instruksi inti selalu-aktif (sangat ringkas, hanya memuat rujukan).
-* **[INDEX.md](references/template-dokumen.md#5-template-indexmd)**: *Router* utama bagi AI untuk memuat dokumen secara spesifik sesuai jenis pekerjaan (*tier loading*).
-
-### 📁 Folder `docs/`
-#### 🔹 Klaster Strategis (00–03)
-* `00_EXECUTIVE_SUMMARY.md` — Rangkuman "Kenapa" proyek dibuat (stakeholder level).
-* `01_PRD.md` — Pemilik fitur utama & *user story* (MVP vs *Later*).
-* `02_SCOPE.md` — Batas proyek, berisi in-scope dan minimal 3 out-of-scope eksplisit.
-* `03_ROADMAP.md` — Urutan rilis per fase berupa *vertical slice* (bukan horizontal per layer).
-
-#### 🔹 Klaster Domain (04–07)
-* `04_DOMAIN_MODEL.md` — Glosarium istilah bisnis dan hubungan entitas secara konseptual.
-* `05_USER_ROLE.md` — Daftar peran pengguna beserta matriks otorisasi akses (RBAC).
-* `06_BUSINESS_PROCESS.md` — Alur proses bisnis utama (*happy path* dan alur gagal).
-* `07_DATA_MODEL.md` — Skema database fisik (tabel, kolom, indeks, foreign key). **Satu-satunya sumber kebenaran data.**
-
-#### 🔹 Klaster Fondasi Teknis (08–12)
-* `08_ARCHITECTURE.md` — Diagram arsitektur aplikasi dan tanggung jawab tiap layer.
-* `09_STACK.md` — Detail teknologi, pustaka pihak ketiga, versi, dan teknologi terlarang.
-* `10_DEV_ENV.md` — Prasyarat, instruksi instalasi lokal, dan daftar variabel lingkungan (`.env`).
-* `11_COMMANDS.md` — Tabel perintah lengkap untuk menjalankan, menguji, migrasi, build, dan deploy.
-* `12_PROJECT_STRUCTURE.md` — Struktur pohon folder proyek dan aturan penamaan berkas/kelas.
-
-#### 🔹 Klaster Kualitas & Operasi (13–16)
-* `13_TESTING.md` — Strategi pengujian, cakupan tes, dan jenis tes yang wajib dijalankan.
-* `14_ERROR_HANDLING.md` — Aturan penanganan error (tampilan ramah pengguna vs log detail).
-* `15_OBSERVABILITY.md` — Standar logging, audit trail, format log, dan metrik aplikasi.
-* `16_DEBUGGING_GUIDE.md` — Panduan penanganan masalah umum berdasarkan *observability* dan perintah uji.
-
-#### 🔹 Klaster Perilaku-Agen (17–22)
-* `17_AGENT_WORKFLOW.md` — Panduan alur kerja mandiri agen AI per-task.
-* `18_REPAIR_RULES.md` — Aturan khusus saat memperbaiki bug (mencegah *scope creep* dan refaktor liar).
-* `19_TASK_TEMPLATE.md` — Format standar bagi pengguna untuk memberikan instruksi pekerjaan ke agen AI.
-* `20_GUARDRAILS.md` — Larangan keras operasional (misalnya: anti hardcode rahasia, larangan mematikan validasi).
-* `21_SECURITY_RULES.md` — Aturan otentikasi, otorisasi, validasi, enkripsi, dan keamanan data.
-* `22_CHANGE_POLICY.md` — Alur Git branch, penggabungan (*merge*), rollback, dan operasi irreversibel.
-
-#### 🔹 Klaster Gerbang Selesai (23–25)
-* `23_ACCEPTANCE_CRITERIA.md` — Kriteria penerimaan per fitur MVP dalam format Given/When/Then dengan blok verifikasi.
-* `24_DEFINITION_OF_DONE.md` — Definisi "Selesai" universal yang berlaku untuk semua tugas.
-* `25_RELEASE_CHECKLIST.md` — Langkah-langkah perilisan produksi berurutan bersyarat konfirmasi manusia.
-
-#### 🔹 Klaster Antarmuka (26)
-
-* `26_UI_DESIGN.md` — Sumber kebenaran desain antarmuka: design system & komponen kanonik, inventaris layar & navigasi, pola layar baku, UI states wajib, target perangkat, bahasa & aksesibilitas. **Stub bila aplikasi tanpa UI.**
-
-#### 🔹 Berkas Pendukung Internal
-* `docs/_MANIFEST.json` — Status internal terstruktur dari kebutuhan yang disepakati untuk keperluan sinkronisasi berkas dokumen.
-
----
-
-## 🛠️ Cara Penggunaan dengan Claude Code
-
-1. Jalankan skill VCBD untuk menghasilkan paket 29 dokumen di atas.
-2. Ketika dokumen selesai dibuat, buat **sesi Claude Code baru** (menggunakan *context* bersih).
-3. Jalankan prompt awal seperti berikut:
-   ```text
-   Baca CLAUDE.md lalu INDEX.md. 
-   Untuk mengerjakan task [Nama Task], muat hanya dokumen yang ditunjuk oleh INDEX.md. 
-   Kerjakan tugas tersebut, lalu jalankan verifikasi sesuai dokumen.
-   ```
-4. Claude Code akan membaca `INDEX.md` dan secara otomatis hanya memuat berkas-berkas dokumentasi yang relevan dengan tugas tersebut sehingga menghemat *token window* dan meningkatkan akurasi pengerjaan.
-
----
-
-## 📋 Dokumen Terkait
-
-* [SKILL.md](SKILL.md) — Aturan operasional lengkap dan perilaku agen VCBD.
-* [protokol-wawancara.md](references/protokol-wawancara.md) — Bank pertanyaan K1-K9 dan panduan wawancara.
-* [template-dokumen.md](references/template-dokumen.md) — Spesifikasi template rinci untuk seluruh 29 dokumen.
-* [contoh-keluaran.md](references/contoh-keluaran.md) — Contoh konkret keluaran (*golden output*) potongan dokumen kunci sebagai patokan gaya & kepadatan.
+Berkas [LICENSE](LICENSE) di root repo adalah **GPL-2.0**, dan `skills/vcbd/` membawa salinan lisensinya sendiri. Keempat skill lain belum membawa berkas lisensi terpisah di foldernya.

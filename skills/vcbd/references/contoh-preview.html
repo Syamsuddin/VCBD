@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!-- =====================================================================
+  contoh-preview.html — KERANGKA PREVIEW DESAIN VCBD (v2.4)
+  ATURAN PAKAI (untuk model):
+  1. SALIN file ini, lalu isi HANYA: (a) blok token :root di bawah,
+     (b) teks berpenanda {ISI:...}, (c) baris komponen sesuai inventaris 26.
+  2. STRUKTUR & bagian JANGAN diubah/ditambah — preview merender token,
+     bukan mendesain ulang. Nilai di luar tabel token 26 TERLARANG.
+  3. Bila berbeda dengan docs/26_UI_CONVENTIONS.md, 26 yang MENANG;
+     regenerasi preview dari 26.
+===================================================================== -->
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Preview Desain — {ISI:NAMA_APP}</title>
+<style>
+:root{
+  /* ====== BLOK TOKEN — satu-satunya bagian yang diisi dari tabel 26 ====== */
+  --primer:#495057;        --primer-teks:#ffffff;
+  --netral-bg:#f8f9fa;     --netral-permukaan:#ffffff;
+  --netral-garis:#dee2e6;  --teks:#212529;  --teks-redup:#6c757d;
+  --sukses:#198754; --peringatan:#ffc107; --bahaya:#dc3545; --info:#0dcaf0;
+  --font:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --ukuran-basis:15px; --ukuran-h1:24px; --ukuran-h2:19px;
+  --radius:8px; --bayangan:0 1px 3px rgba(0,0,0,.09);
+  --rapat:10px 14px; /* kepadatan sel/field */
+}
+/* ====== DI BAWAH INI BEKU — jangan diubah ====== */
+*{box-sizing:border-box}body{margin:0;font-family:var(--font);font-size:var(--ukuran-basis);color:var(--teks);background:var(--netral-bg)}
+.wrap{max-width:960px;margin:0 auto;padding:20px}
+.banner{background:var(--primer);color:var(--primer-teks);padding:10px 16px;border-radius:var(--radius);font-size:13px;margin-bottom:18px}
+h1{font-size:var(--ukuran-h1);margin:.2em 0}h2{font-size:var(--ukuran-h2);border-bottom:2px solid var(--primer);padding-bottom:4px;margin-top:28px}
+.grid{display:flex;flex-wrap:wrap;gap:10px}
+.sw{width:120px;border:1px solid var(--netral-garis);border-radius:var(--radius);overflow:hidden;background:var(--netral-permukaan)}
+.sw div{height:44px}.sw span{display:block;padding:6px 8px;font-size:11px;color:var(--teks-redup)}
+.btn{border:0;border-radius:var(--radius);padding:var(--rapat);font-size:var(--ukuran-basis);cursor:pointer}
+.btn-primer{background:var(--primer);color:var(--primer-teks)}.btn-garis{background:transparent;border:1px solid var(--primer);color:var(--primer)}
+.btn-bahaya{background:var(--bahaya);color:#fff}
+.badge{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;color:#fff}
+.kartu{background:var(--netral-permukaan);border:1px solid var(--netral-garis);border-radius:var(--radius);box-shadow:var(--bayangan);padding:16px;margin:10px 0}
+label{display:block;font-size:13px;color:var(--teks-redup);margin-bottom:4px}
+input,select{width:100%;max-width:320px;padding:var(--rapat);border:1px solid var(--netral-garis);border-radius:var(--radius);font-size:var(--ukuran-basis)}
+table{width:100%;border-collapse:collapse;background:var(--netral-permukaan);border-radius:var(--radius);overflow:hidden;box-shadow:var(--bayangan)}
+th{background:var(--primer);color:var(--primer-teks);text-align:left;font-size:13px}
+th,td{padding:var(--rapat);border-bottom:1px solid var(--netral-garis)}
+.state{border:1px dashed var(--netral-garis);border-radius:var(--radius);padding:14px;background:var(--netral-permukaan);flex:1;min-width:200px}
+.state b{display:block;font-size:12px;color:var(--teks-redup);letter-spacing:.5px;margin-bottom:8px}
+.muat{height:10px;border-radius:6px;background:linear-gradient(90deg,var(--netral-garis),var(--netral-bg),var(--netral-garis));background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+.err{color:var(--bahaya)}.ok{color:var(--sukses)}
+</style></head><body><div class="wrap">
+
+<div class="banner"><b>PREVIEW</b> — dirender dari tabel token docs/26_UI_CONVENTIONS.md ·
+Jangkar: {ISI:JANGKAR} · {ISI:TANGGAL} · Bukan desain final halaman; bila beda dengan 26, 26 menang.</div>
+<h1>{ISI:NAMA_APP} — Preview Desain</h1>
+
+<h2>1 · Palet warna (token)</h2>
+<div class="grid">
+<div class="sw"><div style="background:var(--primer)"></div><span>primer {ISI:HEX}</span></div>
+<div class="sw"><div style="background:var(--sukses)"></div><span>sukses {ISI:HEX}</span></div>
+<div class="sw"><div style="background:var(--peringatan)"></div><span>peringatan {ISI:HEX}</span></div>
+<div class="sw"><div style="background:var(--bahaya)"></div><span>bahaya {ISI:HEX}</span></div>
+<div class="sw"><div style="background:var(--info)"></div><span>info {ISI:HEX}</span></div>
+<div class="sw"><div style="background:var(--netral-bg)"></div><span>latar {ISI:HEX}</span></div>
+</div>
+
+<h2>2 · Tipografi</h2>
+<div class="kartu"><h1 style="margin:0">Judul H1 — {ISI:FONT} {ISI:UKURAN}</h1>
+<h2 style="margin:.4em 0;border:0">Judul H2</h2>
+<p style="margin:0">Teks basis. <span style="color:var(--teks-redup)">Teks redup untuk keterangan.</span></p></div>
+
+<h2>3 · Komponen inti (dari inventaris 26)</h2>
+<div class="kartu"><div class="grid" style="align-items:center">
+<button class="btn btn-primer">Simpan</button>
+<button class="btn btn-garis">Batal</button>
+<button class="btn btn-bahaya">Hapus</button>
+<span class="badge" style="background:var(--sukses)">Disetujui</span>
+<span class="badge" style="background:var(--peringatan);color:#333">Menunggu</span>
+<span class="badge" style="background:var(--bahaya)">Ditolak</span>
+</div>
+<div style="margin-top:14px"><label>Nama Pelatihan</label><input value="{ISI:contoh isian}"></div></div>
+
+<h2>4 · Halaman contoh — pola: {ISI:POLA, mis. daftar+filter}</h2>
+<div class="kartu"><div class="grid" style="margin-bottom:10px">
+<input placeholder="Cari…" style="max-width:220px"><select style="max-width:160px"><option>Semua status</option></select>
+<button class="btn btn-primer">Filter</button></div>
+<table><tr><th>{ISI:Kolom}</th><th>{ISI:Kolom}</th><th>Status</th><th>Aksi</th></tr>
+<tr><td>{ISI:data contoh}</td><td>{ISI:data contoh}</td><td><span class="badge" style="background:var(--sukses)">Disetujui</span></td><td><button class="btn btn-garis" style="padding:4px 10px">Detail</button></td></tr>
+<tr><td>{ISI:data contoh}</td><td>{ISI:data contoh}</td><td><span class="badge" style="background:var(--peringatan);color:#333">Menunggu</span></td><td><button class="btn btn-garis" style="padding:4px 10px">Detail</button></td></tr>
+</table></div>
+
+<h2>5 · Empat state wajib</h2>
+<div class="grid">
+<div class="state"><b>KOSONG</b>Belum ada data. <button class="btn btn-primer" style="padding:6px 12px">+ Tambah</button></div>
+<div class="state"><b>MEMUAT</b><div class="muat"></div><div class="muat" style="margin-top:6px;width:70%"></div></div>
+<div class="state"><b>GAGAL</b><span class="err">Gagal memuat data.</span> <button class="btn btn-garis" style="padding:6px 12px">Coba lagi</button></div>
+<div class="state"><b>SUKSES</b><span class="ok">✓ Data tersimpan.</span></div>
+</div>
+
+</div></body></html>
