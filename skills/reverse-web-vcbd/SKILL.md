@@ -2,7 +2,7 @@
 name: "reverse-web-vcbd"
 license: GPL-2.0
 metadata:
-  version: "2.0"
+  version: "2.6"
   author: syamsuddin.ideris@gmail.com
 description: 'Membedah aplikasi web yang sudah berjalan secara KOTAK HITAM (dari peramban, tanpa kode) menjadi dosir bukti dan draf _MANIFEST.json berskema vcbd, siap disusun skill vcbd menjadi blueprint 28 dokumen. Bahan: HAR per peran dan/atau halaman HTML tersimpan. Menarik menu, endpoint, matriks akses per peran, formulir dan enum, entitas teramati, status, kandidat alur, bentuk galat, stack, integrasi, token UI, serta jebakan dan temuan keamanan pasif; data pribadi dan token disaring mesin. WAJIB dipakai saat pengguna ingin menarik blueprint, spesifikasi, alur, atau fitur dari aplikasi web yang hanya bisa dibuka lewat browser, menulis ulang aplikasi vendor/lama, atau membedah file HAR. Pemicu: "reverse engineering aplikasi web ini", "bedah HAR ini", "blueprint dari aplikasi yang sudah jalan", "tiru aplikasi vendor ini", meski kata reverse tak disebut. Ada kode sumber: pakai reverse-vcbd; proyek dari nol: pakai vcbd. Hanya aplikasi yang pengguna berwenang telaah; pengamatan pasif.'
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion

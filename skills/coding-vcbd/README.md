@@ -2,7 +2,7 @@
 
 **Eksekutor blueprint VCBD.** Skill `vcbd` menghasilkan paket 28 dokumen; skill ini mengubah paket itu menjadi aplikasi jadi — satu *vertical slice* demi satu slice, dengan pemuatan dokumen menurut rute `INDEX.md` agar hemat token, gerbang selesai yang diuji mesin, serta laporan counter waktu dan token di akhir tiap step.
 
-Versi 1.2 · Bahasa: Indonesia · Penulis: Syamsuddin (`syamsuddin.ideris@gmail.com`) · Lisensi: GPL-2.0 (lihat `LICENSE`)
+Versi 2.6 · Bahasa: Indonesia · Penulis: Syamsuddin (`syamsuddin.ideris@gmail.com`) · Lisensi: GPL-2.0 (lihat `LICENSE`)
 
 ---
 
@@ -141,7 +141,7 @@ Efeknya terasa pada proyek panjang: rute *Fitur baru* memuat 6 dokumen, bukan 28
 - Tidak melonggarkan tes, validasi, atau otorisasi agar gerbang lulus. Bila gerbang hanya bisa lulus dengan cara itu, skill berhenti dan bertanya.
 - Tidak menyatakan aplikasi selesai sebelum kelima indikator Fase G terpenuhi.
 
-## Batasan jujur v1.0
+## Batasan jujur
 
 - **Belum ada eval formal.** Mekanisme skrip sudah diuji; kepatuhan perilaku agen terhadap rute INDEX belum diukur pada proyek nyata.
 - **Belum ada fase rekonsiliasi brownfield khusus.** Proyek yang sudah berjalan lama sebaiknya dicek manual dulu: kode aktual vs `07`/`12`, sebelum slice pertama.
@@ -163,6 +163,8 @@ coding-vcbd/
 ```
 
 ## Riwayat
+
+**2.6** — Nomor versi diseragamkan dengan VCBD Suite (sebelumnya 1.2); isi dan perilaku sama dengan 1.2. Folder skill kini membawa `LICENSE` (GPL-2.0).
 
 **1.2** — `gerbang.sh` kompatibel bash 3.2 (macOS: `[[ ]]` menggantikan `case` di dalam `$( )`), dan S8 mengenali pemilik UI `26_UI_CONVENTIONS.md` maupun nama warisan `26_UI_DESIGN.md` (paket VCBD v1.2) — sebelumnya proyek warisan itu dianggap "tanpa UI" sehingga cek empat state terlewat diam-diam.
 

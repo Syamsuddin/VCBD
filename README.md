@@ -75,10 +75,10 @@ VCBD menjawab keduanya dengan **"gali & konfirmasi dulu, baru tulis"** dan **"sa
 | Skill | Versi | Peran | Mulai dari sini bila… | Contoh pemicu |
 |---|---|---|---|---|
 | [`vcbd`](skills/vcbd/) | 2.6 | Menyusun paket blueprint 28+ dokumen dari wawancara bertahap | Aplikasi belum ada, baru ide | "siapkan blueprint lengkap aplikasi X" |
-| [`coding-vcbd`](skills/coding-vcbd/) | 1.2 | Mengeksekusi blueprint menjadi aplikasi, satu vertical slice demi slice | Blueprint sudah ada, coding belum mulai | "mulai coding dari blueprint", "kerjakan fase 2 roadmap" |
-| [`review-vcbd`](skills/review-vcbd/) | 1.2 | Mengaudit, menguji, melacak bug, dan menambal terhadap blueprint | Kode sudah ada, ingin tahu di mana ia menyimpang | "audit kode terhadap blueprint", "tambal TEM-003" |
-| [`reverse-vcbd`](skills/reverse-vcbd/) | 1.0 | Membedah aplikasi brownfield (ada kode) menjadi dosir bukti lalu blueprint | Aplikasi sudah ada, dokumennya tidak ada | "buatkan blueprint dari kode yang sudah ada" |
-| [`reverse-web-vcbd`](skills/reverse-web-vcbd/) | 2.0 | Membedah aplikasi web secara kotak hitam (HAR/HTML) jadi dosir & draf manifest | Aplikasinya hanya bisa dibuka lewat peramban | "bedah HAR ini", "tiru aplikasi vendor ini" |
+| [`coding-vcbd`](skills/coding-vcbd/) | 2.6 | Mengeksekusi blueprint menjadi aplikasi, satu vertical slice demi slice | Blueprint sudah ada, coding belum mulai | "mulai coding dari blueprint", "kerjakan fase 2 roadmap" |
+| [`review-vcbd`](skills/review-vcbd/) | 2.6 | Mengaudit, menguji, melacak bug, dan menambal terhadap blueprint | Kode sudah ada, ingin tahu di mana ia menyimpang | "audit kode terhadap blueprint", "tambal TEM-003" |
+| [`reverse-vcbd`](skills/reverse-vcbd/) | 2.6 | Membedah aplikasi brownfield (ada kode) menjadi dosir bukti lalu blueprint | Aplikasi sudah ada, dokumennya tidak ada | "buatkan blueprint dari kode yang sudah ada" |
+| [`reverse-web-vcbd`](skills/reverse-web-vcbd/) | 2.6 | Membedah aplikasi web secara kotak hitam (HAR/HTML) jadi dosir & draf manifest | Aplikasinya hanya bisa dibuka lewat peramban | "bedah HAR ini", "tiru aplikasi vendor ini" |
 
 ---
 
@@ -281,8 +281,8 @@ VCBD/
 
 | Rilis | Isi |
 |---|---|
-| **Suite 2026.10** | Repo menjadi suite lima skill, hasil sintesis semua sumber: `vcbd` 2.6 · `coding-vcbd` 1.2 · `review-vcbd` 1.2 · `reverse-vcbd` 1.0 · `reverse-web-vcbd` 2.0 |
-| v2.0–2.5 | Garis skill `vcbd` di luar repo: format 28+ dokumen, `scaffold.py`/`validate.sh`, mode SPLIT, profil native |
+| **Suite 2026.10** | Repo menjadi suite lima skill hasil sintesis semua sumber; **kelima skill versi 2.6** (nomor versi diseragamkan) |
+| v2.0–2.5 | Garis skill `vcbd` di luar repo: 2.0 format 28 dokumen + `validate.sh` · 2.2 `scaffold.py`, rute DIET · 2.4 `26_UI_CONVENTIONS` · 2.5 mode SPLIT, profil native, rantai suite |
 | v1.2 | Format 29 dokumen dengan `26_UI_DESIGN` (tag `v1.2`) |
 | v1.1 | Perbaikan efektivitas routing & isi R1–R6 (tag `v1.1`) |
 | v1.0 | Perbaikan konsistensi & kualitas skill (tag `v1.0`) |

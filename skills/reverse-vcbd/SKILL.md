@@ -2,7 +2,7 @@
 name: reverse-vcbd
 license: GPL-2.0
 metadata:
-  version: "1.0"
+  version: "2.6"
 description: 'Membedah aplikasi brownfield yang sudah berjalan (Laravel, PHP native, Flutter, boleh campuran) menjadi dosir bukti mesin, lalu merakitnya jadi paket blueprint VCBD 28 dokumen — termasuk peta proses bisnis aplikasi di 06_BUSINESS_PROCESS. Menarik rute, skema, matriks peran, siklus status, proses terjadwal/antrean, aturan bisnis tertanam, dan titik integrasi langsung dari kode; bila basis data boleh diakses (read-only), membuktikan jalur mana yang benar-benar terjadi dan mana yang mati. WAJIB dipakai saat pengguna minta: menarik alur kerja, proses bisnis, atau dokumentasi dari aplikasi yang sudah ada; membuat blueprint atau CLAUDE.md untuk aplikasi lama; memahami sistem warisan sebelum dilanjutkan atau ditulis ulang. Pemicu: "tarik proses bisnis dari aplikasi ini", "buatkan blueprint dari kode yang sudah ada", "dokumentasikan aplikasi lama", "alur aplikasi ini sebenarnya bagaimana". TIDAK untuk proyek dari nol (pakai vcbd), TIDAK menambal bug (pakai review-vcbd).'
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion
 ---

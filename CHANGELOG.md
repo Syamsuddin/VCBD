@@ -6,15 +6,21 @@ Entri terbaru di atas. Versi tiap skill mengikuti `metadata.version` di `SKILL.m
 
 ## Suite 2026.10 — 8 Oktober 2026
 
-| Skill | Versi | Status |
-|---|---|---|
-| `vcbd` | **2.6** | naik dari 2.5 |
-| `coding-vcbd` | **1.2** | naik dari 1.1 |
-| `review-vcbd` | **1.2** | naik dari 1.1 |
-| `reverse-vcbd` | 1.0 | pertama kali di repo — salinan lengkap |
-| `reverse-web-vcbd` | 2.0 | pertama kali di repo |
+| Skill | Versi | Sebelumnya | Status |
+|---|---|---|---|
+| `vcbd` | **2.6** | 2.5 | isi diperbarui |
+| `coding-vcbd` | **2.6** | 1.1 | isi diperbarui (sempat bernomor 1.2) |
+| `review-vcbd` | **2.6** | 1.1 | isi diperbarui (sempat bernomor 1.2) |
+| `reverse-vcbd` | **2.6** | 1.0 | pertama kali di repo — salinan lengkap |
+| `reverse-web-vcbd` | **2.6** | 2.0 | pertama kali di repo — data uji dummy |
 
-Digabung lewat [PR #1](https://github.com/Syamsuddin/VCBD/pull/1) (suite), [PR #2](https://github.com/Syamsuddin/VCBD/pull/2) (README), [PR #3](https://github.com/Syamsuddin/VCBD/pull/3) (lisensi), dan [PR #4](https://github.com/Syamsuddin/VCBD/pull/4) (INSTALL).
+Digabung lewat [PR #1](https://github.com/Syamsuddin/VCBD/pull/1) (suite), [PR #2](https://github.com/Syamsuddin/VCBD/pull/2) (README), [PR #3](https://github.com/Syamsuddin/VCBD/pull/3) (lisensi), [PR #4](https://github.com/Syamsuddin/VCBD/pull/4) (INSTALL), [PR #5](https://github.com/Syamsuddin/VCBD/pull/5) (CHANGELOG), dan [PR #6](https://github.com/Syamsuddin/VCBD/pull/6) (penyeragaman versi & README `vcbd` 2.6).
+
+### Penomoran versi
+
+- **Kelima skill kini bernomor 2.6** — satu nomor untuk satu rilis suite, mengikuti `vcbd` sebagai akar rantai. Nomor lama (`coding-vcbd` 1.1/1.2, `review-vcbd` 1.1/1.2, `reverse-vcbd` 1.0, `reverse-web-vcbd` 2.0) tetap tercatat di bagian Riwayat README tiap skill.
+- Penyeragaman ini tidak mengubah perilaku; isi tiap skill sama dengan yang dijelaskan di bawah.
+- README `vcbd` diperbarui untuk 2.6: bagian antarmuka (`26`), Mode Pembaruan & migrasi paket v1.2, isi paket lengkap, perintah gerbang yang dijalankan dari root proyek (sebelumnya contohnya dijalankan dari luar root sehingga akan `[FAIL]`), kebutuhan, kaitan dengan `reverse-web-vcbd`, dan riwayat versi yang dicocokkan dengan isi paket lama.
 
 ### Struktur repo
 
@@ -33,22 +39,22 @@ Dasar: garis v2.5 (format 28+ dokumen, `scaffold.py`/`validate.sh`, mode SPLIT, 
 - Wawancara K9 menanyakan breakpoint minimum, konfirmasi aksi destruktif, dan aksesibilitas; tabel pemetaan wawancara→dokumen dan checklist kelengkapan ikut diperbarui.
 - **Migrasi paket warisan v1.2** (`26_UI_DESIGN.md`) lewat Mode Pembaruan: ganti nama ke `26_UI_CONVENTIONS.md`, set `ui.enabled`, terjemahkan ke tabel token, lengkapi bagian yang belum ada, lalu `validate.sh`.
 
-### `coding-vcbd` 1.2
+### `coding-vcbd` 2.6
 
 - `gerbang.sh` kompatibel **bash 3.2** (macOS): `[[ ]]` menggantikan `case` di dalam `$( )` — tambalan lokal 15 Sep yang kini masuk repo.
 - **Diperbaiki:** cek **S8** (empat state UI) mengenali `26_UI_CONVENTIONS.md` maupun nama warisan `26_UI_DESIGN.md`. Sebelumnya proyek format v1.2 dianggap "tanpa UI" sehingga S8 terlewat diam-diam.
 
-### `review-vcbd` 1.2
+### `review-vcbd` 2.6
 
 - `pindai.py` mengecualikan **perkakas rantai VCBD** (`meter.py`, `gerbang.sh`, `pindai.py`, `temuan.py`, `asap.py`, `validate.sh`, `token_ledger.py`, `scaffold.py`, `validate-kontrak.sh`) dari pemindaian — tambalan lokal 12 Sep yang kini masuk repo. Tanpa ini, pola regex pemindai terbaca sebagai temuan KRITIS pada dirinya sendiri.
 - Token UI dibaca dari `26_UI_CONVENTIONS.md` (kanonik, diutamakan) atau `26_UI_DESIGN.md` (warisan).
 - **Diperbaiki:** temuan `UI-TOKEN-LUAR` kini menunjuk berkas 26 yang benar-benar ada; sebelumnya selalu `26_UI_CONVENTIONS.md` walau berkas itu tidak ada.
 
-### `reverse-vcbd` 1.0
+### `reverse-vcbd` 2.6
 
 - Masuk repo dari paket suite 12 Sep, **satu-satunya salinan lengkap**: `references/peta-isian.md`, `references/protokol-recon.md`, dan skrip `recon.py`, `db_recon.py`, `adapters.py`, `rakit_manifest.py`, `redaksi.py`. Salinan lain yang beredar, termasuk salinan sinkron akun claude.ai, hanya berisi `SKILL.md` sehingga tidak bisa dijalankan.
 
-### `reverse-web-vcbd` 2.0
+### `reverse-web-vcbd` 2.6
 
 - Masuk repo dari salinan sinkron akun (5 Okt 2026).
 - **Privasi data uji:** dua NIP di `uji/buat_fixture.py` dan contoh di README ternyata NIP sungguhan — diganti NIP dummy bertanggal mustahil (TMT 2099). Email contoh diganti `budi@contoh.go.id`. Nilai asli tidak pernah masuk riwayat git repo ini. Nama host aplikasi (`*.hss.go.id`, `sso-siasn.bkn.go.id`) dipertahankan karena dipakai menguji logika domain internal dan bukan data pribadi.
@@ -80,10 +86,10 @@ Isi suite disintesis dari semua salinan VCBD yang ditemukan (Juni–Oktober 2026
 
 ## Garis v2.x — skill di luar repo (kini digabung)
 
-- **2.5** (12 Sep 2026) — rilis bersama rantai `coding-vcbd` 1.1, `review-vcbd` 1.1, `reverse-vcbd` 1.0: format 28+ dokumen, `scaffold.py`/`validate.sh`/`token_ledger.py`, mode SPLIT dengan `27_API_CONTRACT` dan `validate-kontrak.sh`, profil tanpa framework, `26_UI_CONVENTIONS` kondisional dengan tabel token dan preview.
-- **2.4** (13 Agu 2026) — paket skill mandiri.
-- **2.2** (11 Agu 2026) — paket skill mandiri; zip-nya sempat di-upload ke root repo ini sebagai `vcbd.zip` (commit `f419127`).
-- **2.0** (18 Jun 2026) — awal garis v2.x, pada hari yang sama dengan v1.1.
+- **2.5** (12 Sep 2026) — rilis bersama rantai `coding-vcbd` 1.1, `review-vcbd` 1.1, `reverse-vcbd` 1.0: mode SPLIT dengan `27_API_CONTRACT` dan `validate-kontrak.sh`, profil tanpa framework (native).
+- **2.4** (13 Agu 2026) — `26_UI_CONVENTIONS` kondisional untuk proyek ber-UI: tabel token terkunci, anti-slop, preview desain dari token.
+- **2.2** (11 Agu 2026) — `scaffold.py` sebagai penulis kerangka deterministik, `token_ledger.py`, rute DIET di `INDEX.md`, arsip-saat-diterima untuk `23`; zip-nya sempat di-upload ke root repo ini sebagai `vcbd.zip` (commit `f419127`).
+- **2.0** (18 Jun 2026) — format 28 dokumen dengan gerbang mesin `validate.sh`; awal garis v2.x, pada hari yang sama dengan v1.1.
 
 ## Garis v1.x — repo ini
 

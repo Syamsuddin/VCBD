@@ -2,6 +2,8 @@
 
 **Ubah aplikasi web yang hanya bisa Anda buka di peramban menjadi bahan blueprint siap-coding: berbukti, jujur cakupannya, dan bersih dari data pribadi.**
 
+Versi 2.6 · Bahasa: Indonesia · Penulis: Syamsuddin · Lisensi: GPL-2.0 (lihat `LICENSE`)
+
 Vendor sudah pergi, kode tak pernah diserahkan, tetapi aplikasinya masih dipakai setiap hari dan harus ditulis ulang. `reverse-web-vcbd` adalah skill Claude yang membedah aplikasi seperti itu **dari luar**, dari lalu lintas peramban saat aplikasi dipakai secara wajar. Hasilnya adalah dosir bukti dan draf `_MANIFEST.json` yang langsung dipahami skill **vcbd** untuk disusun menjadi paket blueprint 28 dokumen.
 
 ```
@@ -309,6 +311,8 @@ Sekitar 15–30 menit per peran untuk aplikasi berukuran sedang. Yang paling men
 Belum. Dosir adalah bahan, bukan blueprint. vcbd masih akan menanyakan hal yang tak terlihat dari luar (lingkungan, perintah, struktur, tes, rilis), lalu menyusun 28 dokumen yang tervalidasi. Karena faktanya sudah terkumpul, konfirmasi di vcbd biasanya cukup satu putaran.
 
 ## Catatan perubahan
+
+**v2.6** — Nomor versi diseragamkan dengan VCBD Suite (sebelumnya 2.0); perilaku sama dengan 2.0. Data uji memakai NIP dan email dummy (nilai sebelumnya ternyata data sungguhan); folder skill membawa `LICENSE` (GPL-2.0).
 
 **v2.0**
 - Privasi: slug nama orang di path menjadi `{slug}`; label tautan konten dan judul halaman objek dibuang; ID hanya sebagai hash bergaram per sumber daya.

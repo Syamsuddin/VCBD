@@ -10,7 +10,7 @@ review-vcbd     → memeriksa, menguji, melacak, menambal   ← berkas ini
 
 Pertanyaan tunggal yang dijawab: **di mana kode dan blueprint sudah tidak lagi bercerita hal yang sama?**
 
-Versi 1.2 · Bahasa: Indonesia · Penulis: Syamsuddin (`syamsuddin.ideris@gmail.com`) · Lisensi: GPL-2.0 (lihat `LICENSE`)
+Versi 2.6 · Bahasa: Indonesia · Penulis: Syamsuddin (`syamsuddin.ideris@gmail.com`) · Lisensi: GPL-2.0 (lihat `LICENSE`)
 
 ---
 
@@ -182,15 +182,15 @@ Satu-satunya berkas milik skill lain yang dipakai — dan itu pun opsional — a
 - Tidak mengubah dokumen blueprint agar cocok dengan kode yang salah.
 - Tidak menutup temuan dengan melonggarkan tes, mematikan validasi, atau menghapus tes merah.
 
-## Batasan jujur v1.0
+## Batasan jujur
 
 - **`pindai.py` adalah regex, bukan analisis AST.** Ia cepat dan buta. Daftar false positive yang sering muncul ada di `references/rubrik-temuan.md` §4 — bacalah sebelum mempercayai temuan mentah.
 - **Deteksi "tabel tak ada di 07" bergantung gaya penulisan `07`.** Paling andal bila nama tabel ditulis dalam backtick pada heading (`### \`peserta\``). Gaya lain bisa lolos atau salah tangkap.
 - **Deteksi "fitur tanpa tes penjaga" berbasis pencocokan kata**, bukan pemahaman. Fitur dengan penamaan tes yang jauh berbeda akan salah dilaporkan.
-- **Perkakas rantai dikecualikan dari audit** — `scripts/meter.py`, `pindai.py`, `temuan.py`, `asap.py`, `gerbang.sh`, `validate.sh`, `token_ledger.py`. Tanpa pengecualian ini, pola regex di dalam pemindai terbaca sebagai temuan KRITIS pada dirinya sendiri. Konsekuensinya: skrip buatan sendiri yang kebetulan bernama sama tidak akan diaudit.
-- **Kode mati belum dideteksi** — perlu analisis pemanggilan yang belum ada di v1.0.
+- **Perkakas rantai dikecualikan dari audit** — `scripts/meter.py`, `pindai.py`, `temuan.py`, `asap.py`, `gerbang.sh`, `validate.sh`, `token_ledger.py`, `scaffold.py`, `validate-kontrak.sh`. Tanpa pengecualian ini, pola regex di dalam pemindai terbaca sebagai temuan KRITIS pada dirinya sendiri. Konsekuensinya: skrip buatan sendiri yang kebetulan bernama sama tidak akan diaudit.
+- **Kode mati belum dideteksi** — perlu analisis pemanggilan yang belum tersedia.
 - **`asap.py` hanya untuk aplikasi ber-HTTP.** Aplikasi CLI, mobile, dan desktop diuji lewat daftar periksa manual di `references/uji-dinamis.md` §4 — hasilnya tetap butuh bukti keluaran, tapi tidak ada otomasinya.
-- **Rantai transaksi belum diotomatiskan.** Uji create → tampil → ubah → hapus dijalankan manual mengikuti protokol; v1.0 tidak menyediakan perayap yang mengisi form sendiri.
+- **Rantai transaksi belum diotomatiskan.** Uji create → tampil → ubah → hapus dijalankan manual mengikuti protokol; skill belum menyediakan perayap yang mengisi form sendiri.
 - **Belum ada eval formal.** Mekanisme skrip sudah diuji pada proyek tiruan bercacat; ketepatan penilaian model pada repo nyata belum diukur.
 
 ## Berkas
@@ -210,6 +210,8 @@ review-vcbd/
 ```
 
 ## Riwayat
+
+**2.6** — Nomor versi diseragamkan dengan VCBD Suite (sebelumnya 1.2); isi dan perilaku sama dengan 1.2. Folder skill kini membawa `LICENSE` (GPL-2.0).
 
 **1.2** — perkakas rantai VCBD (`meter.py`, `gerbang.sh`, `pindai.py`, `temuan.py`, `asap.py`, `validate.sh`, `token_ledger.py`, `scaffold.py`, `validate-kontrak.sh`) dikecualikan dari pemindaian; token UI dibaca dari `26_UI_CONVENTIONS.md` (kanonik) atau nama warisan `26_UI_DESIGN.md`, dan temuan `UI-TOKEN-LUAR` menunjuk berkas 26 yang benar-benar ada.
 

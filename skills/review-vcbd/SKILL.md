@@ -2,7 +2,7 @@
 name: review-vcbd
 license: GPL-2.0
 metadata:
-  version: "1.2"
+  version: "2.6"
 description: 'Mereview, menguji, melacak bug, dan menambal aplikasi hasil coding-vcbd dengan blueprint VCBD (docs/00-27) sebagai basis kebenaran dan seluruh kode repo sebagai bahan mentah. Memindai 100% kode secara deterministik lewat scripts/pindai.py, menyilangkannya dengan 07 skema, 12 struktur, 21 keamanan, 26 token UI, dan 23 kriteria terima, lalu menerbitkan Dosir Temuan berjenjang KRITIS-TINGGI-SEDANG-RENDAH berbukti path:baris. WAJIB dipakai setiap kali pengguna minta: review atau audit aplikasi terhadap blueprint, cari bug, cek kesesuaian kode dengan dokumen, uji sebelum rilis, telusuri akar sebuah error, atau perbaiki temuan. Pemicu: "review aplikasi ini", "audit kode terhadap blueprint", "kenapa error ini muncul", "tambal TEM-003", "siap rilis belum". Menegakkan: tak ada temuan tanpa bukti, tambalan tak melebihi temuan, dilarang menghijaukan tes dengan melonggarkannya. TIDAK menyusun blueprint (pakai vcbd), TIDAK membangun fitur baru (pakai coding-vcbd).'
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion
 ---
