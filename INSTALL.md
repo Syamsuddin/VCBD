@@ -3,10 +3,10 @@
 | Skill | Versi | Fungsi | Lisensi |
 |---|---|---|---|
 | `vcbd` | 2.6 | Menyusun paket blueprint 28+ dokumen | GPL-2.0 |
-| `coding-vcbd` | 1.2 | Mengeksekusi coding dari blueprint, slice demi slice | GPL-2.0 |
-| `review-vcbd` | 1.2 | Review, audit, lacak bug, tambal terhadap blueprint | GPL-2.0 |
-| `reverse-vcbd` | 1.0 | Membedah aplikasi brownfield (ada kode) menjadi blueprint | GPL-2.0 |
-| `reverse-web-vcbd` | 2.0 | Membedah aplikasi web kotak hitam (HAR/HTML) menjadi dosir & draf manifest | GPL-2.0 |
+| `coding-vcbd` | 2.6 | Mengeksekusi coding dari blueprint, slice demi slice | GPL-2.0 |
+| `review-vcbd` | 2.6 | Review, audit, lacak bug, tambal terhadap blueprint | GPL-2.0 |
+| `reverse-vcbd` | 2.6 | Membedah aplikasi brownfield (ada kode) menjadi blueprint | GPL-2.0 |
+| `reverse-web-vcbd` | 2.6 | Membedah aplikasi web kotak hitam (HAR/HTML) menjadi dosir & draf manifest | GPL-2.0 |
 
 Setiap folder skill berisi `SKILL.md`, `README.md`, `LICENSE`, dan subfolder `references/` serta `scripts/` (`reverse-web-vcbd` juga `uji/`).
 

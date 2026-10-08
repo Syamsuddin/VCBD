@@ -1,9 +1,9 @@
-# reverse-vcbd v1.0
+# reverse-vcbd
 
 Pembedah aplikasi brownfield menjadi paket blueprint VCBD. Melengkapi rantai:
 `reverse-vcbd` → `vcbd` → `coding-vcbd` → `review-vcbd`.
 
-Versi 1.0 · Bahasa: Indonesia · Penulis: Syamsuddin · Lisensi: GPL-2.0 (lihat `LICENSE`)
+Versi 2.6 · Bahasa: Indonesia · Penulis: Syamsuddin · Lisensi: GPL-2.0 (lihat `LICENSE`)
 
 ## Pasang
 
@@ -61,3 +61,9 @@ Fixture campuran Laravel 11 + Flutter + SQLite berisi kasus yang sengaja ditanam
 - Pembaca tabel audit/log untuk menaikkan urutan proses ke derajat DATA.
 - Adapter CodeIgniter (banyak dipakai aplikasi pemda warisan).
 - Rekonstruksi `kontrak/openapi.yaml` otomatis dari irisan rute backend × panggilan klien.
+
+## Riwayat
+
+**2.6** — Nomor versi diseragamkan dengan VCBD Suite (sebelumnya 1.0); isi dan perilaku sama dengan 1.0. Masuk repo suite sebagai satu-satunya salinan lengkap (referensi + lima skrip) dan membawa `LICENSE` (GPL-2.0).
+
+**1.0** (12 Sep 2026) — Rilis awal: tiga mode (RECON, PETA, BLUEPRINT), dosir bukti mesin dari kode, pembuktian jalur lewat agregat basis data read-only, derajat bukti `[KODE:]`/`[DATA:]`/`[USULAN]`/`[ISI:]`, dan penyaringan rahasia oleh `redaksi.py`.
