@@ -1,6 +1,6 @@
 # Contoh Keluaran VCBD (golden output)
 
-Tujuan file ini: satu contoh **kecil tapi nyata** agar agen punya patokan konkret saat menulis 29 dokumen — bukan menebak dari deskripsi template. Dibaca opsional di Fase 3 ketika butuh anchor gaya/kepadatan. Contoh dipangkas (hanya potongan dokumen kunci), bukan paket 29 lengkap.
+Tujuan file ini: satu contoh **kecil tapi nyata** agar agen punya patokan konkret saat menulis 28 dokumen — bukan menebak dari deskripsi template. Dibaca opsional di Fase 3 ketika butuh anchor gaya/kepadatan. Contoh dipangkas (hanya potongan dokumen kunci), bukan paket 28 lengkap.
 
 Aplikasi contoh: **PRESQU** — pencatatan kehadiran pegawai via scan QR harian. Stack: Laravel 11 + Blade + MySQL 8. Greenfield, 2 peran (admin, pegawai).
 
@@ -22,7 +22,6 @@ Aplikasi contoh: **PRESQU** — pencatatan kehadiran pegawai via scan QR harian.
 | Data sensitif | NIP (PII), foto pegawai → akses per peran; tanpa hard-delete data absensi |
 | Stack & versi | Laravel 11, PHP 8.3, Blade, MySQL 8; Terlarang: jQuery |
 | Arsitektur & integrasi | Monolit modular berlapis (Controller tipis → Service); tanpa integrasi eksternal di MVP |
-| Antarmuka (UI) | Blade + Bootstrap 5 tema default; layar: login, scan (mobile-first), rekap, kelola pegawai; id-ID |
 | Lingkungan & perintah | Ubuntu + Nginx; php artisan serve / test / migrate |
 | Tes & keamanan | Feature test alur scan; semua input divalidasi; otorisasi per peran |
 | Definisi terima/selesai | Kriteria per fitur (lihat 23) + tes hijau + tanpa regresi |
@@ -34,7 +33,7 @@ Aplikasi contoh: **PRESQU** — pencatatan kehadiran pegawai via scan QR harian.
 [TERBUKA] (sengaja ditunda)
 - Notifikasi keterlambatan via WhatsApp — pasca-MVP
 
-Konfirmasi: generate 29 dokumen blueprint dengan ringkasan di atas?
+Konfirmasi: generate 28 dokumen blueprint dengan ringkasan di atas?
 Jawab "ya" atau koreksi bagian yang salah.
 ```
 
@@ -66,14 +65,16 @@ Ditulis lebih dulu di Fase 3; menjadi sumber semua dokumen.
     ],
     "sensitive_data": ["nip (PII)", "foto pegawai"],
     "stack": { "backend": "Laravel 11 / PHP 8.3", "frontend": "Blade", "db": "MySQL 8",
-               "versions": { "laravel": "11", "php": "8.3" }, "forbidden": ["jQuery"] },
-    "ui": { "design_system": "Bootstrap 5 (tema default)", "screens": [{ "name": "Scan QR", "route": "/scan", "roles": ["pegawai"] }],
-            "device_targets": "desktop-first; /scan mobile-first", "language": "id-ID" }
+               "versions": { "laravel": "11", "php": "8.3" }, "forbidden": ["jQuery"] }
   },
   "canonical_owners": {
     "schema": "07", "roles": "05", "commands": "11",
-    "repair_rules": "18", "guardrails": "20", "security": "21", "ui": "26"
+    "repair_rules": "18", "guardrails": "20", "security": "21"
   },
+  "referenced_by": {
+    "07": ["06","21","23"], "05": ["06","23"], "11": ["13","23","25","CLAUDE"]
+  },
+  "collapsed": ["17","19"],
   "assumptions": ["Jendela scan masuk 06:00–09:00, pulang 14:00–18:00 WITA"],
   "open_questions": ["Notifikasi keterlambatan via WhatsApp — pasca-MVP"]
 }
@@ -184,31 +185,87 @@ Baca INDEX.md → muat dokumen relevan → konfirmasi scope → vertical slice �
 Tanpa penyimpangan proyek. Gunakan format baku: Judul · Dokumen dimuat · Kriteria terima (rujuk docs/23) · Blok verifikasi · Catatan irreversibilitas (rujuk docs/22).
 ```
 
-Bandingkan: `docs/07` (di atas) **tidak** boleh dikolaps — ia memuat fakta proyek nyata. Kolaps hanya untuk turunan yang 100% default.
+Bandingkan: `docs/07` (di atas) **tidak** boleh dikolaps — ia memuat fakta proyek nyata. Kolaps hanya untuk turunan yang 100% default. Karena dikolaps, `17` dan `19` didaftarkan di field `collapsed` pada `_MANIFEST.json` di atas — sehingga `scripts/validate.sh` tahu ukuran pendeknya disengaja (bukan dokumen yang lupa diisi). Stub dasarnya ditulis OTOMATIS oleh `scripts/scaffold.py` dari field `collapsed`; contoh 19 di atas adalah stub yang *diperkaya* satu baris pointer spesifik — pengayaan begitu boleh, menulis stub dari nol tidak perlu.
 
 ---
 
-## G. `docs/26_UI_DESIGN.md` (pemilik fakta antarmuka — padat, table-driven)
+## G. Mode split (potongan) — PRESQU dipecah: API PHP native + aplikasi Flutter
 
-```markdown
-# 26 — UI Design
-Sumber kebenaran antarmuka. Versi teknologi → docs/09.
+Tata letak monorepo dan pembagian rumah fakta:
 
-Design system: Bootstrap 5 tema default. Komponen wajib: table, form, alert, badge, modal — JANGAN buat komponen tandingan.
-Token: warna status → hijau=hadir, kuning=terlambat, merah=tidak hadir. Selebihnya ikut default Bootstrap.
-
-| Layar | Route | Peran | Tujuan |
-|---|---|---|---|
-| Login | /login | semua | autentikasi |
-| Scan QR | /scan | pegawai | rekam kehadiran (mobile-first) |
-| Rekap Harian | /admin/rekap | admin | pantau & ekspor CSV |
-| Kelola Pegawai | /admin/employees | admin | CRUD pegawai |
-
-Navigasi: navbar atas; item menu per peran → docs/05.
-Pola: list-detail-form untuk CRUD; aksi destruktif wajib modal konfirmasi (selaras docs/22).
-States wajib layar data: loading · kosong ("Belum ada data") · error (teks → docs/14) · sukses.
-Perangkat: desktop-first, layak ≤768px; khusus /scan mobile-first (dipakai di ponsel).
-Bahasa: id-ID. Aksesibilitas: [TERBUKA] pasca-MVP.
+```
+presqu/
+├── kontrak/
+│   ├── openapi.yaml          # RUMAH endpoint+payload — v0.2.0
+│   ├── KONTRAK.md            # presedensi, glosarium bersama, envelope error, auth
+│   └── scripts/validate-kontrak.sh
+├── backend/                  # paket VCBD — role backend, ui.enabled=false, framework "none" (profil native)
+└── frontend/                 # paket VCBD — role frontend, ui.enabled=true (ada 26), 07 di-collapse
 ```
 
-Perhatikan: layar diturunkan dari fitur MVP (bagian A), bukan dikarang; akses menu tidak disalin dari docs/05, hanya dirujuk.
+Potongan `kontrak/openapi.yaml` — satu endpoint nyata:
+
+```yaml
+openapi: "3.0.3"
+info: { title: "PRESQU API", version: "0.2.0" }
+paths:
+  /attendances:
+    post:
+      security: [ { bearerAuth: [] } ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type]
+              properties:
+                type: { type: string, enum: [in, out] }
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scanned_at: { type: string, format: date-time }  # ISO-8601 ber-offset
+        "422": { $ref: "#/components/responses/Error" }
+```
+
+Potongan `backend/docs/27_API_CONTRACT.md` — perhatikan: TIPIS, tanpa satu pun payload:
+
+```markdown
+# 27 — API Contract
+Peran paket: BACKEND · Kontrak: ../kontrak/openapi.yaml v0.2.0 (pin: _MANIFEST split.contract_version).
+Presedensi: KONTRAK menang — implementasi tak sesuai kontrak = bug paket ini; selisih → berhenti & gerbang manusia.
+Perubahan endpoint: rute "Perubahan kontrak API" (diff openapi.yaml → konfirmasi → bump versi → regen dua sisi).
+
+| Tujuan | Perintah |
+|---|---|
+| Uji kontrak | `vendor/bin/phpunit --testsuite=contract` (schemathesis terhadap ../kontrak/openapi.yaml) |
+| Validasi lintas-paket | `bash ../kontrak/scripts/validate-kontrak.sh` (dari root monorepo) |
+```
+
+Potongan `frontend/docs/07_DATA_MODEL.md` — stub `collapsed` yang diperkaya (skema BUKAN milik FE):
+
+```markdown
+# 07 — Data Model
+Skema fisik bukan milik paket ini (rumah: paket backend). Bentuk payload yang dilihat FE = ../kontrak/openapi.yaml v0.2.0 — regen types via perintah codegen di docs/27; DILARANG mengetik nama field manual.
+```
+
+Potongan manifest kedua paket (field yang membedakan):
+
+```json
+// backend/docs/_MANIFEST.json
+"stack": { "backend": "PHP 8.3 native modular", "db": "MySQL 8",
+           "framework": { "backend": "none" }, "forbidden": ["framework apa pun (lihat 20)", "jQuery"] },
+"split": { "enabled": true, "role": "backend", "contract_path": "../kontrak/openapi.yaml", "contract_version": "0.2.0" },
+"collapsed": ["17","19"]          // 12/14/21 TIDAK di-collapse: profil native (validator cek 11)
+
+// frontend/docs/_MANIFEST.json
+"stack": { "frontend": "Flutter 3.x", "framework": { "frontend": "flutter" } },
+"ui": { "enabled": true, "anchor": "preset aman skill" },
+"split": { "enabled": true, "role": "frontend", "contract_path": "../kontrak/openapi.yaml", "contract_version": "0.2.0" },
+"collapsed": ["07","17","19"]     // 07 stub — skema bukan milik FE
+```
+
+Dua pin `contract_version` di atas identik dan sama dengan `info.version` kontrak — persis yang diuji `validate-kontrak.sh` (K3/K4). Bila BE naik ke v0.3.0 sendirian, gerbang merah sebelum drift sempat menjadi bug produksi.
