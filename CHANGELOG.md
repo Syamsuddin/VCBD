@@ -14,7 +14,7 @@ Entri terbaru di atas. Versi tiap skill mengikuti `metadata.version` di `SKILL.m
 | `reverse-vcbd` | **2.6** | 1.0 | pertama kali di repo — salinan lengkap |
 | `reverse-web-vcbd` | **2.6** | 2.0 | pertama kali di repo — data uji dummy |
 
-Digabung lewat [PR #1](https://github.com/Syamsuddin/VCBD/pull/1) (suite), [PR #2](https://github.com/Syamsuddin/VCBD/pull/2) (README), [PR #3](https://github.com/Syamsuddin/VCBD/pull/3) (lisensi), [PR #4](https://github.com/Syamsuddin/VCBD/pull/4) (INSTALL), [PR #5](https://github.com/Syamsuddin/VCBD/pull/5) (CHANGELOG), dan penyeragaman versi.
+Digabung lewat [PR #1](https://github.com/Syamsuddin/VCBD/pull/1) (suite), [PR #2](https://github.com/Syamsuddin/VCBD/pull/2) (README), [PR #3](https://github.com/Syamsuddin/VCBD/pull/3) (lisensi), [PR #4](https://github.com/Syamsuddin/VCBD/pull/4) (INSTALL), [PR #5](https://github.com/Syamsuddin/VCBD/pull/5) (CHANGELOG), dan [PR #6](https://github.com/Syamsuddin/VCBD/pull/6) (penyeragaman versi & README `vcbd` 2.6).
 
 ### Penomoran versi
 
