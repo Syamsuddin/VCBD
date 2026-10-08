@@ -1,38 +1,73 @@
 # VCBD Suite — Panduan Instalasi
 
-| Skill | Versi | Fungsi |
+| Skill | Versi | Fungsi | Lisensi |
+|---|---|---|---|
+| `vcbd` | 2.6 | Menyusun paket blueprint 28+ dokumen | GPL-2.0 |
+| `coding-vcbd` | 1.2 | Mengeksekusi coding dari blueprint, slice demi slice | GPL-2.0 |
+| `review-vcbd` | 1.2 | Review, audit, lacak bug, tambal terhadap blueprint | GPL-2.0 |
+| `reverse-vcbd` | 1.0 | Membedah aplikasi brownfield (ada kode) menjadi blueprint | GPL-2.0 |
+| `reverse-web-vcbd` | 2.0 | Membedah aplikasi web kotak hitam (HAR/HTML) menjadi dosir & draf manifest | GPL-2.0 |
+
+Setiap folder skill berisi `SKILL.md`, `README.md`, `LICENSE`, dan subfolder `references/` serta `scripts/` (`reverse-web-vcbd` juga `uji/`).
+
+## Kebutuhan
+
+| Kebutuhan | Untuk | Catatan |
 |---|---|---|
-| `vcbd` | 2.6 | Menyusun paket blueprint 28+ dokumen |
-| `coding-vcbd` | 1.2 | Mengeksekusi coding dari blueprint, slice demi slice |
-| `review-vcbd` | 1.2 | Review, audit, lacak bug, tambal terhadap blueprint |
-| `reverse-vcbd` | 1.0 | Membedah aplikasi brownfield (ada kode) menjadi blueprint |
-| `reverse-web-vcbd` | 2.0 | Membedah aplikasi web kotak hitam (HAR/HTML) menjadi dosir & draf manifest |
+| **Python 3.8+** | Semua skrip `.py` | Hanya pustaka standar. Diuji pada Python 3.12 dan 3.14. |
+| **Bash** | `validate.sh`, `validate-kontrak.sh`, `gerbang.sh` | Kompatibel bash 3.2 (bawaan macOS) ke atas. |
+| `zip` | `scripts/kemas.sh` (paket claude.ai) | Ubuntu/Debian: `sudo apt install zip` bila belum ada. |
+| `pymysql` *(opsional)* | `reverse-vcbd` membaca basis data MySQL/MariaDB | Bila tidak ada, otomatis memakai klien `mysql` di PATH sebagai cadangan. |
+| `psycopg2-binary` *(opsional)* | `reverse-vcbd` membaca basis data PostgreSQL | — |
+| — | `reverse-vcbd` membaca SQLite | Tanpa tambahan (`sqlite3` bawaan Python). |
 
 ## Claude Code
 
-Salin kelima folder di `skills/` ke `~/.claude/skills/` (global) atau `.claude/skills/` (per proyek):
+### 1. Pasang
+
+Global (berlaku untuk semua proyek):
 
 ```bash
-mkdir -p ~/.claude/skills && cp -r skills/* ~/.claude/skills/
+git clone https://github.com/Syamsuddin/VCBD.git
+mkdir -p ~/.claude/skills && cp -r VCBD/skills/* ~/.claude/skills/
 ```
 
-Kelima folder harus **bersebelahan**:
+Atau per proyek: salin ke `.claude/skills/` di root proyek tersebut. Claude Code membaca skill baru secara otomatis; bila belum muncul, mulai sesi baru.
 
-| Skill | Memakai dari skill lain | Untuk apa |
+**Di server/VPS untuk user lain** (mis. user khusus agen): jalankan langkah yang sama sebagai user itu, misalnya setelah `sudo -iu <user>`. Skill terpasang di `~/.claude/skills/` milik user yang menjalankan Claude Code.
+
+### 2. Pastikan kelima folder bersebelahan
+
+Beberapa skrip dipakai lintas skill:
+
+| Skill | Memakai | Cara menemukannya |
 |---|---|---|
-| `reverse-vcbd` | `vcbd/scripts/scaffold.py`, `validate.sh` | Satu-satunya penulis format kerangka & gerbang mesin |
-| `coding-vcbd` | `vcbd/scripts/token_ledger.py`, `validate.sh` | Buku besar token; gerbang blueprint sebelum coding |
-| `review-vcbd` | `coding-vcbd/scripts/gerbang.sh`, `meter.py` | Gerbang DoD setelah menambal; pencatatan step |
-| `reverse-web-vcbd` | `vcbd` (lewat draf `_MANIFEST.json`) | Blueprint disusun `vcbd` dari dosir |
+| `reverse-vcbd` | `vcbd/scripts/scaffold.py` (+ `validate.sh` yang disalinnya) | Mencari `../vcbd/scripts/scaffold.py` (folder bersaudara), lalu `/mnt/skills/user/vcbd/scripts/scaffold.py` (claude.ai) |
+| `coding-vcbd` | `validate.sh`, `token_ledger.py` milik `vcbd` | Dari `scripts/` proyek — disalin `scaffold.py` saat kerangka blueprint dibuat |
+| `review-vcbd` | `gerbang.sh`, `meter.py` milik `coding-vcbd` | Dari `scripts/` proyek (lihat langkah 3) |
+| `reverse-web-vcbd` | `vcbd` | Lewat `docs/_MANIFEST.draft.json` yang disusun `vcbd` menjadi blueprint |
 | `vcbd` | — | Akar rantai |
 
-`scaffold.py` menyalin `validate.sh` dan `token_ledger.py` ke `scripts/` milik proyek saat kerangka dibuat, jadi proyek yang sudah terbentuk tidak bergantung pada folder skill untuk dua berkas itu. Rujukan `scripts/...` di SKILL.md `reverse-vcbd` dan `review-vcbd` yang tidak ada di folder skill-nya sendiri memang milik skill saudara atau proyek — bukan berkas yang hilang.
+### 3. Salin skrip ke proyek (disarankan)
 
-**Jalankan skrip gerbang dari root proyek** (`cd /path/proyek && bash scripts/validate.sh`). `validate.sh`, `validate-kontrak.sh`, dan `gerbang.sh` membaca berkas secara relatif.
+`scaffold.py` otomatis menyalin `validate.sh` dan `token_ledger.py` ke `scripts/` proyek, serta `validate-kontrak.sh` ke `kontrak/scripts/` pada mode split. Salin juga skrip `coding-vcbd` dan `review-vcbd` supaya proyek bisa memeriksa dirinya sendiri tanpa folder skill:
 
-### Bila akun claude.ai Anda juga menyinkronkan VCBD
+```bash
+cd /path/proyek
+cp ~/.claude/skills/coding-vcbd/scripts/{meter.py,gerbang.sh} scripts/
+cp ~/.claude/skills/review-vcbd/scripts/*.py scripts/
+```
 
-Claude Code menampilkan skill hasil sinkron akun sebagai `anthropic-skills:<nama>`. Bila versinya berbeda dari yang dipasang lokal, agen bisa memakai versi yang salah. Blokir salinan sinkron di `~/.claude/settings.json`:
+Tanpa langkah ini, skrip tetap bisa dipanggil dengan path lengkap ke folder skill.
+
+**Jalankan skrip gerbang dari root proyek** (`cd /path/proyek && bash scripts/validate.sh`). `validate.sh`, `validate-kontrak.sh`, dan `gerbang.sh` membaca berkas secara relatif; dijalankan dari luar, ketiganya melapor `[FAIL] … jalankan skrip dari root proyek`.
+
+### 4. Bila akun claude.ai Anda juga menyinkronkan VCBD
+
+Skill yang diunggah ke akun claude.ai ikut tersinkron ke Claude Code dan tampil sebagai `anthropic-skills:<nama>`, di samping salinan lokal. Bila versinya berbeda, agen bisa memakai versi yang salah. Ada dua cara:
+
+1. **Disarankan:** perbarui skill di akun claude.ai dengan paket dari repo ini (lihat bagian claude.ai), sehingga kedua salinan identik.
+2. Blokir salinan sinkron di `~/.claude/settings.json`:
 
 ```json
 {
@@ -40,36 +75,68 @@ Claude Code menampilkan skill hasil sinkron akun sebagai `anthropic-skills:<nama
     "deny": [
       "Skill(anthropic-skills:vcbd)",
       "Skill(anthropic-skills:coding-vcbd)",
-      "Skill(anthropic-skills:review-vcbd)"
+      "Skill(anthropic-skills:review-vcbd)",
+      "Skill(anthropic-skills:reverse-vcbd)",
+      "Skill(anthropic-skills:reverse-web-vcbd)"
     ]
   }
 }
 ```
 
-Cara yang lebih bersih: perbarui skill di akun claude.ai dengan paket dari repo ini, sehingga kedua salinan identik.
+Dalam mode headless (`claude -p`), skill lokal butuh izin per pemanggilan, misalnya `--allowedTools "Skill(vcbd)"`, atau aturan `allow` yang setara di settings.
 
 ## claude.ai
 
-Buat satu zip per skill, lalu unggah satu per satu lewat pengaturan Skills:
+Buat satu zip per skill dari root repo:
 
 ```bash
-bash scripts/kemas.sh        # hasil: dist/<skill>.zip
+bash scripts/kemas.sh        # hasil: dist/<skill>.zip — berisi SKILL.md, README.md, LICENSE, references/, scripts/
 ```
 
-Setiap zip berisi satu folder skill dengan `SKILL.md` di dalamnya.
-
-## Kebutuhan luar
-
-Python 3.9+ dan Bash untuk seluruh skrip; tidak ada pustaka pihak ketiga yang wajib. `reverse-vcbd` punya kebutuhan opsional: `pymysql` (atau klien `mysql` di PATH) untuk MySQL, `psycopg2-binary` untuk PostgreSQL; SQLite jalan tanpa tambahan.
+Unggah satu per satu lewat **Settings → Capabilities → Skills**. Unggah **kelimanya**: `reverse-vcbd` membutuhkan `vcbd` (dicari di `/mnt/skills/user/vcbd/`), dan `review-vcbd` memakai skrip `coding-vcbd`. Bila akun sudah punya skill bernama sama, pastikan versi lama itu tergantikan (hapus dulu bila claude.ai tidak menimpanya), supaya tidak ada dua versi berbeda.
 
 ## Memeriksa instalasi
 
 ```bash
 cd ~/.claude/skills
 for f in vcbd/scripts/*.sh coding-vcbd/scripts/*.sh; do bash -n "$f" && echo "OK $f"; done
-python3 reverse-web-vcbd/uji/uji_regresi.py      # 32/32 lulus
+for f in */scripts/*.py; do python3 -m py_compile "$f" && echo "OK $f"; done
+python3 reverse-web-vcbd/uji/uji_regresi.py      # harus: 32/32 lulus
 ```
+
+Uji asap generator blueprint di folder sementara:
+
+```bash
+T=$(mktemp -d) && mkdir -p "$T/docs" && cd "$T"
+echo '{"app":{"name":"Uji","description":"uji","type":"greenfield"},"requirements":{"ui":{"enabled":true},"split":{"enabled":false}},"collapsed":[],"landmines":[],"assumptions":[]}' > docs/_MANIFEST.json
+python3 ~/.claude/skills/vcbd/scripts/scaffold.py --root . && bash scripts/validate.sh
+```
+
+Hasil yang benar: 27 dokumen bernomor (00–26) terbentuk, dan `validate.sh` melaporkan `FAIL=1 WARN=1 PASS=9` — FAIL `8. Dokumen masih KERANGKA` dan WARN `6. Dokumen pendek` wajar karena kerangkanya belum diisi.
+
+## Memperbarui
+
+```bash
+cd VCBD && git pull
+for d in vcbd coding-vcbd review-vcbd reverse-vcbd reverse-web-vcbd; do
+  rm -rf ~/.claude/skills/$d && cp -r skills/$d ~/.claude/skills/
+done
+```
+
+Proyek yang sudah menyalin skrip ke `scripts/` (langkah 3) tidak ikut terbarui otomatis — salin ulang bila skrip skill berubah (lihat `CHANGELOG.md`).
+
+## Mencopot
+
+```bash
+cd ~/.claude/skills && rm -rf vcbd coding-vcbd review-vcbd reverse-vcbd reverse-web-vcbd
+```
+
+Berkas yang sudah lahir di proyek (`docs/`, `CLAUDE.md`, `INDEX.md`, `scripts/`) tidak tersentuh.
 
 ## Memutakhirkan dari repo versi lama (satu skill di root)
 
-Sebelum rilis suite, repo ini berisi satu skill `vcbd` di root (format 29 dokumen, `26_UI_DESIGN.md`). Bila Anda dulu meng-clone repo langsung menjadi `~/.claude/skills/vcbd`, hapus folder itu lalu pasang ulang dari `skills/`. Proyek yang dibuat dengan format lama tetap terbaca oleh `coding-vcbd` dan `review-vcbd`; migrasikan lewat Mode Pembaruan `vcbd` (lihat bagian *Paket warisan VCBD v1.2* di `skills/vcbd/SKILL.md`).
+Sebelum rilis suite, repo ini berisi satu skill `vcbd` di root (format 29 dokumen, `26_UI_DESIGN.md`). Bila Anda dulu meng-clone repo langsung menjadi `~/.claude/skills/vcbd`, hapus folder itu lalu pasang ulang dari `skills/`. Proyek yang dibuat dengan format lama tetap terbaca oleh `coding-vcbd` dan `review-vcbd`; migrasikan lewat Mode Pembaruan `vcbd` (bagian *Paket warisan VCBD v1.2* di `skills/vcbd/SKILL.md`).
+
+## Lisensi
+
+Kelima skill berlisensi **GPL-2.0**; tiap folder skill membawa salinan `LICENSE` dan mencantumkan `license: GPL-2.0` di frontmatter `SKILL.md`.

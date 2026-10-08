@@ -226,7 +226,7 @@ Kelima folder harus **bersebelahan**, karena beberapa skrip dipakai lintas skill
 
 Untuk claude.ai, buat zip per skill dengan `bash scripts/kemas.sh` lalu unggah lewat pengaturan Skills. Panduan lengkap — termasuk menangani salinan skill hasil sinkron akun dan memutakhirkan dari repo versi lama — ada di [INSTALL.md](INSTALL.md).
 
-**Kebutuhan luar:** Python 3.9+ dan Bash; tidak ada pustaka pihak ketiga yang wajib. Opsional untuk `reverse-vcbd`: `pymysql` (atau klien `mysql`) untuk MySQL, `psycopg2-binary` untuk PostgreSQL; SQLite tanpa tambahan.
+**Kebutuhan luar:** Python 3.8+ dan Bash (kompatibel bash 3.2 bawaan macOS); tidak ada pustaka pihak ketiga yang wajib; `zip` untuk `kemas.sh`. Opsional untuk `reverse-vcbd`: `pymysql` (atau klien `mysql` sebagai cadangan) untuk MySQL, `psycopg2-binary` untuk PostgreSQL; SQLite tanpa tambahan.
 
 ---
 
