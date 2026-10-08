@@ -6,7 +6,7 @@
 
 **Lima skill Claude Code untuk seluruh siklus hidup aplikasi**: dari ide atau aplikasi warisan, menjadi blueprint terstruktur, menjadi kode yang dibangun slice demi slice, sampai kode yang diaudit, diuji, dan ditambal — semuanya dengan gerbang mesin, bukan harapan.
 
-Suite 2026.10 · Bahasa Indonesia · Penulis: Syamsuddin · Lisensi: GPL-2.0
+Suite 2026.10 (v2.6) · Bahasa Indonesia · Penulis: Syamsuddin · Lisensi: GPL-2.0 · [Unduh rilis](https://github.com/Syamsuddin/VCBD/releases/tag/v2.6)
 
 ---
 
@@ -224,7 +224,7 @@ Kelima folder harus **bersebelahan**, karena beberapa skrip dipakai lintas skill
 | `review-vcbd` | `coding-vcbd/scripts/gerbang.sh`, `meter.py` |
 | `reverse-web-vcbd` | `vcbd` (lewat draf manifest) |
 
-Untuk claude.ai, buat zip per skill dengan `bash scripts/kemas.sh` lalu unggah lewat pengaturan Skills. Panduan lengkap — termasuk menangani salinan skill hasil sinkron akun dan memutakhirkan dari repo versi lama — ada di [INSTALL.md](INSTALL.md).
+Untuk claude.ai, unduh zip per skill dari [rilis v2.6](https://github.com/Syamsuddin/VCBD/releases/tag/v2.6) (atau buat sendiri dengan `bash scripts/kemas.sh`), lalu unggah lewat pengaturan Skills. Panduan lengkap — termasuk menangani salinan skill hasil sinkron akun dan memutakhirkan dari repo versi lama — ada di [INSTALL.md](INSTALL.md).
 
 **Kebutuhan luar:** Python 3.8+ dan Bash (kompatibel bash 3.2 bawaan macOS); tidak ada pustaka pihak ketiga yang wajib; `zip` untuk `kemas.sh`. Opsional untuk `reverse-vcbd`: `pymysql` (atau klien `mysql` sebagai cadangan) untuk MySQL, `psycopg2-binary` untuk PostgreSQL; SQLite tanpa tambahan.
 
@@ -281,7 +281,7 @@ VCBD/
 
 | Rilis | Isi |
 |---|---|
-| **Suite 2026.10** | Repo menjadi suite lima skill hasil sintesis semua sumber; **kelima skill versi 2.6** (nomor versi diseragamkan) |
+| **Suite 2026.10** | Repo menjadi suite lima skill hasil sintesis semua sumber; **kelima skill versi 2.6** (nomor versi diseragamkan) — tag `v2.6`, [rilis](https://github.com/Syamsuddin/VCBD/releases/tag/v2.6) dengan zip per skill |
 | v2.0–2.5 | Garis skill `vcbd` di luar repo: 2.0 format 28 dokumen + `validate.sh` · 2.2 `scaffold.py`, rute DIET · 2.4 `26_UI_CONVENTIONS` · 2.5 mode SPLIT, profil native, rantai suite |
 | v1.2 | Format 29 dokumen dengan `26_UI_DESIGN` (tag `v1.2`) |
 | v1.1 | Perbaikan efektivitas routing & isi R1–R6 (tag `v1.1`) |
