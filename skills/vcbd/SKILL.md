@@ -1,5 +1,6 @@
 ---
 name: vcbd
+license: GPL-2.0
 metadata:
   version: "2.6"
 description: 'Menyusun paket blueprint baku 28+ dokumen (00–25 + CLAUDE.md + INDEX.md; kondisional 26_UI_CONVENTIONS dan 27_API_CONTRACT) untuk vibe coding dengan Claude Code. Gunakan setiap kali pengguna ingin blueprint/paket konteks formal sebelum coding, atau menyebut "buatkan 28 dokumen blueprint", "susun paket SPEC bernomor", "siapkan blueprint lengkap aplikasi X", "buat CLAUDE.md dan INDEX.md", "generate the full blueprint package". Mendukung mode SPLIT backend/frontend — dua paket dikerjakan terpisah dengan kontrak openapi.yaml sebagai rumah tunggal endpoint/payload (pemicu: "pisahkan backend dan frontend", "dua repo dengan kontrak API") — dan proyek TANPA framework (mis. PHP native modular) lewat profil native. Cukup beri nama + deskripsi; skill mewawancarai bertahap (K1–K10), menyajikan Ringkasan Kebutuhan, lalu MENUNGGU konfirmasi eksplisit sebelum menulis. Tiered-loading, satu fakta satu rumah, anti-kontradiksi; proyek ber-UI mendapat token desain terkunci anti-drift.'

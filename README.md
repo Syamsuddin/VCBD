@@ -6,7 +6,7 @@
 
 **Lima skill Claude Code untuk seluruh siklus hidup aplikasi**: dari ide atau aplikasi warisan, menjadi blueprint terstruktur, menjadi kode yang dibangun slice demi slice, sampai kode yang diaudit, diuji, dan ditambal — semuanya dengan gerbang mesin, bukan harapan.
 
-Suite 2026.10 · Bahasa Indonesia · Penulis: Syamsuddin · Lisensi: lihat [Lisensi](#lisensi)
+Suite 2026.10 · Bahasa Indonesia · Penulis: Syamsuddin · Lisensi: GPL-2.0
 
 ---
 
@@ -269,10 +269,10 @@ VCBD/
 ├── scripts/kemas.sh              zip per skill → dist/ (untuk claude.ai)
 └── skills/
     ├── vcbd/                     SKILL.md · README.md · LICENSE · references/ · scripts/
-    ├── coding-vcbd/              SKILL.md · README.md · references/ · scripts/
-    ├── review-vcbd/              SKILL.md · README.md · references/ · scripts/
-    ├── reverse-vcbd/             SKILL.md · README.md · references/ · scripts/
-    └── reverse-web-vcbd/         SKILL.md · README.md · references/ · scripts/ · uji/
+    ├── coding-vcbd/              SKILL.md · README.md · LICENSE · references/ · scripts/
+    ├── review-vcbd/              SKILL.md · README.md · LICENSE · references/ · scripts/
+    ├── reverse-vcbd/             SKILL.md · README.md · LICENSE · references/ · scripts/
+    └── reverse-web-vcbd/         SKILL.md · README.md · LICENSE · references/ · scripts/ · uji/
 ```
 
 ---
@@ -293,4 +293,4 @@ Rincian sumber mana dipakai untuk apa dan apa yang digabungkan ada di [CHANGELOG
 
 ## Lisensi
 
-Berkas [LICENSE](LICENSE) di root repo adalah **GPL-2.0**, dan `skills/vcbd/` membawa salinan lisensinya sendiri. Keempat skill lain belum membawa berkas lisensi terpisah di foldernya.
+Seluruh isi repo ini — kelima skill beserta skripnya — dilisensikan di bawah **GNU General Public License v2.0** ([LICENSE](LICENSE)). Setiap folder skill membawa salinan `LICENSE` yang sama dan mencantumkan `license: GPL-2.0` di frontmatter `SKILL.md`, sehingga lisensinya tetap jelas bila satu skill dipasang atau dibagikan sendiri-sendiri (mis. lewat zip per skill untuk claude.ai).

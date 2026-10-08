@@ -2,7 +2,7 @@
 
 **Eksekutor blueprint VCBD.** Skill `vcbd` menghasilkan paket 28 dokumen; skill ini mengubah paket itu menjadi aplikasi jadi — satu *vertical slice* demi satu slice, dengan pemuatan dokumen menurut rute `INDEX.md` agar hemat token, gerbang selesai yang diuji mesin, serta laporan counter waktu dan token di akhir tiap step.
 
-Versi 1.2 · Bahasa: Indonesia · Penulis: Syamsuddin (`syamsuddin.ideris@gmail.com`)
+Versi 1.2 · Bahasa: Indonesia · Penulis: Syamsuddin (`syamsuddin.ideris@gmail.com`) · Lisensi: GPL-2.0 (lihat `LICENSE`)
 
 ---
 

@@ -1,5 +1,6 @@
 ---
 name: coding-vcbd
+license: GPL-2.0
 metadata:
   version: "1.2"
 description: 'Mengeksekusi coding aplikasi dari paket blueprint VCBD (CLAUDE.md + INDEX.md + docs/00-27) sampai tuntas, satu vertical slice demi satu slice, dengan pemuatan dokumen menurut rute INDEX agar hemat token. WAJIB dipakai setiap kali pengguna minta: mulai atau lanjutkan coding dari blueprint, kerjakan fitur berikutnya sesuai roadmap, implementasikan paket VCBD, atau bertanya apakah sebuah fitur sudah boleh disebut selesai. Pemicu: "mulai coding dari blueprint", "lanjutkan implementasi VCBD", "kerjakan fase 2 roadmap", "apakah fitur ini sudah selesai", "cek DoD fitur" - bahkan tanpa kata VCBD, selama di root proyek ada CLAUDE.md + INDEX.md + docs/_MANIFEST.json. Menegakkan aturan coding ketat (blueprint sumber kebenaran, kode menang atas dokumen usang, dilarang hijau-karena-dihapus), gerbang selesai per fitur yang diuji mesin, dan melaporkan counter waktu + token di akhir TIAP step. TIDAK menyusun blueprint - untuk itu pakai skill vcbd.'
