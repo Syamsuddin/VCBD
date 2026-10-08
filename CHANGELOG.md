@@ -10,7 +10,7 @@ Repo berubah dari satu skill di root menjadi **suite lima skill** di `skills/`. 
 | `coding-vcbd` | 1.2 | 1.1 + tambalan lokal `gerbang.sh` (15 Sep: kompatibel bash 3.2) | S8 mengenali `26_UI_CONVENTIONS.md` maupun warisan `26_UI_DESIGN.md` |
 | `review-vcbd` | 1.2 | 1.1 + tambalan lokal `pindai.py` (12 Sep: perkakas rantai dikecualikan) | Urutan pemilik UI kanonik-dulu; temuan `UI-TOKEN-LUAR` menunjuk berkas 26 yang ada; README memuat batasan perkakas |
 | `reverse-vcbd` | 1.0 | Paket suite 12 Sep — **satu-satunya salinan lengkap** (referensi + 5 skrip) | — (salinan lain, termasuk sinkron akun, hanya berisi `SKILL.md`) |
-| `reverse-web-vcbd` | 2.0 | Salinan sinkron akun (5 Okt 2026) | NIP pada data uji (`uji/buat_fixture.py`) dan contoh di README diganti NIP dummy (TMT 2099) — nomor sebelumnya ternyata NIP sungguhan |
+| `reverse-web-vcbd` | 2.0 | Salinan sinkron akun (5 Okt 2026) | NIP pada data uji (`uji/buat_fixture.py`) dan contoh di README diganti NIP dummy (TMT 2099) — nomor sebelumnya ternyata NIP sungguhan; email contoh memakai domain dummy `contoh.go.id` |
 
 **Unsur v1.2 yang digabung ke `vcbd` 2.6** — v1.2 memperkenalkan "rumah resmi desain UI" (`26_UI_DESIGN`); garis v2.x mengembangkan rumah yang sama secara terpisah (`26_UI_CONVENTIONS`: tabel token, anti-slop, preview). Sintesis mempertahankan rancangan v2.x dan menambahkan yang hanya ada di v1.2:
 
