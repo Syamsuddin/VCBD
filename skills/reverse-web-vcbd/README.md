@@ -323,4 +323,4 @@ Belum. Dosir adalah bahan, bukan blueprint. vcbd masih akan menanyakan hal yang 
 
 Disusun oleh **Syamsuddin, S.Pd, MM** (syamsuddin.ideris@gmail.com) sebagai bagian dari keluarga skill VCBD, untuk kebutuhan modernisasi aplikasi pemerintah daerah: dari aplikasi warisan yang hanya bisa dibuka di peramban, menjadi blueprint yang siap dibangun ulang dengan aman.
 
-Lisensi: [ISI: ikuti lisensi keluarga skill VCBD atau tetapkan lisensi tersendiri]
+Lisensi: GPL-2.0, sama dengan seluruh keluarga skill VCBD (lihat `LICENSE`).

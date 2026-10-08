@@ -1,5 +1,6 @@
 ---
 name: "reverse-web-vcbd"
+license: GPL-2.0
 metadata:
   version: "2.0"
   author: syamsuddin.ideris@gmail.com

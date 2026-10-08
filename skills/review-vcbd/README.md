@@ -10,7 +10,7 @@ review-vcbd     → memeriksa, menguji, melacak, menambal   ← berkas ini
 
 Pertanyaan tunggal yang dijawab: **di mana kode dan blueprint sudah tidak lagi bercerita hal yang sama?**
 
-Versi 1.2 · Bahasa: Indonesia · Penulis: Syamsuddin (`syamsuddin.ideris@gmail.com`)
+Versi 1.2 · Bahasa: Indonesia · Penulis: Syamsuddin (`syamsuddin.ideris@gmail.com`) · Lisensi: GPL-2.0 (lihat `LICENSE`)
 
 ---
 

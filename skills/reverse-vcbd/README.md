@@ -3,6 +3,8 @@
 Pembedah aplikasi brownfield menjadi paket blueprint VCBD. Melengkapi rantai:
 `reverse-vcbd` → `vcbd` → `coding-vcbd` → `review-vcbd`.
 
+Versi 1.0 · Bahasa: Indonesia · Penulis: Syamsuddin · Lisensi: GPL-2.0 (lihat `LICENSE`)
+
 ## Pasang
 
 ```bash

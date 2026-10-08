@@ -1,5 +1,9 @@
 # Riwayat VCBD
 
+## Lisensi seragam GPL-2.0 (Okt 2026)
+
+Kelima skill kini berlisensi **GPL-2.0**, sama dengan `LICENSE` di root repo. Sebelumnya hanya `vcbd` yang membawa berkas lisensi; `coding-vcbd`, `review-vcbd`, `reverse-vcbd`, dan `reverse-web-vcbd` belum menyatakan lisensi (README `reverse-web-vcbd` masih berisi `[ISI:]`). Setiap folder skill kini membawa `LICENSE`, frontmatter `SKILL.md` mencantumkan `license: GPL-2.0`, dan README tiap skill menyebut lisensinya. Versi skill tidak berubah karena isi dan perilakunya tidak berubah.
+
 ## Suite 2026.10 — sintesis seluruh sumber
 
 Repo berubah dari satu skill di root menjadi **suite lima skill** di `skills/`. Isinya disintesis dari semua salinan VCBD yang beredar: garis v1.x repo ini, garis v2.x, rantai `coding`/`review`/`reverse`, salinan sinkron akun claude.ai, dan paket-paket lokal (`.skill`/`.zip`, Juni–Oktober 2026). Setiap varian dibandingkan isinya, lalu yang paling baru dan paling lengkap dipakai sebagai dasar.
