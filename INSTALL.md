@@ -140,6 +140,21 @@ Unggah satu per satu lewat **Settings → Capabilities → Skills**. Unggah **ke
 
 ## Memeriksa instalasi
 
+Dari clone repo, satu perintah menjalankan **seluruh** pemeriksaan, sama persis dengan CI (`.github/workflows/uji.yml`):
+
+```bash
+cd VCBD && bash scripts/uji.sh      # harus: "Semua 11 pemeriksaan lulus."
+```
+
+Isinya:
+- sintaks semua skrip bash dan kompilasi semua skrip Python;
+- konsistensi frontmatter skill dan agen, serta tabel versi di README/INSTALL (`scripts/cek_repo.py`);
+- uji regresi `reverse-web-vcbd` dan `vcbd-agent`;
+- uji asap generator blueprint di bawah;
+- `kemas.sh`.
+
+CI menjalankannya pada Python 3.8 (batas bawah), Python 3.13, dan macOS (bash 3.2). Untuk memeriksa salinan yang sudah terpasang:
+
 ```bash
 cd ~/.claude/skills
 for f in vcbd/scripts/*.sh coding-vcbd/scripts/*.sh; do bash -n "$f" && echo "OK $f"; done

@@ -6,6 +6,24 @@ Entri terbaru di atas. Versi tiap skill mengikuti `metadata.version` di `SKILL.m
 
 ## Belum dirilis
 
+### CI dan pemeriksaan repo
+
+- `.github/workflows/uji.yml` berjalan pada push ke `main`, setiap PR, dan manual. Izinnya `contents: read`, dan run lama dibatalkan bila ada push baru. Matriks dipilih untuk menguji janji INSTALL.md:
+  - Python 3.8 di Ubuntu 22.04 (3.8 tidak tersedia di 24.04);
+  - Python 3.13 di Ubuntu;
+  - Python 3.13 di macOS (bash 3.2 bawaan).
+- `scripts/uji.sh` adalah satu-satunya isi CI, sehingga yang lulus lokal lulus juga di CI. Pemeriksaannya:
+  - sintaks bash dan kompilasi Python;
+  - `scripts/cek_repo.py`;
+  - uji regresi `reverse-web-vcbd` (32) dan `vcbd-agent` (59);
+  - uji asap `scaffold.py` + `validate.sh` (harus 27 dokumen dan `FAIL=1 WARN=1 PASS=9`, seperti tertulis di INSTALL.md);
+  - `kemas.sh` (satu zip lengkap per skill).
+- `scripts/cek_repo.py` menjaga hal yang dulu hanya dijaga ketelitian penulis:
+  - frontmatter skill (`name` = folder, `license` GPL-2.0, `metadata.version`), README dan LICENSE per skill;
+  - nomor versi kelima skill seragam dan sama dengan tabel README dan INSTALL;
+  - definisi agen: `name`, skill yang dimuat ada, hook memanggil `jaga.py` dengan peran yang benar, allowlist `Agent(...)` hanya menyebut agen yang ada, dan tidak ada `.md` di subfolder `agents/`.
+- Diverifikasi lokal: lulus di Python 3.13 dan 3.8. Lima kerusakan sengaja (versi README, skill agen, peran hook, `.md` di subfolder, sintaks bash) semuanya tertangkap.
+
 ### `vcbd-agent` 0.1 — orkestrator otonom (eksperimental, khusus Claude Code)
 
 Folder baru `agents/`. **Tidak ada satu pun skill yang diubah**: semua otonomi tinggal di lapisan agen.

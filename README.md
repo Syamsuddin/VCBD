@@ -8,6 +8,8 @@
 
 Suite 2026.10 (v2.6) · Bahasa Indonesia · Penulis: Syamsuddin · Lisensi: GPL-2.0 · [Unduh rilis](https://github.com/Syamsuddin/VCBD/releases/tag/v2.6)
 
+[![Uji](https://github.com/Syamsuddin/VCBD/actions/workflows/uji.yml/badge.svg)](https://github.com/Syamsuddin/VCBD/actions/workflows/uji.yml)
+
 ---
 
 ## Daftar isi
@@ -314,8 +316,11 @@ Empat hal ini berlaku di kelima skill, dan itulah yang membuat mereka bisa salin
 ```
 VCBD/
 ├── README.md · INSTALL.md · CHANGELOG.md · LICENSE
+├── .github/workflows/uji.yml     CI: menjalankan scripts/uji.sh (Python 3.8 & 3.13, Ubuntu & macOS/bash 3.2)
 ├── assets/img/header-vcbd.jpg
 ├── scripts/kemas.sh              zip per skill → dist/ (untuk claude.ai)
+├── scripts/uji.sh                seluruh pemeriksaan repo — sama persis dengan CI
+├── scripts/cek_repo.py           konsistensi frontmatter, versi README/INSTALL, definisi agen
 ├── agents/                       vcbd-agent (khusus Claude Code; tidak ikut zip claude.ai)
 │   ├── vcbd-agent.md · vcbd-arsitek.md · vcbd-pembangun.md · vcbd-auditor.md · vcbd-penambal.md
 │   └── vcbd-agent/               orkestra.py · jaga.py · LICENSE · uji/uji_agen.py

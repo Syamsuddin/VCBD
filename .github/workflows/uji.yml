@@ -1,0 +1,42 @@
+name: Uji
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uji-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  uji:
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # batas bawah yang dijanjikan INSTALL.md (Python 3.8+); 3.8 tak tersedia di ubuntu-24.04
+          - label: Python 3.8 · Ubuntu 22.04
+            os: ubuntu-22.04
+            python: "3.8"
+          - label: Python 3.13 · Ubuntu
+            os: ubuntu-latest
+            python: "3.13"
+          # bash 3.2 bawaan macOS — kompatibilitas yang dijanjikan validate.sh & gerbang.sh
+          - label: Python 3.13 · macOS (bash 3.2)
+            os: macos-latest
+            python: "3.13"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Seluruh pemeriksaan repo (sama dengan bash scripts/uji.sh lokal)
+        run: bash scripts/uji.sh
