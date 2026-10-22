@@ -123,7 +123,7 @@ Hasil akhirnya ada di `docs/_AGEN/LAPORAN.md`: eskalasi, asumsi, slice, temuan, 
 ### Menguji
 
 ```bash
-python3 VCBD/agents/vcbd-agent/uji/uji_agen.py    # harus: 66/66 lulus
+python3 VCBD/agents/vcbd-agent/uji/uji_agen.py    # harus: 67/67 lulus
 ```
 
 Uji ini menjalankan `orkestra.py` dan `jaga.py` terhadap skrip **asli** di `skills/`. Subagen disimulasikan dengan perintah yang akan mereka jalankan, jadi yang diuji adalah mesin state, gerbang, dan penjaga, bukan model.
@@ -160,7 +160,7 @@ cd ~/.claude/skills
 for f in vcbd/scripts/*.sh coding-vcbd/scripts/*.sh; do bash -n "$f" && echo "OK $f"; done
 for f in */scripts/*.py; do python3 -m py_compile "$f" && echo "OK $f"; done
 python3 reverse-web-vcbd/uji/uji_regresi.py      # harus: 32/32 lulus
-python3 ~/.claude/agents/vcbd-agent/uji/uji_agen.py   # bila vcbd-agent dipasang (memakai skill di ~/.claude/skills): 66/66
+python3 ~/.claude/agents/vcbd-agent/uji/uji_agen.py   # bila vcbd-agent dipasang (memakai skill di ~/.claude/skills): 67/67
 ```
 
 Uji asap generator blueprint di folder sementara:

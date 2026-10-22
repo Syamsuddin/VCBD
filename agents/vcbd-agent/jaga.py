@@ -52,6 +52,7 @@ RX_ARTEFAK = re.compile(r"(^|/)(__pycache__|\.pytest_cache|\.mypy_cache|\.ruff_c
                         r"|(^|/)\.phpunit\.result\.cache$")
 
 hasil = {"FAIL": 0, "PASS": 0, "SKIP": 0}
+ASAL = {}  # path baru -> path lama untuk rename, diisi berubah()
 
 
 def lapor(tanda, teks, rinci=()):
@@ -82,6 +83,8 @@ def berubah(base):
         bag = ln.split("\t")
         if len(bag) >= 2:
             out[bag[-1]] = bag[0][0]
+        if len(bag) == 3 and bag[0].startswith("R"):
+            ASAL[bag[2]] = bag[1]
         if len(bag) == 3 and bag[0].startswith("R") and not (RX_UJI.search(bag[1]) and RX_UJI.search(bag[2])):
             out[bag[1]] = "D"
     for f in git("ls-files", "--others", "--exclude-standard").splitlines():
@@ -95,8 +98,11 @@ def baris_diff(base, paths, baru):
     res = {p: ([], []) for p in paths}
     lacak = [p for p in paths if p not in baru]
     if lacak:
+        # path asal rename wajib ikut di pathspec: tanpa itu git tak bisa memasangkannya dan isi
+        # lama tak terhitung sebagai baris dihapus (rename tes -> tes sambil membuang kasus lolos J3/J4)
+        spek = lacak + [ASAL[p] for p in lacak if p in ASAL and ASAL[p] not in lacak]
         cur, hunk = None, False
-        for ln in git("diff", "-U0", "-M", "--no-color", base, "--", *lacak).splitlines():
+        for ln in git("diff", "-U0", "-M", "--no-color", base, "--", *spek).splitlines():
             if ln.startswith("diff --git "):
                 m = re.match(r"diff --git a/(.+) b/(.+)$", ln)
                 cur, hunk = (m.group(2) if m else None), False

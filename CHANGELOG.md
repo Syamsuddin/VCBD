@@ -15,7 +15,7 @@ Entri terbaru di atas. Versi tiap skill mengikuti `metadata.version` di `SKILL.m
 - `scripts/uji.sh` adalah satu-satunya isi CI, sehingga yang lulus lokal lulus juga di CI. Pemeriksaannya:
   - sintaks bash dan kompilasi Python;
   - `scripts/cek_repo.py`;
-  - uji regresi `reverse-web-vcbd` (32) dan `vcbd-agent` (66);
+  - uji regresi `reverse-web-vcbd` (32) dan `vcbd-agent` (67);
   - uji asap `scaffold.py` + `validate.sh` (harus 27 dokumen dan `FAIL=1 WARN=1 PASS=9`, seperti tertulis di INSTALL.md);
   - `kemas.sh` (satu zip lengkap per skill).
 - `scripts/cek_repo.py` menjaga hal yang dulu hanya dijaga ketelitian penulis:
@@ -43,13 +43,14 @@ Folder baru `agents/`. **Tidak ada satu pun skill yang diubah**: semua otonomi t
 - **`jaga.py`: gerbang anti-curang** pengganti mata manusia, tanpa mengubah `gerbang.sh`. Cek J1–J9: tes dihapus, skip/only baru, kasus tes atau asersi berkurang, penambal menyentuh blueprint, kriteria `23` hilang tanpa diarsip, dokumen berubah tanpa dicatat, skrip gerbang diubah, berkas di luar rencana tanpa deviasi. Juga hook PreToolUse yang memblokir Edit/Write ke skrip gerbang, `docs/_AGEN/`, dan (untuk penambal) blueprint; bila `jaga.py` tidak ada, hook gagal-tertutup.
 - **Celah yang ditutup setelah review CodeRabbit dan uji regresi:**
   - rename tes ke lokasi bukan-tes, dan rename dokumen blueprint keluar `docs/`, kini dihitung sebagai penghapusan path lama; rename tes → tes tetap sah;
+  - rename tes → tes yang sekaligus membuang kasus atau asersi kini terhitung J3/J4: path asal rename ikut diberikan ke `git diff`, supaya isi lama terbaca sebagai baris dihapus;
   - segel dosir tidak lagi diperbarui oleh `putuskan`, `kebijakan`, dan `lapor`, sehingga perubahan auditor di tengah pemeriksaan tidak bisa menjadi patokan baru;
   - `unit-gagal` memeriksa kerja subagen dulu sebelum menyegel;
   - slice yang dibuka ulang di ledger tetapi belum ditutup ditolak di `slice-dibangun`, bukan baru ketahuan saat serah terima;
   - `komit()` orkestrator tidak lagi mengomit artefak build/tes (`__pycache__` dan sejenisnya), yang tadinya membuat J9 menggagalkan slice.
   - `komit()` kini mengurai `git status -z` dan menambah berkas dengan `--literal-pathspecs`, sehingga nama berspasi, non-ASCII, dan ber-kurung siku (`app/[id]/page.tsx`) ikut dikomit.
 - **Segel dosir temuan.** Perubahan status di luar wewenang penambal atau auditor, termasuk dosir yang tertimpa PINDAI, dikembalikan otomatis dan dihitung sebagai kegagalan.
-- **Uji.** `agents/vcbd-agent/uji/uji_agen.py`, 66 cek terhadap skrip skill asli. Uji asap dengan Claude Code 2.1.308: agen termuat dari `.claude/agents/`, `init` dan `lanjut` berjalan, dan `vcbd-arsitek` memuat skill `vcbd` lalu mengembalikan ronde wawancara K1–K9 berusulan default tanpa menulis dokumen sebelum konfirmasi.
+- **Uji.** `agents/vcbd-agent/uji/uji_agen.py`, 67 cek terhadap skrip skill asli. Uji asap dengan Claude Code 2.1.308: agen termuat dari `.claude/agents/`, `init` dan `lanjut` berjalan, dan `vcbd-arsitek` memuat skill `vcbd` lalu mengembalikan ronde wawancara K1–K9 berusulan default tanpa menulis dokumen sebelum konfirmasi.
 - **Belum diuji:** satu proses penuh dengan model, dan mode SPLIT.
 - **Dokumentasi.** `README.md` (bagian *Mode agen otonom*) dan `INSTALL.md` (bagian *Agen otonom `vcbd-agent`*). `scripts/kemas.sh` tetap hanya mengemas `skills/`, karena claude.ai tidak menjalankan subagen.
 

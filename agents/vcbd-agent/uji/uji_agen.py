@@ -215,6 +215,10 @@ coba_jaga("J1 tes di-rename ke lokasi bukan-tes = dihapus",
           kode="J1")
 coba_jaga("J5 dokumen blueprint di-rename keluar docs/ tertangkap",
           lambda: jalan(R, "git", "mv", "docs/_archive/23-fitur-login.md", "src/catatan.md"), kode="J5")
+coba_jaga("J3 rename tes -> tes sambil membuang kasus tes tertangkap",
+          lambda: (jalan(R, "git", "mv", "tests/test_login.py", "tests/test_masuk.py"),
+                   tulis(R, "tests/test_masuk.py", (R / "tests/test_masuk.py").read_text().split("    def test_salah")[0])),
+          kode="J3")
 coba_jaga("rename tes -> tes (sah) lulus",
           lambda: jalan(R, "git", "mv", "tests/test_login.py", "tests/test_masuk.py"), harus="PASS")
 coba_jaga("J2 skip baru", lambda: tulis(R, "tests/test_login.py", (R / "tests/test_login.py").read_text()

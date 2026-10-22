@@ -254,7 +254,7 @@ Skrip gerbang (`validate.sh`, `validate-kontrak.sh`, `gerbang.sh`) membaca berka
 
 ### Mode agen otonom: `vcbd-agent`
 
-> **Status: eksperimental (0.1), khusus Claude Code.** Mesin state dan gerbangnya diuji 66 cek terhadap skrip skill asli. Uji asap dengan Claude Code 2.1.308 membuktikan agen termuat, `init` berjalan, dan subagen mengembalikan pertanyaan wawancara alih-alih menjawab sendiri. Satu proses penuh dari ide sampai aplikasi jadi **belum** diuji dengan model.
+> **Status: eksperimental (0.1), khusus Claude Code.** Mesin state dan gerbangnya diuji 67 cek terhadap skrip skill asli. Uji asap dengan Claude Code 2.1.308 membuktikan agen termuat, `init` berjalan, dan subagen mengembalikan pertanyaan wawancara alih-alih menjawab sendiri. Satu proses penuh dari ide sampai aplikasi jadi **belum** diuji dengan model.
 
 `vcbd-agent` menjalankan rantai `vcbd` → `coding-vcbd` → `review-vcbd` dengan campur tangan manusia seminimal mungkin. **Skill tidak diubah**: skill tetap bertanya, menunggu "ya", dan berhenti di titik wajibnya. Bedanya, yang menjawab adalah orkestrator, menurut kebijakan yang Anda setujui saat menjalankannya. Skill sudah menyiapkan usulan default (wawancara `vcbd`) dan dua opsi konkret (aturan-coding §8); orkestrator memilih opsi terbaik dan mencatat alasannya.
 
@@ -338,7 +338,7 @@ VCBD/
 
 | Rilis | Isi |
 |---|---|
-| *Belum dirilis* | `vcbd-agent` 0.1 (eksperimental): orkestrator otonom + empat subagen, `orkestra.py`, `jaga.py`, 66 cek uji; skill tidak diubah |
+| *Belum dirilis* | `vcbd-agent` 0.1 (eksperimental): orkestrator otonom + empat subagen, `orkestra.py`, `jaga.py`, 67 cek uji; skill tidak diubah |
 | **Suite 2026.10** | Repo menjadi suite lima skill hasil sintesis semua sumber; **kelima skill versi 2.6** (nomor versi diseragamkan) — tag `v2.6`, [rilis](https://github.com/Syamsuddin/VCBD/releases/tag/v2.6) dengan zip per skill |
 | v2.0–2.5 | Garis skill `vcbd` di luar repo: 2.0 format 28 dokumen + `validate.sh` · 2.2 `scaffold.py`, rute DIET · 2.4 `26_UI_CONVENTIONS` · 2.5 mode SPLIT, profil native, rantai suite |
 | v1.2 | Format 29 dokumen dengan `26_UI_DESIGN` (tag `v1.2`) |
