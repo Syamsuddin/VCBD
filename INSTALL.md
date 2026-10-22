@@ -85,6 +85,49 @@ Skill yang diunggah ke akun claude.ai ikut tersinkron ke Claude Code dan tampil 
 
 Dalam mode headless (`claude -p`), skill lokal butuh izin per pemanggilan, misalnya `--allowedTools "Skill(vcbd)"`, atau aturan `allow` yang setara di settings.
 
+## Agen otonom `vcbd-agent`
+
+Opsional, **khusus Claude Code**, berstatus eksperimental (0.1). Cara kerjanya dijelaskan di [README](README.md#mode-agen-otonom-vcbd-agent). Agen ini tidak mengubah skill; ia hanya membutuhkan tiga skill `vcbd`, `coding-vcbd`, dan `review-vcbd` sudah terpasang.
+
+### Pasang
+
+```bash
+mkdir -p ~/.claude/agents && cp -r VCBD/agents/* ~/.claude/agents/
+```
+
+Hasilnya lima definisi agen (`vcbd-agent.md`, `vcbd-arsitek.md`, `vcbd-pembangun.md`, `vcbd-auditor.md`, `vcbd-penambal.md`) dan folder `vcbd-agent/` (`orkestra.py`, `jaga.py`, uji). Claude Code memindai `~/.claude/agents/` secara rekursif, dan hanya berkas `.md` yang dibaca sebagai agen. Jangan menaruh berkas `.md` lain di dalam `vcbd-agent/`.
+
+| Hal | Catatan |
+|---|---|
+| Lingkup pemasangan | **Pengguna** (`~/.claude/agents/`) disarankan. Di lingkup proyek (`.claude/agents/`), hook frontmatter baru aktif setelah dialog *workspace trust* diterima; tanpa hook, penjaga tulis-berkas tidak berjalan. Jangan memasang lewat plugin: subagen plugin tidak mendukung `hooks`. |
+| Nama skill | Subagen memuat skill lewat `skills: [vcbd]`, `[coding-vcbd]`, `[review-vcbd]`. Nama ini terbukti cocok untuk salinan **lokal** (`~/.claude/skills/<nama>` atau `.claude/skills/<nama>`). Bila Anda hanya memakai salinan sinkron akun (`anthropic-skills:<nama>`), pasang salinan lokal dari repo ini (disarankan), atau ganti baris `skills:` di empat berkas subagen. |
+| Prasyarat proyek | Pohon kerja git **bersih**, identitas git terisi. `orkestra.py init` membuat cabang `vcbd-agent/<nama>`, menyalin skrip skill ke `scripts/` (yang sudah ada tidak ditimpa) dan mengomitnya, lalu menaruh state di `docs/_AGEN/` (dikecualikan lewat `.git/info/exclude`). |
+| Izin | Supaya berjalan tanpa banyak dialog izin, jalankan dengan mode izin `auto` bila tersedia di akun Anda, atau `acceptEdits` ditambah aturan `allow` untuk `Bash(python3 docs/_AGEN/bin/*)`, `Bash(python3 scripts/*)`, `Bash(bash scripts/*)`, `Bash(git *)`, dan perintah tes proyek. Mode izin sesi utama ikut berlaku untuk subagen. |
+
+### Menjalankan
+
+```bash
+cd /path/proyek
+claude --agent vcbd-agent "Nama - <nama aplikasi>. Deskripsi - <deskripsi umum>."
+```
+
+Untuk meninjau sendiri Ringkasan Kebutuhan sebelum blueprint ditulis, tambahkan permintaan itu di pesan pembuka. Orkestrator lalu memakai `init --konfirmasi manusia`. Sesi yang terputus dilanjutkan dengan perintah yang sama. Selama proses berjalan:
+
+```bash
+python3 docs/_AGEN/bin/orkestra.py status        # tahap, slice, temuan, gerbang
+python3 docs/_AGEN/bin/orkestra.py kebijakan     # kebijakan aktif; ubah: --set batas_putaran_audit=2
+```
+
+Hasil akhirnya ada di `docs/_AGEN/LAPORAN.md`: eskalasi, asumsi, slice, temuan, dan langkah Anda berikutnya.
+
+### Menguji
+
+```bash
+python3 VCBD/agents/vcbd-agent/uji/uji_agen.py    # harus: 59/59 lulus
+```
+
+Uji ini menjalankan `orkestra.py` dan `jaga.py` terhadap skrip **asli** di `skills/`. Subagen disimulasikan dengan perintah yang akan mereka jalankan, jadi yang diuji adalah mesin state, gerbang, dan penjaga, bukan model.
+
 ## claude.ai
 
 Zip per skill siap pakai tersedia di halaman [rilis v2.6](https://github.com/Syamsuddin/VCBD/releases/tag/v2.6) (`vcbd.zip`, `coding-vcbd.zip`, `review-vcbd.zip`, `reverse-vcbd.zip`, `reverse-web-vcbd.zip`). Atau buat sendiri dari root repo:
@@ -102,6 +145,7 @@ cd ~/.claude/skills
 for f in vcbd/scripts/*.sh coding-vcbd/scripts/*.sh; do bash -n "$f" && echo "OK $f"; done
 for f in */scripts/*.py; do python3 -m py_compile "$f" && echo "OK $f"; done
 python3 reverse-web-vcbd/uji/uji_regresi.py      # harus: 32/32 lulus
+python3 ~/.claude/agents/vcbd-agent/uji/uji_agen.py   # bila vcbd-agent dipasang (memakai skill di ~/.claude/skills): 59/59
 ```
 
 Uji asap generator blueprint di folder sementara:
@@ -131,7 +175,9 @@ Proyek yang sudah menyalin skrip ke `scripts/` (langkah 3) tidak ikut terbarui o
 cd ~/.claude/skills && rm -rf vcbd coding-vcbd review-vcbd reverse-vcbd reverse-web-vcbd
 ```
 
-Berkas yang sudah lahir di proyek (`docs/`, `CLAUDE.md`, `INDEX.md`, `scripts/`) tidak tersentuh.
+Agen otonom: `rm -rf ~/.claude/agents/vcbd-agent ~/.claude/agents/vcbd-{agent,arsitek,pembangun,auditor,penambal}.md`.
+
+Berkas yang sudah lahir di proyek (`docs/`, `docs/_AGEN/`, `CLAUDE.md`, `INDEX.md`, `scripts/`) tidak tersentuh.
 
 ## Memutakhirkan dari repo versi lama (satu skill di root)
 
