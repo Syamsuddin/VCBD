@@ -4,6 +4,67 @@ Entri terbaru di atas. Versi tiap skill mengikuti `metadata.version` di `SKILL.m
 
 ---
 
+## Belum dirilis
+
+### Catatan rancangan
+
+- `catatan/simulasi-vcbd-agent.md`: simulasi logis satu proses `vcbd-agent` (Buku Tamu Kecamatan), bukan hasil run.
+- `catatan/rancangan-agen-vps-ojarvis.md`: rangkuman bahan implementasi. Isinya:
+  - arsitektur `vcbd-agent` (mesin tahap, perintah, kebijakan, penjaga, berkas state, gesekan dengan skill);
+  - pemasangan di VPS Ubuntu 24.04;
+  - rancangan konsol web oJARVIS (arsitektur, panel → sumber data, protokol WebSocket, keamanan, fase implementasi).
+- `catatan/ojarvis-prototipe.html`: prototipe tampilan oJARVIS dengan data simulasi.
+
+### CI dan pemeriksaan repo
+
+- `.github/workflows/uji.yml` berjalan pada push ke `main`, setiap PR, dan manual. Izinnya `contents: read`, dan run lama dibatalkan bila ada push baru. Matriks dipilih untuk menguji janji INSTALL.md:
+  - Python 3.8 di Ubuntu 22.04 (3.8 tidak tersedia di 24.04);
+  - Python 3.13 di Ubuntu;
+  - Python 3.13 di macOS (bash 3.2 bawaan).
+- `scripts/uji.sh` adalah satu-satunya isi CI, sehingga yang lulus lokal lulus juga di CI. Pemeriksaannya:
+  - sintaks bash dan kompilasi Python;
+  - `scripts/cek_repo.py`;
+  - uji regresi `reverse-web-vcbd` (32) dan `vcbd-agent` (67);
+  - uji asap `scaffold.py` + `validate.sh` (harus 27 dokumen dan `FAIL=1 WARN=1 PASS=9`, seperti tertulis di INSTALL.md);
+  - `kemas.sh` (satu zip lengkap per skill).
+- `scripts/cek_repo.py` menjaga hal yang dulu hanya dijaga ketelitian penulis:
+  - frontmatter skill (`name` = folder, `license` GPL-2.0, `metadata.version`), README dan LICENSE per skill;
+  - nomor versi kelima skill seragam dan sama dengan tabel README dan INSTALL;
+  - definisi agen: `name`, skill yang dimuat ada, hook memanggil `jaga.py` dengan peran yang benar, allowlist `Agent(...)` hanya menyebut agen yang ada, dan tidak ada `.md` di subfolder `agents/`.
+- Diverifikasi lokal: lulus di Python 3.13 dan 3.8. Lima kerusakan sengaja (versi README, skill agen, peran hook, `.md` di subfolder, sintaks bash) semuanya tertangkap.
+
+### `vcbd-agent` 0.1 — orkestrator otonom (eksperimental, khusus Claude Code)
+
+Folder baru `agents/`. **Tidak ada satu pun skill yang diubah**: semua otonomi tinggal di lapisan agen.
+
+- **Lima definisi agen.**
+  - `vcbd-agent`: thread utama, `claude --agent vcbd-agent`.
+  - `vcbd-arsitek` (`vcbd`) dan `vcbd-pembangun` (`coding-vcbd`).
+  - `vcbd-auditor` (`review-vcbd`, hanya membaca) dan `vcbd-penambal` (`review-vcbd` Mode TAMBAL).
+- **Prinsip.** Skill tetap bertanya dan menunggu di titik wajibnya. Subagen mengembalikan setiap titik tanya ke orkestrator (`HASIL: bertanya`), lalu orkestrator menjawab dengan opsi terbaik menurut kebijakan dan mencatatnya di `docs/_AGEN/keputusan.json`.
+- **`orkestra.py`: ingatan dan gerbang.** Mesin tahap BLUEPRINT → BANGUN → AUDIT → TAMBAL → SEHAT dengan `lanjut` yang mencetak AKSI berikutnya beserta prompt subagen, sehingga kesinambungan langkah ada di berkas, bukan di ingatan model.
+  - Gerbang skill (`validate.sh`, `gerbang.sh`, syarat sehat) dijalankan ulang dan exit code-nya dicatat.
+  - Batas percobaan 3 + 1 alternatif.
+  - Persetujuan temuan menurut kebijakan (KRITIS/TINGGI/SEDANG ditambal, RENDAH dicatat, temuan yang hanya bisa ditutup dengan mengubah blueprint dieskalasi).
+  - Pindai ulang ke berkas terpisah lalu direkonsiliasi, karena `pindai.py` menimpa seluruh `_TEMUAN.json`.
+  - Pembatalan percobaan yang buntu (`git reset` hanya di cabang `vcbd-agent/*`, jejak disimpan).
+  - Laporan akhir `docs/_AGEN/LAPORAN.md`.
+- **`jaga.py`: gerbang anti-curang** pengganti mata manusia, tanpa mengubah `gerbang.sh`. Cek J1–J9: tes dihapus, skip/only baru, kasus tes atau asersi berkurang, penambal menyentuh blueprint, kriteria `23` hilang tanpa diarsip, dokumen berubah tanpa dicatat, skrip gerbang diubah, berkas di luar rencana tanpa deviasi. Juga hook PreToolUse yang memblokir Edit/Write ke skrip gerbang, `docs/_AGEN/`, dan (untuk penambal) blueprint; bila `jaga.py` tidak ada, hook gagal-tertutup.
+- **Celah yang ditutup setelah review CodeRabbit dan uji regresi:**
+  - rename tes ke lokasi bukan-tes, dan rename dokumen blueprint keluar `docs/`, kini dihitung sebagai penghapusan path lama; rename tes → tes tetap sah;
+  - rename tes → tes yang sekaligus membuang kasus atau asersi kini terhitung J3/J4: path asal rename ikut diberikan ke `git diff`, supaya isi lama terbaca sebagai baris dihapus;
+  - segel dosir tidak lagi diperbarui oleh `putuskan`, `kebijakan`, dan `lapor`, sehingga perubahan auditor di tengah pemeriksaan tidak bisa menjadi patokan baru;
+  - `unit-gagal` memeriksa kerja subagen dulu sebelum menyegel;
+  - slice yang dibuka ulang di ledger tetapi belum ditutup ditolak di `slice-dibangun`, bukan baru ketahuan saat serah terima;
+  - `komit()` orkestrator tidak lagi mengomit artefak build/tes (`__pycache__` dan sejenisnya), yang tadinya membuat J9 menggagalkan slice.
+  - `komit()` kini mengurai `git status -z` dan menambah berkas dengan `--literal-pathspecs`, sehingga nama berspasi, non-ASCII, dan ber-kurung siku (`app/[id]/page.tsx`) ikut dikomit.
+- **Segel dosir temuan.** Perubahan status di luar wewenang penambal atau auditor, termasuk dosir yang tertimpa PINDAI, dikembalikan otomatis dan dihitung sebagai kegagalan.
+- **Uji.** `agents/vcbd-agent/uji/uji_agen.py`, 67 cek terhadap skrip skill asli. Uji asap dengan Claude Code 2.1.308: agen termuat dari `.claude/agents/`, `init` dan `lanjut` berjalan, dan `vcbd-arsitek` memuat skill `vcbd` lalu mengembalikan ronde wawancara K1–K9 berusulan default tanpa menulis dokumen sebelum konfirmasi.
+- **Belum diuji:** satu proses penuh dengan model, dan mode SPLIT.
+- **Dokumentasi.** `README.md` (bagian *Mode agen otonom*) dan `INSTALL.md` (bagian *Agen otonom `vcbd-agent`*). `scripts/kemas.sh` tetap hanya mengemas `skills/`, karena claude.ai tidak menjalankan subagen.
+
+---
+
 ## Suite 2026.10 — 8 Oktober 2026 (tag `v2.6`)
 
 Rilis GitHub: [v2.6](https://github.com/Syamsuddin/VCBD/releases/tag/v2.6) — kode sumber + zip per skill untuk claude.ai.

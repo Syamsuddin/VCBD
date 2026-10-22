@@ -4,9 +4,11 @@
 
 # VCBD Suite — Vibe Coding Blueprint Drafter
 
-**Lima skill Claude Code untuk seluruh siklus hidup aplikasi**: dari ide atau aplikasi warisan, menjadi blueprint terstruktur, menjadi kode yang dibangun slice demi slice, sampai kode yang diaudit, diuji, dan ditambal — semuanya dengan gerbang mesin, bukan harapan.
+**Lima skill Claude Code untuk seluruh siklus hidup aplikasi**: dari ide atau aplikasi warisan, menjadi blueprint terstruktur, menjadi kode yang dibangun slice demi slice, sampai kode yang diaudit, diuji, dan ditambal — semuanya dengan gerbang mesin, bukan harapan. Ditambah **`vcbd-agent`** (eksperimental), orkestrator yang menjalankan rantai `vcbd` → `coding-vcbd` → `review-vcbd` secara otonom tanpa mengubah satu pun skill.
 
 Suite 2026.10 (v2.6) · Bahasa Indonesia · Penulis: Syamsuddin · Lisensi: GPL-2.0 · [Unduh rilis](https://github.com/Syamsuddin/VCBD/releases/tag/v2.6)
+
+[![Uji](https://github.com/Syamsuddin/VCBD/actions/workflows/uji.yml/badge.svg)](https://github.com/Syamsuddin/VCBD/actions/workflows/uji.yml)
 
 ---
 
@@ -21,6 +23,7 @@ Suite 2026.10 (v2.6) · Bahasa Indonesia · Penulis: Syamsuddin · Lisensi: GPL-
 6. [Berkas state yang lahir di proyek](#berkas-state-yang-lahir-di-proyek)
 7. [Pasang](#pasang)
 8. [Cara pakai](#cara-pakai)
+   - [Mode agen otonom: `vcbd-agent`](#mode-agen-otonom-vcbd-agent)
 9. [Konvensi bersama](#konvensi-bersama)
 10. [Struktur repo](#struktur-repo)
 11. [Riwayat versi](#riwayat-versi)
@@ -205,6 +208,7 @@ Satu perintah membedah semua bahan dan mencetak ringkasan ≤15 baris. Keluaran:
 | `docs/_RECON_WEB/` | `reverse-web-vcbd` | Dosir kotak hitam + laporan cakupan |
 | `docs/_UI_PREVIEW.html` | `vcbd` (opsional) | Render preview dari tabel token 26 — `26` tetap sumber kebenaran |
 | `kontrak/openapi.yaml`, `KONTRAK.md` | `vcbd` (mode split) | Rumah tunggal endpoint & payload lintas paket |
+| `docs/_AGEN/` | `vcbd-agent` | State orkestrator, log keputusan & gerbang, laporan akhir; tidak di-commit (`.git/info/exclude`) |
 
 ---
 
@@ -213,6 +217,7 @@ Satu perintah membedah semua bahan dan mencetak ringkasan ≤15 baris. Keluaran:
 ```bash
 git clone https://github.com/Syamsuddin/VCBD.git
 mkdir -p ~/.claude/skills && cp -r VCBD/skills/* ~/.claude/skills/
+mkdir -p ~/.claude/agents && cp -r VCBD/agents/* ~/.claude/agents/     # opsional: vcbd-agent
 ```
 
 Kelima folder harus **bersebelahan**, karena beberapa skrip dipakai lintas skill:
@@ -247,6 +252,52 @@ Kerjakan, lalu jalankan blok verifikasinya.
 
 Skrip gerbang (`validate.sh`, `validate-kontrak.sh`, `gerbang.sh`) membaca berkas secara relatif — **jalankan dari root proyek**.
 
+### Mode agen otonom: `vcbd-agent`
+
+> **Status: eksperimental (0.1), khusus Claude Code.** Mesin state dan gerbangnya diuji 67 cek terhadap skrip skill asli. Uji asap dengan Claude Code 2.1.308 membuktikan agen termuat, `init` berjalan, dan subagen mengembalikan pertanyaan wawancara alih-alih menjawab sendiri. Satu proses penuh dari ide sampai aplikasi jadi **belum** diuji dengan model.
+
+`vcbd-agent` menjalankan rantai `vcbd` → `coding-vcbd` → `review-vcbd` dengan campur tangan manusia seminimal mungkin. **Skill tidak diubah**: skill tetap bertanya, menunggu "ya", dan berhenti di titik wajibnya. Bedanya, yang menjawab adalah orkestrator, menurut kebijakan yang Anda setujui saat menjalankannya. Skill sudah menyiapkan usulan default (wawancara `vcbd`) dan dua opsi konkret (aturan-coding §8); orkestrator memilih opsi terbaik dan mencatat alasannya.
+
+```bash
+cd /path/proyek          # pohon kerja harus bersih
+claude --agent vcbd-agent "Nama - Buku Tamu. Deskripsi - aplikasi buku tamu kantor kecamatan."
+```
+
+| Agen | Skill | Peran |
+|---|---|---|
+| `vcbd-agent` | — | Thread utama: menjalankan AKSI dari `orkestra.py lanjut`, menjawab titik tanya skill, mencatat semuanya |
+| `vcbd-arsitek` | `vcbd` | Menyusun / memperbaiki blueprint |
+| `vcbd-pembangun` | `coding-vcbd` | Satu slice per panggilan, context bersih |
+| `vcbd-auditor` | `review-vcbd` | Audit, verifikasi temuan, memeriksa S1/S6 tiap slice dan setiap tambalan dengan mata segar; hanya membaca |
+| `vcbd-penambal` | `review-vcbd` | Menambal satu temuan yang disetujui kebijakan; tidak bisa menyentuh blueprint |
+
+**Alur.** BLUEPRINT (`validate.sh`) → BANGUN per slice (`gerbang.sh` + `jaga.py` + pemeriksaan auditor) → serah terima → AUDIT → TAMBAL berulang (pindai ulang + rekonsiliasi, maksimal 3 putaran) → SEHAT → laporan. Setiap gerbang dijalankan ulang oleh `orkestra.py`, dan exit code-nya dicatat; klaim subagen tidak dihitung sebagai bukti. Gagal 3x pada unit yang sama memicu satu percobaan alternatif. Bila masih gagal, slice dinyatakan buntu dan proses berhenti; temuan yang buntu dieskalasi dan proses lanjut ke temuan berikutnya. Jejak percobaan yang dibatalkan disimpan di `docs/_AGEN/sisa/`.
+
+**Kesinambungan.** Semua state ada di `docs/_AGEN/`. Sesi yang terputus cukup dijalankan ulang dengan perintah yang sama, dan orkestrator melanjutkan dari state, bukan dari ingatan.
+
+**Penjaga pengganti mata manusia** (semuanya di lapisan agen):
+
+| Penjaga | Mencegah |
+|---|---|
+| `jaga.py` J1–J4 | Lulus dengan menghapus tes, menambah skip/only, mengurangi kasus tes atau asersi |
+| `jaga.py` J5, J6, J7 | Penambal mengubah blueprint; kriteria `23` hilang tanpa diarsip utuh; dokumen berubah tanpa dicatat |
+| `jaga.py` J8 + hook | Skrip gerbang atau perkakas agen diubah agar lulus |
+| `jaga.py` J9 | Berkas di luar rencana slice tanpa `--deviasi` |
+| Segel dosir temuan | Status temuan diubah di luar wewenang, atau dosir ditimpa `pindai.py` (yang menomori ulang dan me-reset semua status) |
+| Pemisahan peran | Penambal tidak menilai tambalannya sendiri; yang menilai `vcbd-auditor` dengan context bersih |
+
+**Yang tetap milik manusia.** Nama dan deskripsi aplikasi di awal. Di akhir: membaca `docs/_AGEN/LAPORAN.md` (eskalasi dan asumsi), meninjau cabang `vcbd-agent/*`, merge, dan deploy. Agen tidak pernah merge, push, atau menyentuh produksi. Temuan yang hanya bisa ditutup dengan mengubah blueprint dieskalasi: kalau agen boleh mengubah patokannya sendiri, setiap audit bisa "lulus" tanpa ada yang benar-benar diperbaiki.
+
+**Risiko yang perlu diketahui.**
+- Konfirmasi Ringkasan Kebutuhan dijawab AI secara bawaan. Untuk proyek penting, pakai `init --konfirmasi manusia`.
+- J3/J4 menghitung pola dengan regex, jadi bisa keliru pada refactor tes yang sah. Penilaian maknanya tetap di tangan auditor.
+- Hook memblokir Edit/Write. Tulisan lewat Bash baru tertangkap sesudahnya oleh J5/J8 dan segel dosir.
+- S4 `gerbang.sh` menolak penanda TODO/debug lama di berkas yang disentuh tambalan. Penambal diizinkan membersihkan baris itu saja.
+- Mode SPLIT belum diuji.
+- Satu proses penuh memanggil banyak subagen, jadi biaya tokennya besar.
+
+Pemasangan, izin, dan uji: [INSTALL.md](INSTALL.md#agen-otonom-vcbd-agent). Gambaran satu proses dari awal sampai akhir: [simulasi logis Buku Tamu Kecamatan](catatan/simulasi-vcbd-agent.md). Rancangan lanjutan (pemasangan di VPS dan konsol web oJARVIS): [catatan/rancangan-agen-vps-ojarvis.md](catatan/rancangan-agen-vps-ojarvis.md).
+
 ---
 
 ## Konvensi bersama
@@ -265,8 +316,15 @@ Empat hal ini berlaku di kelima skill, dan itulah yang membuat mereka bisa salin
 ```
 VCBD/
 ├── README.md · INSTALL.md · CHANGELOG.md · LICENSE
+├── .github/workflows/uji.yml     CI: menjalankan scripts/uji.sh (Python 3.8 & 3.13, Ubuntu & macOS/bash 3.2)
 ├── assets/img/header-vcbd.jpg
 ├── scripts/kemas.sh              zip per skill → dist/ (untuk claude.ai)
+├── scripts/uji.sh                seluruh pemeriksaan repo — sama persis dengan CI
+├── scripts/cek_repo.py           konsistensi frontmatter, versi README/INSTALL, definisi agen
+├── catatan/                      simulasi logis vcbd-agent · rancangan VPS & konsol oJARVIS · prototipe HTML oJARVIS
+├── agents/                       vcbd-agent (khusus Claude Code; tidak ikut zip claude.ai)
+│   ├── vcbd-agent.md · vcbd-arsitek.md · vcbd-pembangun.md · vcbd-auditor.md · vcbd-penambal.md
+│   └── vcbd-agent/               orkestra.py · jaga.py · LICENSE · uji/uji_agen.py
 └── skills/
     ├── vcbd/                     SKILL.md · README.md · LICENSE · references/ · scripts/
     ├── coding-vcbd/              SKILL.md · README.md · LICENSE · references/ · scripts/
@@ -281,6 +339,7 @@ VCBD/
 
 | Rilis | Isi |
 |---|---|
+| *Belum dirilis* | `vcbd-agent` 0.1 (eksperimental): orkestrator otonom + empat subagen, `orkestra.py`, `jaga.py`, 67 cek uji; skill tidak diubah |
 | **Suite 2026.10** | Repo menjadi suite lima skill hasil sintesis semua sumber; **kelima skill versi 2.6** (nomor versi diseragamkan) — tag `v2.6`, [rilis](https://github.com/Syamsuddin/VCBD/releases/tag/v2.6) dengan zip per skill |
 | v2.0–2.5 | Garis skill `vcbd` di luar repo: 2.0 format 28 dokumen + `validate.sh` · 2.2 `scaffold.py`, rute DIET · 2.4 `26_UI_CONVENTIONS` · 2.5 mode SPLIT, profil native, rantai suite |
 | v1.2 | Format 29 dokumen dengan `26_UI_DESIGN` (tag `v1.2`) |

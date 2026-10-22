@@ -1,0 +1,1183 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>oJARVIS Konsol Agen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Tata letak: HUD tiga kolom — percakapan | inti reaktor + kru | telemetri — dengan transkrip selebar layar di bawah.
+   Satu dunia visual yang sengaja gelap (konsol operasi malam), jadi hanya satu tema. */
+:root {
+  color-scheme: dark;
+  --bg: #03070c;
+  --panel: #07131d;
+  --panel-2: #0a1a27;
+  --line: #133247;
+  --line-hi: #1f5677;
+  --fg: #d5eaf5;
+  --muted: #7b98ab;
+  --dim: #4a687b;
+  --arc: #5ad8ff;
+  --arc-2: #2b9fcc;
+  --gold: #ffa64a;
+  --ok: #46e0a1;
+  --bad: #ff5f70;
+  --warn: #ffd166;
+  --s-arsitek: #b3a6ff;
+  --s-pembangun: #52e5c6;
+  --s-auditor: #c9f26e;
+  --s-penambal: #ff93c9;
+  --f-disp: "Chakra Petch", "Bahnschrift", "Arial Narrow", sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+html, body { background: var(--bg); color: var(--fg); }
+body {
+  font-family: var(--f-body);
+  font-size: 14px;
+  line-height: 1.5;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 18%, rgba(90, 216, 255, 0.07), transparent 70%),
+    repeating-linear-gradient(0deg, transparent 0 39px, rgba(31, 86, 119, 0.13) 39px 40px),
+    repeating-linear-gradient(90deg, transparent 0 39px, rgba(31, 86, 119, 0.13) 39px 40px),
+    var(--bg);
+}
+* { box-sizing: border-box; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--arc); outline-offset: 2px; }
+
+.app {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 14px 28px;
+  display: grid;
+  gap: 14px;
+}
+
+/* ---------- bar atas ---------- */
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  padding-block: 4px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand svg { width: 34px; height: 34px; flex: none; }
+.brand-name { font-family: var(--f-disp); font-weight: 700; font-size: 22px; letter-spacing: 0.16em; line-height: 1; }
+.brand-name .o { color: var(--arc); letter-spacing: 0.04em; }
+.brand-sub { font-family: var(--f-disp); font-size: 11px; letter-spacing: 0.16em; color: var(--muted); text-transform: uppercase; }
+.proj { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; min-width: 0; }
+.pill {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  padding: 3px 9px;
+  border: 1px solid var(--line-hi);
+  border-radius: 2px;
+  color: var(--fg);
+  background: var(--panel);
+  white-space: nowrap;
+}
+.pill.sim { border-color: var(--gold); color: var(--gold); letter-spacing: 0.12em; font-family: var(--f-disp); font-weight: 600; }
+.pill.link::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); margin-right: 7px; box-shadow: 0 0 8px var(--ok); vertical-align: 1px; }
+.spacer { flex: 1 1 auto; }
+.ctrl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.btn {
+  background: var(--panel-2);
+  border: 1px solid var(--line-hi);
+  color: var(--fg);
+  padding: 5px 11px;
+  border-radius: 2px;
+  font-family: var(--f-disp);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.btn:hover { border-color: var(--arc); color: var(--arc); }
+.seg { display: inline-flex; border: 1px solid var(--line-hi); border-radius: 2px; overflow: hidden; }
+.seg button { background: transparent; border: 0; padding: 5px 10px; font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--line-hi); color: var(--fg); }
+.clock { font-family: var(--f-disp); font-weight: 600; font-size: 20px; letter-spacing: 0.08em; color: var(--arc); font-variant-numeric: tabular-nums; }
+.clock small { font-size: 10px; color: var(--muted); letter-spacing: 0.14em; display: block; text-align: right; }
+.progress { height: 2px; background: var(--line); position: relative; overflow: hidden; margin-top: -14px; }
+.progress span { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--arc); box-shadow: 0 0 10px var(--arc); transition: width 0.4s; }
+
+/* ---------- panel ---------- */
+.panel {
+  position: relative;
+  background: linear-gradient(180deg, rgba(10, 26, 39, 0.92), rgba(7, 19, 29, 0.92));
+  border: 1px solid var(--line);
+  padding: 12px 14px 14px;
+  min-width: 0;
+}
+.panel::before, .panel::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 0 solid var(--arc);
+  pointer-events: none;
+}
+.panel::before { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
+.panel::after { bottom: -1px; right: -1px; border-bottom-width: 2px; border-right-width: 2px; }
+.ph {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-family: var(--f-disp);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ph b { color: var(--fg); font-weight: 600; }
+.ph .meta { font-family: var(--f-mono); letter-spacing: 0; text-transform: none; font-size: 11.5px; color: var(--dim); }
+
+/* ---------- grid utama ---------- */
+.grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "core" "chat" "tele";
+}
+.chat { grid-area: chat; }
+.core-col { grid-area: core; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.tele { grid-area: tele; display: grid; gap: 14px; align-content: start; min-width: 0; }
+@media (min-width: 760px) {
+  .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "core tele" "chat chat"; }
+}
+@media (min-width: 1200px) {
+  .grid { grid-template-columns: 340px minmax(0, 1fr) 360px; grid-template-areas: "chat core tele"; }
+}
+
+/* ---------- percakapan ---------- */
+.chat { display: flex; flex-direction: column; min-height: 0; }
+.msgs {
+  flex: 1 1 auto;
+  min-height: 300px;
+  max-height: 560px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 4px;
+  scrollbar-color: var(--line-hi) transparent;
+}
+@media (min-width: 1200px) { .msgs { max-height: none; height: 520px; } }
+.msg { display: grid; gap: 2px; max-width: 92%; }
+.msg .who { font-family: var(--f-disp); font-weight: 600; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; }
+.msg .txt { font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
+.msg.jaw .who { color: var(--arc); text-transform: none; letter-spacing: 0.1em; }
+.msg.jaw .txt { color: var(--fg); }
+.msg.anda { justify-self: end; text-align: right; }
+.msg.anda .who { color: var(--gold); }
+.msg.anda .txt { background: rgba(255, 166, 74, 0.08); border: 1px solid rgba(255, 166, 74, 0.28); padding: 7px 10px; border-radius: 2px; text-align: left; }
+.msg.sys .who { color: var(--dim); }
+.msg.sys .txt { color: var(--muted); font-size: 13px; font-style: italic; }
+.caret { display: inline-block; width: 7px; height: 1em; background: var(--arc); vertical-align: -2px; margin-left: 2px; animation: blink 0.9s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.chip-q {
+  background: transparent;
+  border: 1px dashed var(--line-hi);
+  color: var(--muted);
+  font-size: 12.5px;
+  padding: 3px 9px;
+  border-radius: 2px;
+}
+.chip-q:hover { color: var(--arc); border-color: var(--arc); }
+.say { display: flex; gap: 8px; margin-top: 10px; }
+.say input {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--bg);
+  border: 1px solid var(--line-hi);
+  border-radius: 2px;
+  padding: 8px 10px;
+}
+.say input::placeholder { color: var(--dim); }
+.icon-btn {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  background: var(--panel-2);
+  border: 1px solid var(--line-hi);
+  border-radius: 2px;
+  color: var(--arc);
+}
+.icon-btn:hover { border-color: var(--arc); }
+.icon-btn[aria-pressed="true"] { background: var(--arc); color: var(--bg); }
+.icon-btn svg { width: 18px; height: 18px; }
+
+/* ---------- inti ---------- */
+.core { display: grid; justify-items: center; gap: 12px; padding-block: 16px 14px; }
+.reactor { position: relative; width: min(100%, 340px); aspect-ratio: 1; max-width: 100%; }
+.reactor canvas { width: 100%; height: 100%; display: block; }
+.reactor .mid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 2px;
+  pointer-events: none;
+  padding: 22%;
+}
+.mid .t1 { font-family: var(--f-disp); font-weight: 700; font-size: clamp(20px, 5vw, 30px); letter-spacing: 0.16em; line-height: 1.05; }
+.mid .t2 { font-size: 12.5px; color: var(--muted); line-height: 1.35; text-wrap: balance; }
+.mid .t3 { font-family: var(--f-disp); font-weight: 600; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; margin-top: 4px; }
+.mode-kerja { color: var(--arc); }
+.mode-tanya { color: var(--gold); }
+.mode-gerbang { color: var(--warn); }
+.mode-selesai { color: var(--ok); }
+.pipe { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 6px; list-style: none; margin: 0; padding: 0; }
+.pipe li {
+  font-family: var(--f-disp);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  color: var(--dim);
+}
+.pipe li.done { color: var(--arc); border-color: var(--arc-2); }
+.pipe li.now { color: var(--bg); background: var(--arc); border-color: var(--arc); }
+.aksi { display: grid; gap: 4px; }
+.aksi code { font-family: var(--f-mono); font-size: 13px; color: var(--arc); overflow-wrap: anywhere; }
+.aksi .note { font-size: 12.5px; color: var(--muted); }
+
+.crew { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 560px) and (max-width: 759px), (min-width: 1200px) { .crew { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 1200px) and (max-width: 1360px) { .crew { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.agent { padding: 10px 11px; display: grid; gap: 4px; align-content: start; }
+.agent .nm { display: flex; align-items: center; gap: 7px; font-family: var(--f-disp); font-weight: 600; font-size: 12.5px; letter-spacing: 0.06em; }
+.agent .sk { font-family: var(--f-mono); font-size: 11px; color: var(--dim); }
+.agent .tk { font-size: 12.5px; color: var(--muted); line-height: 1.35; min-height: 2.7em; overflow-wrap: anywhere; }
+.led { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); flex: none; }
+.led.kerja { background: var(--arc); box-shadow: 0 0 8px var(--arc); animation: pulse 1.1s ease-in-out infinite; }
+.led.tanya { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.led.selesai { background: var(--ok); }
+@keyframes pulse { 50% { opacity: 0.35; } }
+
+/* ---------- telemetri ---------- */
+.rows { display: grid; gap: 6px; }
+.row { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 13px; }
+.row .n { font-family: var(--f-mono); color: var(--dim); font-size: 12px; }
+.row .label { min-width: 0; overflow-wrap: anywhere; }
+.row .sub { display: block; font-size: 11.5px; color: var(--dim); }
+.st {
+  font-family: var(--f-disp);
+  font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+.st.ok { color: var(--ok); }
+.st.bad { color: var(--bad); }
+.st.run { color: var(--arc); }
+.st.warn { color: var(--gold); }
+.st.mut { color: var(--dim); }
+.gate { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 12.5px; padding-block: 6px; border-top: 1px solid var(--line); }
+.gate .st { text-align: center; }
+.gate:first-child { border-top: 0; }
+.gate .gn { font-family: var(--f-mono); color: var(--fg); }
+.gate .gd { color: var(--muted); display: block; font-size: 12px; overflow-wrap: anywhere; }
+.gate .gt { font-family: var(--f-mono); color: var(--dim); font-size: 11px; }
+.sev { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
+.sev div { border: 1px solid var(--line); padding: 6px 8px; display: grid; }
+.sev b { font-family: var(--f-disp); font-size: 20px; line-height: 1; font-variant-numeric: tabular-nums; }
+.sev span { font-family: var(--f-disp); font-size: 10px; letter-spacing: 0.14em; color: var(--muted); }
+.sev .k b { color: var(--bad); }
+.sev .t b { color: var(--gold); }
+.sev .s b { color: var(--warn); }
+.sev .r b { color: var(--muted); }
+.meter { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+.meter div { display: grid; }
+.meter b { font-family: var(--f-disp); font-weight: 600; font-size: 22px; color: var(--fg); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.meter span { font-size: 11.5px; color: var(--muted); }
+.empty { color: var(--dim); font-size: 13px; }
+
+.esk { border-color: var(--gold); }
+.esk::before, .esk::after { border-color: var(--gold); }
+.esk .ph { color: var(--gold); }
+.esk-item { display: grid; gap: 6px; padding-block: 8px; border-top: 1px solid rgba(255, 166, 74, 0.25); }
+.esk-item:first-of-type { border-top: 0; padding-top: 0; }
+.esk-item h3 { margin: 0; font-family: var(--f-body); font-size: 14.5px; font-weight: 600; text-wrap: balance; }
+.esk-item p { margin: 0; font-size: 13px; color: var(--muted); }
+.esk-item .opsi { display: flex; flex-wrap: wrap; gap: 6px; }
+.esk-item .opsi button { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 5px 10px; font-size: 13px; border-radius: 2px; }
+.esk-item .opsi button:hover { background: var(--gold); color: var(--bg); }
+.esk-item .done { font-size: 13px; color: var(--ok); }
+
+/* ---------- bawah: transkrip ---------- */
+.tabs { display: flex; flex-wrap: wrap; gap: 4px 18px; border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+.tabs button {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 4px 0 7px;
+  font-family: var(--f-disp);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: -1px;
+}
+.tabs button[aria-selected="true"] { color: var(--arc); border-bottom-color: var(--arc); }
+.filt { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.filt button { background: transparent; border: 1px solid var(--line-hi); color: var(--muted); padding: 2px 9px; font-size: 12px; border-radius: 2px; }
+.filt button[aria-pressed="true"] { color: var(--bg); background: var(--arc); border-color: var(--arc); }
+.filt input { flex: 1 1 180px; min-width: 0; background: var(--bg); border: 1px solid var(--line-hi); border-radius: 2px; padding: 4px 9px; font-size: 13px; }
+.log { max-height: 340px; overflow-y: auto; font-family: var(--f-mono); font-size: 12.5px; scrollbar-color: var(--line-hi) transparent; }
+.lr { display: grid; grid-template-columns: 46px 92px minmax(0, 1fr); gap: 10px; padding-block: 3px; border-bottom: 1px dotted rgba(31, 86, 119, 0.35); }
+.lr .lt { color: var(--dim); font-variant-numeric: tabular-nums; }
+.lr .ls { text-transform: uppercase; letter-spacing: 0.06em; font-size: 11.5px; }
+.lr .ls.c-ojarvis { text-transform: none; }
+.lr .lm { overflow-wrap: anywhere; color: var(--fg); }
+.lr.fail .lm { color: var(--bad); }
+.lr.pass .lm { color: var(--ok); }
+@media (max-width: 560px) { .lr { grid-template-columns: 40px minmax(0, 1fr); } .lr .lm { grid-column: 1 / -1; } }
+.c-anda { color: var(--gold); }
+.c-ojarvis { color: var(--arc); }
+.c-arsitek { color: var(--s-arsitek); }
+.c-pembangun { color: var(--s-pembangun); }
+.c-auditor { color: var(--s-auditor); }
+.c-penambal { color: var(--s-penambal); }
+.c-gerbang { color: var(--warn); }
+.tbl-wrap { overflow-x: auto; max-height: 340px; overflow-y: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-family: var(--f-disp); font-weight: 600; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line-hi); white-space: nowrap; }
+td { padding: 7px 10px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+td.mono { font-family: var(--f-mono); font-size: 12px; white-space: nowrap; }
+td .why { color: var(--muted); font-size: 12.5px; }
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; margin-bottom: 14px; }
+.node { border: 1px solid var(--line-hi); padding: 8px 10px; background: var(--bg); min-width: 0; flex: 1 1 170px; }
+.node b { display: block; font-family: var(--f-disp); font-weight: 600; letter-spacing: 0.06em; font-size: 13px; color: var(--arc); }
+.node span { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); overflow-wrap: anywhere; }
+.arrow { align-self: center; font-family: var(--f-mono); color: var(--dim); font-size: 13px; flex: none; }
+@media (max-width: 760px) { .arrow { flex-basis: 100%; text-align: center; } }
+.note-p { color: var(--muted); font-size: 13px; max-width: 75ch; margin: 0 0 10px; }
+footer { color: var(--dim); font-size: 12.5px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+footer code { font-family: var(--f-mono); }
+@media (prefers-reduced-motion: reduce) {
+  .led.kerja, .caret { animation: none; }
+  .progress span { transition: none; }
+}
+</style>
+
+</head>
+<body>
+<!-- Prototipe tampilan oJARVIS: data contoh dari catatan/simulasi-vcbd-agent.md, bukan hasil run. -->
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="17" fill="none" stroke="#2b9fcc" stroke-width="1.5" stroke-dasharray="3 3"></circle>
+        <circle cx="20" cy="20" r="11" fill="none" stroke="#5ad8ff" stroke-width="2"></circle>
+        <circle cx="20" cy="20" r="4.5" fill="#5ad8ff"></circle>
+      </svg>
+      <div>
+        <div class="brand-name"><span class="o">o</span>JARVIS</div>
+        <div class="brand-sub">Konsol orkestrator vcbd-agent</div>
+      </div>
+    </div>
+    <div class="proj">
+      <span class="pill">Buku Tamu Kecamatan</span>
+      <span class="pill">vcbd-agent/buku-tamu-kecamatan</span>
+      <span class="pill link">agen@vps · terhubung</span>
+      <span class="pill sim">SIMULASI</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="ctrl">
+      <button class="btn" id="btn-play" type="button">Jeda</button>
+      <div class="seg" role="group" aria-label="Kecepatan simulasi">
+        <button type="button" data-speed="1" aria-pressed="true">1×</button>
+        <button type="button" data-speed="2" aria-pressed="false">2×</button>
+        <button type="button" data-speed="4" aria-pressed="false">4×</button>
+      </div>
+      <button class="btn" id="btn-ulang" type="button">Ulang</button>
+      <div class="clock"><span id="clk">00:00</span><small>jam proses</small></div>
+    </div>
+  </header>
+  <div class="progress" aria-hidden="true"><span id="prog"></span></div>
+
+  <main class="grid">
+    <section class="panel chat" aria-labelledby="h-chat">
+      <div class="ph"><span id="h-chat"><b>Percakapan</b> · oJARVIS</span><span class="meta">orkestrator</span></div>
+      <div class="msgs" id="msgs" aria-live="polite"></div>
+      <div class="chips" aria-label="Pertanyaan cepat">
+        <button class="chip-q" type="button">Status?</button>
+        <button class="chip-q" type="button">Apa yang sedang dikerjakan?</button>
+        <button class="chip-q" type="button">Tampilkan temuan</button>
+        <button class="chip-q" type="button">Ada yang perlu saya putuskan?</button>
+        <button class="chip-q" type="button">Jeda setelah langkah ini</button>
+      </div>
+      <form class="say" id="say" autocomplete="off">
+        <button class="icon-btn" id="btn-mic" type="button" aria-label="Bicara">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>
+        </button>
+        <input id="q" type="text" placeholder="Tulis perintah…" aria-label="Pesan untuk oJARVIS">
+        <button class="icon-btn" id="btn-voice" type="button" aria-pressed="false" aria-label="Bacakan jawaban">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"></path><path d="M16.5 8.5a5 5 0 0 1 0 7"></path></svg>
+        </button>
+        <button class="icon-btn" type="submit" aria-label="Kirim">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"></path></svg>
+        </button>
+      </form>
+    </section>
+
+    <section class="core-col" aria-label="Inti">
+      <div class="panel core">
+        <div class="reactor">
+          <canvas id="cv" aria-hidden="true"></canvas>
+          <div class="mid">
+            <div class="t1" id="t-tahap">BLUEPRINT</div>
+            <div class="t2" id="t-sub">menyiapkan</div>
+            <div class="t3 mode-kerja" id="t-mode">bekerja</div>
+          </div>
+        </div>
+        <ol class="pipe" id="pipe" aria-label="Tahap orkestrator"></ol>
+      </div>
+      <div class="panel aksi">
+        <div class="ph"><span><b>AKSI</b> sekarang</span><span class="meta">orkestra.py lanjut</span></div>
+        <code id="aksi">—</code>
+        <div class="note">oJARVIS hanya menjalankan AKSI yang ditunjuk mesin state. Klaim subagen tidak dihitung sebelum gerbang lulus.</div>
+      </div>
+      <div class="crew" id="crew"></div>
+    </section>
+
+    <section class="tele" aria-label="Telemetri">
+      <div class="panel esk" id="esk" hidden>
+        <div class="ph"><span><b>Butuh keputusan Anda</b></span><span class="meta" id="esk-meta"></span></div>
+        <div id="esk-list"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><span><b>Slice</b> · roadmap</span><span class="meta" id="sl-meta"></span></div>
+        <div class="rows" id="slices"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><span><b>Gerbang</b> · terbaru</span><span class="meta" id="g-meta"></span></div>
+        <div id="gates"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><span><b>Temuan</b> · dosir</span><span class="meta" id="t-meta"></span></div>
+        <div class="sev" id="sev"></div>
+        <div class="rows" id="temuan"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><span><b>Meter</b></span><span class="meta">data contoh</span></div>
+        <div class="meter" id="meter"></div>
+      </div>
+    </section>
+  </main>
+
+  <section class="panel" aria-label="Rekam jejak">
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" id="tab-log" aria-selected="true" aria-controls="p-log">Transkrip</button>
+      <button type="button" role="tab" id="tab-kep" aria-selected="false" aria-controls="p-kep">Keputusan</button>
+      <button type="button" role="tab" id="tab-arc" aria-selected="false" aria-controls="p-arc">Sambungan ke VPS</button>
+    </div>
+    <div id="p-log" role="tabpanel" aria-labelledby="tab-log">
+      <div class="filt" id="filt"></div>
+      <div class="log" id="log"></div>
+    </div>
+    <div id="p-kep" role="tabpanel" aria-labelledby="tab-kep" hidden>
+      <p class="note-p">Setiap pertanyaan skill yang dijawab atas nama Anda, beserta alasannya. Di VPS isinya dibaca dari <code>docs/_AGEN/keputusan.json</code>.</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>Dari</th><th>Pertanyaan</th><th>Pilihan &amp; alasan</th><th>Jam</th></tr></thead>
+        <tbody id="kep"></tbody>
+      </table></div>
+    </div>
+    <div id="p-arc" role="tabpanel" aria-labelledby="tab-arc" hidden>
+      <p class="note-p">Antarmuka ini hanya menyalurkan pesan dan membaca berkas. vcbd-agent dan kelima skill tidak diubah sedikit pun.</p>
+      <div class="flow">
+        <div class="node"><b>Browser Anda</b><span>laman oJARVIS · suara via Web Speech API (id-ID)</span></div>
+        <div class="arrow">⇄ WSS</div>
+        <div class="node"><b>Terowongan</b><span>ssh -L 8080:127.0.0.1:8080 atau Tailscale · tidak pernah terbuka ke publik</span></div>
+        <div class="arrow">⇄</div>
+        <div class="node"><b>ojarvis-server</b><span>Python · 127.0.0.1:8080 · WebSocket + pengamat berkas</span></div>
+        <div class="arrow">⇄ stdin/stdout</div>
+        <div class="node"><b>claude -p --agent vcbd-agent</b><span>--input-format stream-json · --output-format stream-json</span></div>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Panel</th><th>Sumber di VPS</th><th>Cara sampai ke layar</th></tr></thead>
+        <tbody>
+          <tr><td>Percakapan</td><td class="mono">stream-json vcbd-agent</td><td>pesan Anda masuk lewat stdin, jawaban mengalir per token</td></tr>
+          <tr><td>Inti &amp; AKSI</td><td class="mono">docs/_AGEN/state.json</td><td>berkas berubah → pengamat (inotify) → dorong ke browser</td></tr>
+          <tr><td>Kru subagen</td><td class="mono">event tool_use "Agent"</td><td>siapa dipanggil, tugasnya, dan kapan kembali</td></tr>
+          <tr><td>Slice</td><td class="mono">state.json → backlog, aktif</td><td>status, percobaan gagal, commit lulus</td></tr>
+          <tr><td>Gerbang</td><td class="mono">state.json → gerbang[] · docs/_AGEN/log/</td><td>exit code tiap gerbang; klik untuk membuka log</td></tr>
+          <tr><td>Temuan</td><td class="mono">docs/_TEMUAN.json</td><td>tingkat, status, bukti path:baris</td></tr>
+          <tr><td>Keputusan</td><td class="mono">docs/_AGEN/keputusan.json</td><td>jawaban atas nama Anda + alasannya</td></tr>
+          <tr><td>Butuh keputusan</td><td class="mono">state.json → eskalasi[]</td><td>jawaban Anda dikirim sebagai pesan ke vcbd-agent</td></tr>
+          <tr><td>Meter</td><td class="mono">docs/_CODING_LEDGER.json · _TOKEN_LEDGER.json</td><td>waktu terukur, token berlabel [ESTIMASI]</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Prototipe antarmuka. Semua data adalah contoh dari simulasi logis Buku Tamu Kecamatan, bukan hasil run.</span>
+    <span>Rujukan: <code>catatan/simulasi-vcbd-agent.md</code></span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  function $(s) { return document.querySelector(s); }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  var SRC = {
+    anda: "Anda", ojarvis: "oJARVIS", arsitek: "arsitek", pembangun: "pembangun",
+    auditor: "auditor", penambal: "penambal", gerbang: "gerbang"
+  };
+  var TAHAP = ["BLUEPRINT", "BANGUN", "AUDIT", "TAMBAL", "SEHAT"];
+  var CREW = [
+    ["arsitek", "vcbd-arsitek", "skill vcbd"],
+    ["pembangun", "vcbd-pembangun", "skill coding-vcbd"],
+    ["auditor", "vcbd-auditor", "skill review-vcbd"],
+    ["penambal", "vcbd-penambal", "skill review-vcbd"]
+  ];
+  var MODE = { kerja: "bekerja", tanya: "subagen bertanya", gerbang: "menguji gerbang", selesai: "selesai" };
+
+  function ev(d, clk, src, msg, x) { var o = { d: d, clk: clk, src: src, msg: msg }; if (x) for (var k in x) o[k] = x[k]; return o; }
+  function kep(id, dari, q, a, why) { return { id: id, dari: dari, q: q, a: a, why: why }; }
+
+  var E = [
+    ev(0, "00:00", "anda", "Buatkan aplikasi buku tamu kantor kecamatan: catat tamu, rekap bulanan, ekspor CSV. Server ini punya PHP dan SQLite.", { chatAnda: true, mode: "kerja" }),
+    ev(1400, "00:00", "ojarvis", "init · cabang vcbd-agent/buku-tamu-kecamatan · 7 skrip gerbang disalin & dikomit · konfirmasi_kebutuhan=otomatis", { tahap: "BLUEPRINT", sub: "menyiapkan cabang kerja", chat: "Siap. Saya buat cabang kerja terpisah, memasang perkakas gerbang, lalu mulai dari blueprint. Cabang main tidak saya sentuh." }),
+    ev(1100, "00:01", "ojarvis", "AKSI: SUBAGEN · vcbd-arsitek · tugas baru", { aksi: "SUBAGEN vcbd-arsitek — tugas baru", sub: "arsitek menyusun blueprint", crew: { arsitek: ["kerja", "Fase 0: triase repo"] }, call: 1 }),
+    ev(1500, "00:04", "arsitek", "Fase 0: greenfield · ber-UI · mode tunggal · profil native (PHP tanpa framework)"),
+    ev(1300, "00:07", "arsitek", "HASIL: bertanya — ronde 1 (K1–K5), 6 pertanyaan, masing-masing dengan usulan default", { mode: "tanya", sub: "arsitek menunggu jawaban ronde 1", crew: { arsitek: ["tanya", "menunggu jawaban ronde 1"] } }),
+    ev(900, "00:07", "ojarvis", "K-001 · K1 masalah inti → pencatatan di bawah 1 menit per tamu + rekap bulanan otomatis", { kep: kep("K-001", "vcbd-arsitek", "Masalah inti & metrik sukses", "Catat < 1 menit per tamu + rekap otomatis", "usulan default, sejalan dengan deskripsi") }),
+    ev(700, "00:07", "ojarvis", "K-002 · K2 fitur MVP → form tamu, daftar hari ini, filter tanggal, ekspor CSV", { kep: kep("K-002", "vcbd-arsitek", "Fitur MVP", "Form, daftar, filter tanggal, ekspor CSV", "vertical slice terkecil yang bisa didemokan") }),
+    ev(700, "00:07", "ojarvis", "K-003 · K3 peran → Resepsionis + Admin", { kep: kep("K-003", "vcbd-arsitek", "Peran & akses", "Resepsionis + Admin", "dua peran cukup untuk kantor kecil") }),
+    ev(700, "00:08", "ojarvis", "K-004 · K4 data sensitif → nama & nomor HP, hapus lunak + jejak audit", { kep: kep("K-004", "vcbd-arsitek", "Entitas & data sensitif", "Nama & nomor HP; hapus lunak", "data pribadi minimal, tetap bisa diaudit") }),
+    ev(800, "00:08", "ojarvis", "K-005 · K5 stack → PHP 8.3 native + SQLite (usulan MySQL dikalahkan deskripsi)", { kep: kep("K-005", "vcbd-arsitek", "Stack & arsitektur", "PHP 8.3 native + SQLite", "deskripsi menyebut SQLite terpasang; mengalahkan usulan MySQL") }),
+    ev(700, "00:08", "ojarvis", "K-006 · K5 mode → tunggal, bukan split", { kep: kep("K-006", "vcbd-arsitek", "Mode split backend/frontend?", "Tunggal", "tidak ada frontend terpisah") }),
+    ev(900, "00:08", "ojarvis", "Jawaban ronde 1 dikirim ke subagen yang sama", { mode: "kerja", sub: "arsitek melanjutkan wawancara", crew: { arsitek: ["kerja", "ronde 2 wawancara"] } }),
+    ev(1400, "00:12", "arsitek", "HASIL: bertanya — ronde 2 (K6–K9), 4 pertanyaan", { mode: "tanya", sub: "arsitek menunggu jawaban ronde 2", crew: { arsitek: ["tanya", "menunggu jawaban ronde 2"] } }),
+    ev(800, "00:12", "ojarvis", "K-007 · K6 perintah → php -S · vendor/bin/phpunit · php scripts/migrate.php", { kep: kep("K-007", "vcbd-arsitek", "Lingkungan & perintah", "php -S · phpunit · scripts/migrate.php", "default profil native") }),
+    ev(700, "00:12", "ojarvis", "K-008 · K8 kebijakan perubahan → branch per fitur, relatif ke cabang kerja agen", { kep: kep("K-008", "vcbd-arsitek", "Kebijakan perubahan", "Branch per fitur di cabang kerja", "main tetap milik manusia") }),
+    ev(700, "00:13", "ojarvis", "K-009 · K9 jangkar desain → preset netral, aksen biru, Bahasa Indonesia formal", { kep: kep("K-009", "vcbd-arsitek", "Jangkar desain UI", "Preset netral, aksen biru", "tidak ada brand yang diketahui") }),
+    ev(700, "00:13", "ojarvis", "K-010 · tawaran preview UI → tidak", { kep: kep("K-010", "vcbd-arsitek", "Lihat preview desain?", "Tidak", "kebijakan: preview tidak diperlukan") }),
+    ev(1500, "00:18", "arsitek", "Ringkasan Kebutuhan: 11 butir · 9 [ASUMSI] · 0 [TERBUKA] — menunggu \"ya\"", { crew: { arsitek: ["tanya", "menunggu konfirmasi ringkasan"] }, sub: "menunggu konfirmasi ringkasan" }),
+    ev(1100, "00:18", "ojarvis", "K-011 · Ringkasan Kebutuhan → \"ya\" (checklist lengkap, semua celah berlabel [ASUMSI])", { kep: kep("K-011", "vcbd-arsitek", "Konfirmasi Ringkasan Kebutuhan", "Ya", "checklist lengkap; konfirmasi_kebutuhan=otomatis"), mode: "kerja", sub: "arsitek menulis 27 dokumen", crew: { arsitek: ["kerja", "scaffold & isi 27 dokumen"] }, chat: "Ringkasan kebutuhan sudah lengkap, jadi saya konfirmasi atas nama Anda. Sembilan asumsinya saya catat untuk laporan pagi." }),
+    ev(1600, "00:31", "arsitek", "scaffold.py → 27 dokumen + INDEX.md + CLAUDE.md · validator disalin"),
+    ev(1700, "01:02", "arsitek", "Isi substansi 00–26 · validate.sh exit 0 · HASIL: selesai", { crew: { arsitek: ["selesai", "blueprint siap diuji"] } }),
+    ev(1100, "01:03", "gerbang", "validate.sh — 11 cek konsistensi lulus", { mode: "gerbang", gate: ["validate.sh", "blueprint", true, "FAIL=0 · WARN=0 · PASS=11"] }),
+    ev(1000, "01:04", "ojarvis", "Blueprint dikomit · tahap → BANGUN", { tahap: "BANGUN", mode: "kerja", sub: "menyusun backlog slice", chat: "Blueprint lulus validate.sh dan sudah dikomit. Masuk tahap bangun." }),
+    ev(1000, "01:04", "ojarvis", "AKSI: SUBAGEN · vcbd-pembangun · backlog", { aksi: "SUBAGEN vcbd-pembangun — backlog", crew: { arsitek: ["idle", "—"], pembangun: ["kerja", "Fase A: kunci sesi"] }, call: 1 }),
+    ev(1300, "01:09", "pembangun", "Fase A: validate.sh lulus · perintah dipanen ke ledger · blueprint disegel"),
+    ev(1100, "01:10", "pembangun", "DATA: BACKLOG → Login petugas | Form tamu | Daftar kunjungan | Rekap & ekspor CSV", { backlog: ["Login petugas", "Form tamu", "Daftar kunjungan", "Rekap & ekspor CSV"], crew: { pembangun: ["idle", "—"] } }),
+    ev(900, "01:10", "ojarvis", "slice-mulai \"Login petugas\" · basis 3c1f09a", { slice: [0, "jalan"], sub: "slice 1/4 · Login petugas", aksi: "SUBAGEN vcbd-pembangun — bangun", crew: { pembangun: ["kerja", "Step 1/7 skema & migrasi"] }, call: 1 }),
+    ev(1300, "01:14", "pembangun", "⏱ Step 1/7 Skema/migrasi · 3m10s │ slice 3m10s"),
+    ev(1200, "01:24", "pembangun", "⏱ Step 3/7 Service · 6m12s │ slice 14m02s", { crew: { pembangun: ["kerja", "Step 4/7 endpoint"] } }),
+    ev(1200, "01:37", "pembangun", "⏱ Step 6/7 Tes · 5m40s │ slice 27m15s", { crew: { pembangun: ["kerja", "Step 7/7 gerbang fitur"] } }),
+    ev(1200, "01:42", "pembangun", "Commit feat(login) · meter.py fitur-selesai · HASIL: selesai", { crew: { pembangun: ["selesai", "slice 1 diserahkan"] } }),
+    ev(1000, "01:43", "gerbang", "gerbang.sh --fitur \"Login petugas\"", { mode: "gerbang", gate: ["gerbang.sh", "slice 1", true, "S2–S5, S7, S8 lulus · S1 & S6 ke auditor"] }),
+    ev(800, "01:43", "gerbang", "jaga.py --peran pembangun", { gate: ["jaga.py", "slice 1", true, "J1–J9 lulus · tidak ada tes dihapus atau dilonggarkan"] }),
+    ev(1000, "01:44", "ojarvis", "AKSI: SUBAGEN · vcbd-auditor · periksa-slice", { mode: "kerja", aksi: "SUBAGEN vcbd-auditor — periksa-slice", crew: { auditor: ["kerja", "memeriksa S1 & S6 slice 1"] }, call: 1 }),
+    ev(1400, "01:51", "auditor", "S1: 4/4 butir kriteria terbukti oleh keluaran tes · S6: konvensi 12 & aturan 21 sesuai · VERDIK: lulus", { crew: { auditor: ["selesai", "slice 1 lulus"] } }),
+    ev(900, "01:51", "ojarvis", "Slice \"Login petugas\" LULUS", { slice: [0, "lulus"], chat: "Slice 1 dari 4, Login petugas, lulus semua gerbang." }),
+    ev(1000, "01:52", "ojarvis", "slice-mulai \"Form tamu\" · basis 8e40b2d", { slice: [1, "jalan"], sub: "slice 2/4 · Form tamu", aksi: "SUBAGEN vcbd-pembangun — bangun", crew: { pembangun: ["kerja", "Step 3/7 service"], auditor: ["idle", "—"] }, call: 1 }),
+    ev(1500, "02:10", "pembangun", "HASIL: bertanya — perlu menyentuh src/Helpers/Tanggal.php di luar rencana slice. OPSI a) izinkan + --deviasi / b) tulis di service. USULAN a", { mode: "tanya", crew: { pembangun: ["tanya", "berkas di luar rencana"] } }),
+    ev(1000, "02:10", "ojarvis", "K-012 · berkas di luar rencana → a: izinkan, wajib dicatat --deviasi", { kep: kep("K-012", "vcbd-pembangun", "Berkas di luar rencana: src/Helpers/Tanggal.php", "Izinkan + catat --deviasi", "perlu untuk slice ini; bukan refactor sekalian"), mode: "kerja", crew: { pembangun: ["kerja", "Step 5/7 UI + empat state"] } }),
+    ev(1500, "02:31", "pembangun", "Commit feat(form-tamu) · meter.py fitur-selesai · HASIL: selesai", { crew: { pembangun: ["selesai", "slice 2 diserahkan"] } }),
+    ev(900, "02:32", "gerbang", "gerbang.sh --fitur \"Form tamu\"", { mode: "gerbang", gate: ["gerbang.sh", "slice 2", true, "S2–S5, S7, S8 lulus"] }),
+    ev(900, "02:32", "gerbang", "jaga.py --peran pembangun", { gate: ["jaga.py", "slice 2", false, "J9 · src/Helpers/Tanggal.php di luar rencana dan tidak tercatat di --deviasi"] }),
+    ev(1000, "02:32", "ojarvis", "GAGAL slice:Form tamu · percobaan 1/4 → perbaiki", { slice: [1, "perbaiki", 1], mode: "kerja", aksi: "SUBAGEN vcbd-pembangun — perbaiki", crew: { pembangun: ["kerja", "perbaiki: catat deviasi"] }, call: 1, chat: "Gerbang menolak slice 2 karena deviasinya lupa dicatat. Saya kembalikan ke pembangun beserta log gerbangnya." }),
+    ev(1300, "02:36", "pembangun", "Perbaiki: --deviasi \"src/Helpers/Tanggal.php — format tanggal lokal\" dicatat · HASIL: selesai", { crew: { pembangun: ["selesai", "perbaikan diserahkan"] } }),
+    ev(900, "02:37", "gerbang", "gerbang.sh + jaga.py", { mode: "gerbang", gate: ["gerbang.sh + jaga.py", "slice 2", true, "semua lulus · deviasi tercatat"] }),
+    ev(1000, "02:38", "ojarvis", "AKSI: SUBAGEN · vcbd-auditor · periksa-slice", { mode: "kerja", aksi: "SUBAGEN vcbd-auditor — periksa-slice", crew: { auditor: ["kerja", "memeriksa S1 & S6 slice 2"] }, call: 1 }),
+    ev(1300, "02:45", "auditor", "S1: 5/5 butir terbukti · S6 sesuai · deviasi Tanggal.php masuk akal · VERDIK: lulus", { crew: { auditor: ["selesai", "slice 2 lulus"] } }),
+    ev(900, "02:45", "ojarvis", "Slice \"Form tamu\" LULUS (1 percobaan gagal)", { slice: [1, "lulus"] }),
+    ev(1000, "02:46", "ojarvis", "slice-mulai \"Daftar kunjungan\" · basis c71a5e0", { slice: [2, "jalan"], sub: "slice 3/4 · Daftar kunjungan", aksi: "SUBAGEN vcbd-pembangun — bangun", crew: { pembangun: ["kerja", "Step 2/7 model data"], auditor: ["idle", "—"] }, call: 1 }),
+    ev(1600, "03:19", "pembangun", "Commit feat(daftar-kunjungan) · fitur-selesai · HASIL: selesai", { crew: { pembangun: ["selesai", "slice 3 diserahkan"] } }),
+    ev(900, "03:20", "gerbang", "gerbang.sh + jaga.py", { mode: "gerbang", gate: ["gerbang.sh + jaga.py", "slice 3", true, "semua lulus"] }),
+    ev(1000, "03:20", "ojarvis", "AKSI: SUBAGEN · vcbd-auditor · periksa-slice", { mode: "kerja", aksi: "SUBAGEN vcbd-auditor — periksa-slice", crew: { auditor: ["kerja", "memeriksa slice 3"] }, call: 1 }),
+    ev(1300, "03:27", "auditor", "VERDIK: gagal — daftar tidak menangani state kosong (26: empat state wajib) · views/kunjungan/daftar.php:12", { crew: { auditor: ["selesai", "slice 3 ditolak"] } }),
+    ev(900, "03:27", "ojarvis", "GAGAL slice:Daftar kunjungan · percobaan 1/4 → perbaiki", { slice: [2, "perbaiki", 1], aksi: "SUBAGEN vcbd-pembangun — perbaiki", crew: { pembangun: ["kerja", "perbaiki: state kosong"] }, call: 1, chat: "Pemeriksa menemukan daftar kunjungan belum punya tampilan saat datanya kosong. Saya kembalikan untuk diperbaiki." }),
+    ev(1300, "03:36", "pembangun", "Perbaiki: state kosong + tes tampilan kosong ditambahkan · HASIL: selesai", { crew: { pembangun: ["selesai", "perbaikan diserahkan"] } }),
+    ev(900, "03:37", "gerbang", "gerbang.sh + jaga.py", { mode: "gerbang", gate: ["gerbang.sh + jaga.py", "slice 3", true, "semua lulus · kasus tes +1"] }),
+    ev(1100, "03:44", "auditor", "Periksa ulang: empat state lengkap · VERDIK: lulus", { mode: "kerja", call: 1, crew: { auditor: ["selesai", "slice 3 lulus"], pembangun: ["idle", "—"] } }),
+    ev(800, "03:44", "ojarvis", "Slice \"Daftar kunjungan\" LULUS (1 percobaan gagal)", { slice: [2, "lulus"] }),
+    ev(1000, "03:45", "ojarvis", "slice-mulai \"Rekap & ekspor CSV\" · basis 5d2f8a1", { slice: [3, "jalan"], sub: "slice 4/4 · Rekap & ekspor CSV", aksi: "SUBAGEN vcbd-pembangun — bangun", crew: { pembangun: ["kerja", "Step 3/7 service rekap"], auditor: ["idle", "—"] }, call: 1 }),
+    ev(1400, "04:01", "pembangun", "HASIL: bertanya — dokumen tidak menjawab pemisah CSV. OPSI a) titik koma / b) koma. USULAN a", { mode: "tanya", crew: { pembangun: ["tanya", "kebutuhan tak terjawab dokumen"] } }),
+    ev(1000, "04:01", "ojarvis", "K-013 · pemisah CSV → titik koma (Excel berlokal Indonesia), dicatat --asumsi", { kep: kep("K-013", "vcbd-pembangun", "Pemisah kolom CSV", "Titik koma (;)", "Excel berlokal Indonesia membaca titik koma; dicatat sebagai asumsi"), mode: "kerja", crew: { pembangun: ["kerja", "Step 6/7 tes"] } }),
+    ev(1500, "04:28", "pembangun", "Commit feat(rekap-ekspor) · fitur-selesai --asumsi \"pemisah CSV ;\" · HASIL: selesai", { crew: { pembangun: ["selesai", "slice 4 diserahkan"] } }),
+    ev(900, "04:29", "gerbang", "gerbang.sh + jaga.py", { mode: "gerbang", gate: ["gerbang.sh + jaga.py", "slice 4", true, "semua lulus"] }),
+    ev(1100, "04:36", "auditor", "S1: 4/4 butir terbukti · S6 sesuai · VERDIK: lulus", { mode: "kerja", call: 1, crew: { auditor: ["selesai", "slice 4 lulus"] } }),
+    ev(900, "04:36", "ojarvis", "Slice \"Rekap & ekspor CSV\" LULUS", { slice: [3, "lulus"], chat: "Keempat slice lulus. Berikutnya serah terima, lalu audit menyeluruh." }),
+    ev(1000, "04:37", "ojarvis", "AKSI: SUBAGEN · vcbd-pembangun · selesai (Fase G)", { aksi: "SUBAGEN vcbd-pembangun — selesai", sub: "serah terima build", crew: { pembangun: ["kerja", "Fase G: lima syarat selesai"], auditor: ["idle", "—"] }, call: 1 }),
+    ev(1400, "04:49", "pembangun", "Roadmap ✓ · 23 terarsip ✓ · suite hijau ✓ · validate.sh ✓ · checklist rilis ✓ (deploy → untuk manusia) · meter.py serah", { crew: { pembangun: ["selesai", "build diserahkan"] } }),
+    ev(900, "04:49", "ojarvis", "docs/_SERAH_BUILD.json terbit · tahap → AUDIT", { tahap: "AUDIT", sub: "audit menyeluruh", aksi: "SUBAGEN vcbd-auditor — audit", crew: { pembangun: ["idle", "—"], auditor: ["kerja", "PINDAI seluruh repo"] }, call: 1 }),
+    ev(1400, "04:52", "auditor", "PINDAI: 41 berkas kode · 2.318 baris · 5 temuan (KRITIS 0 · TINGGI 2 · SEDANG 2 · RENDAH 1)"),
+    ev(1400, "05:21", "auditor", "REVIEW 8 sumbu · UJI lapis 1–3 · asap.py: 14 rute, otorisasi ditegakkan", { crew: { auditor: ["kerja", "verifikasi temuan"] } }),
+    ev(1200, "05:28", "auditor", "DATA: TERVERIFIKASI TEM-001, TEM-002 · HASIL: selesai", {
+      tem: [
+        ["TEM-001", "TINGGI", "Form ekspor CSV tanpa token CSRF", "baru"],
+        ["TEM-002", "TINGGI", "Fitur Rekap tanpa tes penjaga", "baru"],
+        ["TEM-003", "SEDANG", "Sisa var_dump di RekapService", "baru"],
+        ["TEM-004", "SEDANG", "3 asumsi belum dikunci ke dokumen", "baru"],
+        ["TEM-005", "RENDAH", "Penanda TODO di layout", "baru"]
+      ],
+      crew: { auditor: ["selesai", "audit selesai"] }
+    }),
+    ev(1000, "05:28", "ojarvis", "Kebijakan: TEM-001, TEM-002, TEM-003 → antre · TEM-004 → eskalasi · TEM-005 → dicatat · tahap → TAMBAL", {
+      tahap: "TAMBAL", sub: "menyiapkan antrean tambal",
+      temSt: [["TEM-001", "antre"], ["TEM-002", "antre"], ["TEM-003", "antre"], ["TEM-004", "eskalasi"], ["TEM-005", "dicatat"]],
+      kep: kep("K-014", "kebijakan", "Persetujuan temuan putaran 1", "3 ditambal · 1 eskalasi · 1 dicatat", "tambal_otomatis = KRITIS/TINGGI/SEDANG; TEM-004 hanya bisa ditutup dengan mengubah blueprint"),
+      esk: { id: "TEM-004", judul: "Nomor HP tamu: wajib atau opsional?", isi: "Blueprint tidak menjawabnya, jadi agen memakai asumsi \"opsional\". Mengunci keputusan ini mengubah dokumen 07 dan 23, dan itu wewenang Anda.", opsi: ["Wajib diisi", "Opsional (sesuai asumsi)"] },
+      chat: "Audit selesai. Tiga temuan saya tambal otomatis dan satu dicatat. Satu lagi butuh keputusan Anda, tapi proses tidak saya hentikan; jawab kapan saja di panel kanan."
+    }),
+    ev(1000, "05:29", "ojarvis", "temuan-mulai TEM-001 · basis 0a93c7e", { sub: "TEM-001 · CSRF form ekspor", aksi: "SUBAGEN vcbd-penambal — tambal", temSt: [["TEM-001", "aktif"]], crew: { auditor: ["idle", "—"], penambal: ["kerja", "reproduksi TEM-001"] }, call: 1 }),
+    ev(1300, "05:35", "penambal", "Tes regresi MERAH: POST /ekspor tanpa token → 200 (seharusnya 403)"),
+    ev(1300, "05:44", "penambal", "Tambal: verifikasi token CSRF · tes HIJAU · commit fix(TEM-001) · temuan.py tutup", { crew: { penambal: ["selesai", "TEM-001 diserahkan"] } }),
+    ev(900, "05:45", "gerbang", "gerbang.sh + jaga.py --peran penambal", { mode: "gerbang", gate: ["gerbang.sh + jaga.py", "TEM-001", true, "semua lulus · blueprint tidak disentuh"] }),
+    ev(1100, "05:50", "auditor", "Periksa TEM-001: lokasi bukti beres · tes regresi bermakna · VERDIK: lulus", { mode: "kerja", call: 1, temSt: [["TEM-001", "lulus"]], crew: { auditor: ["selesai", "TEM-001 lulus"] } }),
+    ev(1000, "05:51", "ojarvis", "temuan-mulai TEM-002 · basis 6be1d40", { sub: "TEM-002 · tes penjaga rekap", temSt: [["TEM-002", "aktif"]], crew: { penambal: ["kerja", "menulis tes penjaga rekap"], auditor: ["idle", "—"] }, call: 1 }),
+    ev(1400, "06:03", "penambal", "Tes penjaga RekapTest ditulis · commit fix(TEM-002) · HASIL: selesai", { crew: { penambal: ["selesai", "TEM-002 diserahkan"] } }),
+    ev(900, "06:04", "gerbang", "jaga.py --peran penambal", { mode: "gerbang", gate: ["jaga.py", "TEM-002", false, "J4 · asersi TURUN: 3 dihapus, 1 ditambah (tests/RekapTest.php)"] }),
+    ev(1000, "06:04", "ojarvis", "GAGAL temuan:TEM-002 · percobaan 1/4 → perbaiki", { mode: "kerja", temSt: [["TEM-002", "perbaiki"]], crew: { penambal: ["kerja", "kembalikan asersi lama"] }, call: 1, chat: "Penjaga menangkap tiga asersi lama yang dilonggarkan di RekapTest. Ditolak; asersinya harus dikembalikan." }),
+    ev(1300, "06:11", "penambal", "Perbaiki: asersi lama dikembalikan, tes penjaga baru ditambahkan · HASIL: selesai", { crew: { penambal: ["selesai", "perbaikan diserahkan"] } }),
+    ev(900, "06:12", "gerbang", "gerbang.sh + jaga.py", { mode: "gerbang", gate: ["gerbang.sh + jaga.py", "TEM-002", true, "semua lulus · asersi -0 +4"] }),
+    ev(1100, "06:18", "auditor", "Periksa TEM-002: tes penjaga menguji hasil rekap · VERDIK: lulus", { mode: "kerja", call: 1, temSt: [["TEM-002", "lulus"]], crew: { auditor: ["selesai", "TEM-002 lulus"] } }),
+    ev(1000, "06:19", "ojarvis", "temuan-mulai TEM-003 · basis 91f0c2b", { sub: "TEM-003 · sisa var_dump", temSt: [["TEM-003", "aktif"]], crew: { penambal: ["kerja", "hapus var_dump"], auditor: ["idle", "—"] }, call: 1 }),
+    ev(1200, "06:23", "penambal", "Mencoba menulis catatan jebakan ke docs/16_DEBUGGING_GUIDE.md"),
+    ev(800, "06:23", "gerbang", "hook PreToolUse · jaga.py --peran penambal", { gate: ["hook jaga.py", "TEM-003", false, "docs/16 terlarang untuk penambal — penambal tidak mengubah blueprint"] }),
+    ev(1200, "06:28", "penambal", "var_dump dihapus · penanda TODO lama di baris yang sama ikut dibersihkan (S4) · commit fix(TEM-003)", { crew: { penambal: ["selesai", "TEM-003 diserahkan"] } }),
+    ev(900, "06:29", "gerbang", "gerbang.sh + jaga.py", { mode: "gerbang", gate: ["gerbang.sh + jaga.py", "TEM-003", true, "semua lulus"] }),
+    ev(1100, "06:34", "auditor", "Periksa TEM-003: tambalan minimal · VERDIK: lulus", { mode: "kerja", call: 1, temSt: [["TEM-003", "lulus"]], crew: { auditor: ["selesai", "TEM-003 lulus"] } }),
+    ev(1000, "06:35", "ojarvis", "Antrean tambal habis → rekonsiliasi: pindai ulang · 0 temuan baru · 0 dibuka ulang · tahap → SEHAT", { tahap: "SEHAT", sub: "uji kesehatan aplikasi", aksi: "GERBANG sehat", crew: { penambal: ["idle", "—"], auditor: ["idle", "—"] } }),
+    ev(1100, "06:37", "gerbang", "Syarat sehat 1, 2, 4", { mode: "gerbang", gate: ["gerbang sehat", "aplikasi", true, "0 KRITIS/TINGGI terbuka · suite penuh hijau · validate.sh lulus"] }),
+    ev(1000, "06:38", "ojarvis", "AKSI: SUBAGEN · vcbd-auditor · sehat", { mode: "kerja", aksi: "SUBAGEN vcbd-auditor — sehat", crew: { auditor: ["kerja", "syarat sehat 3 & 5"] }, call: 1 }),
+    ev(1400, "06:52", "auditor", "Tes penjaga 4/4 fitur · checklist rilis non-produksi lulus berurutan · VERDIK: lulus", { crew: { auditor: ["selesai", "aplikasi sehat"] } }),
+    ev(1000, "06:53", "ojarvis", "Status akhir SELESAI-DENGAN-ESKALASI · docs/_AGEN/LAPORAN.md ditulis", { tahap: "SELESAI", akhir: "SELESAI-DENGAN-ESKALASI", mode: "selesai", aksi: "SELESAI — menunggu tinjauan Anda", sub: "cabang siap ditinjau", crew: { auditor: ["idle", "—"] }, chat: "Selesai. Empat slice lulus dan tiga temuan sudah ditambal. Tinggal satu hal untuk Anda: apakah nomor HP tamu wajib diisi. Cabang vcbd-agent/buku-tamu-kecamatan siap ditinjau. Merge dan deploy tetap di tangan Anda." })
+  ];
+  // titik awal: laman terbuka di tengah tahap bangun, bukan layar kosong
+  var MULAI = E.findIndex(function (e) { return e.msg.indexOf("Form tamu\" LULUS") >= 0; }) + 1;
+
+  var S, timer = null, playing = true, speed = 1, pauseAfter = false, voiceOn = false, filter = "semua", cari = "";
+
+  function fresh() {
+    S = {
+      i: 0, clk: "00:00", tahap: "BLUEPRINT", akhir: null, sub: "menunggu perintah", mode: "kerja", aksi: "—",
+      crew: { arsitek: { st: "idle", tk: "—" }, pembangun: { st: "idle", tk: "—" }, auditor: { st: "idle", tk: "—" }, penambal: { st: "idle", tk: "—" } },
+      slices: [], gates: [], temuan: [], kep: [], esk: [], calls: 0, log: []
+    };
+    $("#msgs").innerHTML = "";
+    $("#log").innerHTML = "";
+  }
+
+  function apply(e, live) {
+    S.clk = e.clk || S.clk;
+    if (e.tahap) S.tahap = e.tahap;
+    if (e.akhir) S.akhir = e.akhir;
+    if (e.sub != null) S.sub = e.sub;
+    if (e.mode) S.mode = e.mode;
+    if (e.aksi) S.aksi = e.aksi;
+    if (e.call) S.calls += e.call;
+    if (e.crew) for (var k in e.crew) S.crew[k] = { st: e.crew[k][0], tk: e.crew[k][1] };
+    if (e.backlog) S.slices = e.backlog.map(function (n) { return { n: n, st: "belum", coba: 0 }; });
+    if (e.slice) { var sl = S.slices[e.slice[0]]; sl.st = e.slice[1]; if (e.slice[2]) sl.coba += e.slice[2]; }
+    if (e.gate) { S.gates.push({ n: e.gate[0], u: e.gate[1], ok: e.gate[2], d: e.gate[3], clk: S.clk }); flash(e.gate[2]); }
+    if (e.kep) S.kep.push(Object.assign({ clk: S.clk }, e.kep));
+    if (e.tem) S.temuan = e.tem.map(function (t) { return { id: t[0], lv: t[1], j: t[2], st: t[3] }; });
+    if (e.temSt) e.temSt.forEach(function (p) { S.temuan.forEach(function (t) { if (t.id === p[0]) t.st = p[1]; }); });
+    if (e.esk) S.esk.push(Object.assign({ done: null }, e.esk));
+    var row = { clk: S.clk, src: e.src, msg: e.msg, kind: e.gate ? (e.gate[2] ? "pass" : "fail") : "" };
+    S.log.push(row);
+    appendLog(row);
+    if (e.chatAnda) addChat("anda", e.msg, false);
+    if (e.chat) addChat("ojarvis", e.chat, live);
+  }
+
+  // ---------- percakapan ----------
+  function addChat(who, text, live) {
+    var box = $("#msgs");
+    var m = el("div", "msg " + (who === "anda" ? "anda" : who === "sys" ? "sys" : "jaw"));
+    m.appendChild(el("div", "who", who === "anda" ? "Anda" : who === "sys" ? "sistem" : "oJARVIS"));
+    var t = el("div", "txt");
+    m.appendChild(t);
+    box.appendChild(m);
+    if (live && who === "ojarvis" && !reduce) {
+      var i = 0, caret = el("span", "caret");
+      t.appendChild(caret);
+      var step = Math.max(1, Math.round(2 * speed));
+      var iv = setInterval(function () {
+        i = Math.min(text.length, i + step);
+        t.textContent = text.slice(0, i);
+        if (i < text.length) t.appendChild(caret); else clearInterval(iv);
+        box.scrollTop = box.scrollHeight;
+      }, 18);
+    } else {
+      t.textContent = text;
+    }
+    box.scrollTop = box.scrollHeight;
+    if (live && who === "ojarvis") ucap(text);
+  }
+
+  function ucap(text) {
+    if (!voiceOn) return;
+    try {
+      if (!("speechSynthesis" in window)) return;
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = "id-ID";
+      u.rate = 1.04;
+      window.speechSynthesis.speak(u);
+    } catch (err) { /* suara opsional */ }
+  }
+
+  function hitung() {
+    var lulus = S.slices.filter(function (x) { return x.st === "lulus"; }).length;
+    var pass = S.gates.filter(function (g) { return g.ok; }).length;
+    var esk = S.esk.filter(function (x) { return !x.done; }).length;
+    return { lulus: lulus, pass: pass, esk: esk };
+  }
+
+  function jawab(q) {
+    var t = q.toLowerCase(), h = hitung();
+    if (/jeda|berhenti|tahan|pause/.test(t)) {
+      if (!playing) return "Saya memang sedang berhenti. Katakan \"lanjut\" bila ingin diteruskan.";
+      pauseAfter = true;
+      return "Baik. Langkah yang sedang berjalan saya selesaikan dulu, lalu saya berhenti dan menunggu perintah \"lanjut\".";
+    }
+    if (/lanjut|teruskan|resume/.test(t)) {
+      if (S.i >= E.length) return "Prosesnya sudah selesai. Tekan Ulang di atas untuk memutar simulasi dari awal.";
+      main(true);
+      return "Melanjutkan dari langkah terakhir.";
+    }
+    if (/temuan|bug|audit|celah/.test(t)) {
+      if (!S.temuan.length) return "Belum ada temuan. Audit baru berjalan setelah keempat slice lulus dan build diserahkan.";
+      return S.temuan.map(function (x) { return x.id + " [" + x.lv + "] " + x.j + " — " + label(x.st); }).join(". ") + ".";
+    }
+    if (/putus|eskalasi|tunggu|perlu saya/.test(t)) {
+      if (!h.esk) return "Belum ada yang perlu Anda putuskan. Setiap pilihan yang saya ambil atas nama Anda tercatat di tab Keputusan.";
+      var x = S.esk.filter(function (e) { return !e.done; })[0];
+      return "Ada " + h.esk + ": " + x.judul + " " + x.isi + " Jawab lewat tombol di panel kanan; proses tetap berjalan.";
+    }
+    if (/slice|fitur|roadmap/.test(t)) {
+      if (!S.slices.length) return "Backlog slice belum tersusun; pembangun menyusunnya dari roadmap setelah blueprint lulus.";
+      return S.slices.map(function (x, i) { return (i + 1) + ". " + x.n + ": " + label(x.st) + (x.coba ? " (" + x.coba + " percobaan gagal)" : ""); }).join(" · ");
+    }
+    if (/siapa|agen|tim|kru/.test(t)) {
+      return CREW.map(function (c) { var s = S.crew[c[0]]; return c[1] + ": " + label(s.st) + (s.tk !== "—" ? ", " + s.tk : ""); }).join(". ") + ".";
+    }
+    if (/token|biaya|lama|waktu/.test(t)) {
+      return "Jam proses " + S.clk + ", " + S.calls + " pemanggilan subagen, " + S.gates.length + " gerbang. Di VPS saya membaca waktu dari _CODING_LEDGER.json dan token dari _TOKEN_LEDGER.json, selalu berlabel [ESTIMASI] kecuali terukur.";
+    }
+    if (/status|sedang|kabar|progres|kemajuan|apa yang/.test(t)) {
+      return "Tahap " + S.tahap + (S.akhir ? " (" + S.akhir + ")" : "") + ". " + (S.slices.length ? h.lulus + " dari " + S.slices.length + " slice lulus. " : "") +
+        "Sekarang: " + S.sub + ". Gerbang dijalankan " + S.gates.length + " kali, " + h.pass + " lulus. " +
+        (h.esk ? "Ada " + h.esk + " hal yang menunggu keputusan Anda." : "Belum ada yang perlu Anda putuskan.");
+    }
+    return "Di VPS, pesan ini saya teruskan apa adanya ke vcbd-agent. Di prototipe ini saya hanya bisa menjawab soal status, slice, temuan, keputusan, kru agen, waktu, serta perintah jeda dan lanjut.";
+  }
+
+  function label(st) {
+    return { belum: "belum", jalan: "berjalan", perbaiki: "diperbaiki", lulus: "lulus", baru: "baru", antre: "antre tambal", aktif: "sedang ditambal", eskalasi: "menunggu Anda", dicatat: "dicatat", idle: "siaga", kerja: "bekerja", tanya: "bertanya", selesai: "selesai" }[st] || st;
+  }
+
+  function tanya(q) {
+    q = q.trim();
+    if (!q) return;
+    addChat("anda", q, false);
+    setTimeout(function () { addChat("ojarvis", jawab(q), true); }, reduce ? 0 : 450);
+  }
+
+  // ---------- tampilan ----------
+  function render() {
+    $("#clk").textContent = S.clk;
+    $("#prog").style.width = Math.round(S.i / E.length * 100) + "%";
+    var tahapLabel = S.tahap === "SELESAI" ? "SELESAI" : S.tahap;
+    $("#t-tahap").textContent = tahapLabel;
+    $("#t-sub").textContent = S.sub;
+    var md = $("#t-mode");
+    md.textContent = S.mode === "selesai" ? (S.akhir || "selesai").toLowerCase().replace(/-/g, " ") : MODE[S.mode] || S.mode;
+    md.className = "t3 mode-" + S.mode;
+    $("#aksi").textContent = S.aksi;
+
+    var ti = tahapIdx(), pipe = $("#pipe");
+    pipe.innerHTML = "";
+    TAHAP.forEach(function (t, i) { var li = el("li", i < ti ? "done" : i === ti ? "now" : "", t); pipe.appendChild(li); });
+
+    var crew = $("#crew");
+    crew.innerHTML = "";
+    CREW.forEach(function (c) {
+      var s = S.crew[c[0]];
+      var card = el("div", "panel agent");
+      var nm = el("div", "nm");
+      nm.appendChild(el("span", "led " + s.st));
+      nm.appendChild(el("span", "c-" + c[0], c[1]));
+      card.appendChild(nm);
+      card.appendChild(el("div", "sk", c[2] + " · " + label(s.st)));
+      card.appendChild(el("div", "tk", s.tk));
+      crew.appendChild(card);
+    });
+
+    var sls = $("#slices");
+    sls.innerHTML = "";
+    var h = hitung();
+    $("#sl-meta").textContent = S.slices.length ? h.lulus + "/" + S.slices.length + " lulus" : "";
+    if (!S.slices.length) sls.appendChild(el("div", "empty", "Backlog muncul setelah blueprint lulus validate.sh."));
+    S.slices.forEach(function (x, i) {
+      var r = el("div", "row");
+      r.appendChild(el("span", "n", String(i + 1)));
+      var lb = el("span", "label", x.n);
+      if (x.coba) lb.appendChild(el("span", "sub", x.coba + " percobaan gagal, diperbaiki sendiri"));
+      r.appendChild(lb);
+      r.appendChild(el("span", "st " + ({ lulus: "ok", jalan: "run", perbaiki: "warn", belum: "mut" }[x.st] || "mut"), label(x.st)));
+      sls.appendChild(r);
+    });
+
+    var gs = $("#gates");
+    gs.innerHTML = "";
+    $("#g-meta").textContent = S.gates.length ? S.gates.length + " dijalankan · " + h.pass + " lulus" : "";
+    if (!S.gates.length) gs.appendChild(el("div", "empty", "Belum ada gerbang yang dijalankan."));
+    S.gates.slice(-6).reverse().forEach(function (g) {
+      var r = el("div", "gate");
+      r.appendChild(el("span", "st " + (g.ok ? "ok" : "bad"), g.ok ? "LULUS" : "GAGAL"));
+      var b = el("div");
+      var top = el("span", "gn", g.n + " ");
+      b.appendChild(top);
+      b.appendChild(el("span", "gt", g.u + " · " + g.clk));
+      b.appendChild(el("span", "gd", g.d));
+      r.appendChild(b);
+      gs.appendChild(r);
+    });
+
+    var cnt = { KRITIS: 0, TINGGI: 0, SEDANG: 0, RENDAH: 0 };
+    S.temuan.forEach(function (t) { cnt[t.lv]++; });
+    var sev = $("#sev");
+    sev.innerHTML = "";
+    [["k", "KRITIS"], ["t", "TINGGI"], ["s", "SEDANG"], ["r", "RENDAH"]].forEach(function (p) {
+      var d = el("div", p[0]);
+      d.appendChild(el("b", null, String(cnt[p[1]])));
+      d.appendChild(el("span", null, p[1]));
+      sev.appendChild(d);
+    });
+    var tm = $("#temuan");
+    tm.innerHTML = "";
+    var tutup = S.temuan.filter(function (t) { return t.st === "lulus"; }).length;
+    $("#t-meta").textContent = S.temuan.length ? tutup + " ditambal · " + S.temuan.length + " total" : "";
+    if (!S.temuan.length) tm.appendChild(el("div", "empty", "Dosir temuan terbit saat audit, setelah serah terima build."));
+    S.temuan.forEach(function (t) {
+      var r = el("div", "row");
+      r.appendChild(el("span", "n", t.id.slice(4)));
+      var lb = el("span", "label", t.j);
+      lb.appendChild(el("span", "sub", t.id + " · " + t.lv));
+      r.appendChild(lb);
+      r.appendChild(el("span", "st " + ({ lulus: "ok", aktif: "run", antre: "run", perbaiki: "warn", eskalasi: "warn", dicatat: "mut", baru: "mut" }[t.st] || "mut"), label(t.st)));
+      tm.appendChild(r);
+    });
+
+    var me = $("#meter");
+    me.innerHTML = "";
+    var gagal = S.gates.filter(function (g) { return !g.ok; }).length;
+    [[S.clk, "jam proses"], [String(S.calls), "pemanggilan subagen"], [S.kep.length + "", "keputusan atas nama Anda"], [gagal + "", "kegagalan yang tertangkap"]].forEach(function (p) {
+      var d = el("div");
+      d.appendChild(el("b", null, p[0]));
+      d.appendChild(el("span", null, p[1]));
+      me.appendChild(d);
+    });
+
+    var ek = $("#esk"), list = $("#esk-list");
+    ek.hidden = S.esk.length === 0;
+    list.innerHTML = "";
+    $("#esk-meta").textContent = h.esk ? h.esk + " menunggu · proses tidak dihentikan" : "semua sudah dijawab";
+    S.esk.forEach(function (x) {
+      var it = el("div", "esk-item");
+      it.appendChild(el("h3", null, x.id + " · " + x.judul));
+      it.appendChild(el("p", null, x.isi));
+      if (x.done) {
+        it.appendChild(el("div", "done", "Diputuskan: " + x.done));
+      } else {
+        var op = el("div", "opsi");
+        x.opsi.forEach(function (o) {
+          var b = el("button", null, o);
+          b.type = "button";
+          b.addEventListener("click", function () { putuskan(x, o); });
+          op.appendChild(b);
+        });
+        it.appendChild(op);
+      }
+      list.appendChild(it);
+    });
+
+    renderKep();
+    if (reduce) draw(0);
+  }
+
+  function renderKep() {
+    var tb = $("#kep");
+    tb.innerHTML = "";
+    S.kep.slice().reverse().forEach(function (k) {
+      var tr = el("tr");
+      tr.appendChild(el("td", "mono", k.id));
+      tr.appendChild(el("td", "mono", k.dari));
+      tr.appendChild(el("td", null, k.q));
+      var td = el("td");
+      td.appendChild(el("div", null, k.a));
+      td.appendChild(el("div", "why", k.why));
+      tr.appendChild(td);
+      tr.appendChild(el("td", "mono", k.clk));
+      tb.appendChild(tr);
+    });
+  }
+
+  function putuskan(x, o) {
+    x.done = o;
+    S.kep.push({ id: "K-" + String(S.kep.length + 1).padStart(3, "0"), dari: "Anda", q: x.judul, a: o, why: "keputusan manusia atas eskalasi " + x.id, clk: S.clk });
+    var row = { clk: S.clk, src: "anda", msg: x.id + " diputuskan: " + o, kind: "" };
+    S.log.push(row);
+    appendLog(row);
+    addChat("anda", x.id + ": " + o, false);
+    render();
+    setTimeout(function () {
+      addChat("ojarvis", "Dicatat sebagai keputusan Anda. Di VPS, langkah berikutnya adalah Mode Pembaruan vcbd untuk dokumen 07 dan 23, lalu validate.sh. Delta yang mengubah blueprint selalu saya ajukan dulu, tidak langsung dikerjakan.", true);
+    }, reduce ? 0 : 500);
+  }
+
+  // ---------- transkrip ----------
+  function lolos(r) {
+    if (filter !== "semua" && r.src !== filter) return false;
+    if (cari && (r.msg + " " + r.src).toLowerCase().indexOf(cari) < 0) return false;
+    return true;
+  }
+  function rowEl(r) {
+    var d = el("div", "lr" + (r.kind ? " " + r.kind : ""));
+    d.appendChild(el("span", "lt", r.clk));
+    d.appendChild(el("span", "ls c-" + r.src, SRC[r.src] || r.src));
+    d.appendChild(el("span", "lm", r.msg));
+    return d;
+  }
+  function appendLog(r) {
+    if (!lolos(r)) return;
+    var box = $("#log");
+    var dekat = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+    box.appendChild(rowEl(r));
+    if (dekat) box.scrollTop = box.scrollHeight;
+  }
+  function renderLog() {
+    var box = $("#log");
+    box.innerHTML = "";
+    S.log.filter(lolos).forEach(function (r) { box.appendChild(rowEl(r)); });
+    box.scrollTop = box.scrollHeight;
+  }
+  function buildFilter() {
+    var f = $("#filt");
+    ["semua", "anda", "ojarvis", "arsitek", "pembangun", "auditor", "penambal", "gerbang"].forEach(function (k) {
+      var b = el("button", null, k === "semua" ? "Semua" : SRC[k]);
+      b.type = "button";
+      b.setAttribute("aria-pressed", k === filter ? "true" : "false");
+      b.addEventListener("click", function () {
+        filter = k;
+        f.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+        renderLog();
+      });
+      f.appendChild(b);
+    });
+    var inp = el("input");
+    inp.type = "search";
+    inp.id = "cari";
+    inp.placeholder = "Cari di transkrip…";
+    inp.setAttribute("aria-label", "Cari di transkrip");
+    inp.addEventListener("input", function () { cari = inp.value.trim().toLowerCase(); renderLog(); });
+    f.appendChild(inp);
+  }
+
+  // ---------- reaktor ----------
+  var cv = $("#cv"), ctx = cv.getContext("2d"), W = 0, dpr = 1, rot = 0, last = 0, flashT = -1e9, flashOk = true, C = {};
+  function tok(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function rgba(hex, a) {
+    var h = hex.replace("#", "");
+    if (h.length === 3) h = h.split("").map(function (c) { return c + c; }).join("");
+    var n = parseInt(h, 16);
+    return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
+  }
+  function ukur() {
+    var r = cv.getBoundingClientRect();
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = Math.max(120, r.width);
+    cv.width = Math.round(W * dpr);
+    cv.height = Math.round(W * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    C = { arc: tok("--arc"), arc2: tok("--arc-2"), gold: tok("--gold"), ok: tok("--ok"), bad: tok("--bad"), line: tok("--line-hi") };
+  }
+  function tahapIdx() { var i = TAHAP.indexOf(S.tahap); return i < 0 ? TAHAP.length : i; }
+  function flash(ok) { flashOk = ok; flashT = performance.now(); }
+  function draw(ts) {
+    var dt = Math.min(64, ts - last || 16);
+    last = ts;
+    var mode = S.mode;
+    var v = mode === "kerja" ? 0.9 : mode === "tanya" ? 0.22 : mode === "gerbang" ? 0.5 : 0.1;
+    if (!reduce) rot += dt / 1000 * v;
+    var cx = W / 2, cy = W / 2, R = W / 2 - 6;
+    var col = mode === "tanya" ? C.gold : mode === "selesai" ? C.ok : C.arc;
+    ctx.clearRect(0, 0, W, W);
+    var ti = tahapIdx(), seg = Math.PI * 2 / 5, gap = 0.07;
+    for (var k = 0; k < 5; k++) {
+      var a0 = -Math.PI / 2 + k * seg + gap / 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R - 4, a0, a0 + seg - gap);
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = k < ti ? C.arc : k === ti ? col : C.line;
+      ctx.globalAlpha = k === ti && !reduce ? 0.55 + 0.45 * Math.sin(ts / 380) : 1;
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    if (ts - flashT < 1000) {
+      ctx.globalAlpha = 1 - (ts - flashT) / 1000;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = flashOk ? C.ok : C.bad;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    ctx.strokeStyle = C.arc2;
+    for (var j = 0; j < 72; j++) {
+      var a = j / 72 * Math.PI * 2, r1 = R - 16, r2 = r1 - (j % 6 === 0 ? 10 : 4);
+      ctx.globalAlpha = j % 6 === 0 ? 0.95 : 0.45;
+      ctx.lineWidth = j % 6 === 0 ? 1.6 : 1;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a) * r1, Math.sin(a) * r1);
+      ctx.lineTo(Math.cos(a) * r2, Math.sin(a) * r2);
+      ctx.stroke();
+    }
+    ctx.restore();
+    ctx.globalAlpha = 1;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(-rot * 1.6);
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = col;
+    [[0, 1.5], [Math.PI, 0.9], [Math.PI * 1.55, 0.35]].forEach(function (p) {
+      ctx.beginPath();
+      ctx.arc(0, 0, R * 0.64, p[0], p[0] + p[1]);
+      ctx.stroke();
+    });
+    ctx.restore();
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot * 2.4);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = C.arc2;
+    ctx.setLineDash([3, 6]);
+    ctx.beginPath();
+    ctx.arc(0, 0, R * 0.54, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+    var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 0.48);
+    g.addColorStop(0, rgba(col, 0.26));
+    g.addColorStop(0.7, rgba(col, 0.07));
+    g.addColorStop(1, rgba(col, 0));
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 0.48, 0, Math.PI * 2);
+    ctx.fill();
+    if (!reduce) requestAnimationFrame(draw);
+  }
+
+  // ---------- pemutar ----------
+  function langkah() {
+    timer = null;
+    if (!playing || S.i >= E.length) return;
+    apply(E[S.i], true);
+    S.i++;
+    render();
+    if (S.i >= E.length) { setPlay(false, true); return; }
+    if (pauseAfter) {
+      pauseAfter = false;
+      setPlay(false);
+      addChat("ojarvis", "Berhenti di jam proses " + S.clk + ". Katakan \"lanjut\" atau tekan Lanjut di atas untuk meneruskan.", true);
+      return;
+    }
+    timer = setTimeout(langkah, E[S.i].d / speed);
+  }
+  function setPlay(on, habis) {
+    playing = on;
+    var b = $("#btn-play");
+    b.textContent = habis ? "Selesai" : on ? "Jeda" : "Lanjut";
+    b.disabled = !!habis;
+  }
+  function main(on) {
+    if (timer) { clearTimeout(timer); timer = null; }
+    setPlay(on);
+    if (on && S.i < E.length) timer = setTimeout(langkah, E[S.i].d / speed);
+  }
+  function mulai(dari) {
+    if (timer) { clearTimeout(timer); timer = null; }
+    pauseAfter = false;
+    fresh();
+    for (var i = 0; i < dari; i++) { apply(E[i], false); S.i = i + 1; }
+    render();
+    if (dari > 0) addChat("sys", "Laman dibuka di tengah proses: jam " + S.clk + ", slice 2 dari 4 baru lulus. Simulasi berlanjut otomatis.", false);
+    main(true);
+  }
+
+  // ---------- kontrol ----------
+  $("#btn-play").addEventListener("click", function () { main(!playing); });
+  $("#btn-ulang").addEventListener("click", function () { mulai(0); });
+  document.querySelectorAll(".seg button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      speed = Number(b.getAttribute("data-speed"));
+      document.querySelectorAll(".seg button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      if (playing) main(true);
+    });
+  });
+  document.querySelectorAll(".chip-q").forEach(function (b) { b.addEventListener("click", function () { tanya(b.textContent); }); });
+  $("#say").addEventListener("submit", function (e) { e.preventDefault(); var q = $("#q"); tanya(q.value); q.value = ""; });
+  $("#btn-mic").addEventListener("click", function () {
+    addChat("sys", "Mikrofon tidak tersedia di prototipe ini. Di VPS, tombol ini memakai Web Speech API (id-ID): ucapkan misalnya \"oJARVIS, status?\" lalu teksnya terkirim seperti pesan biasa.", false);
+  });
+  $("#btn-voice").addEventListener("click", function () {
+    voiceOn = !voiceOn;
+    this.setAttribute("aria-pressed", voiceOn ? "true" : "false");
+    if (!voiceOn) { try { window.speechSynthesis.cancel(); } catch (err) { /* abaikan */ } }
+    addChat("sys", voiceOn ? "Jawaban oJARVIS kini dibacakan (bila peramban mendukung suara Indonesia)." : "Pembacaan jawaban dimatikan.", false);
+  });
+  var tabs = [["#tab-log", "#p-log"], ["#tab-kep", "#p-kep"], ["#tab-arc", "#p-arc"]];
+  tabs.forEach(function (p) {
+    $(p[0]).addEventListener("click", function () {
+      tabs.forEach(function (q) { $(q[0]).setAttribute("aria-selected", q === p ? "true" : "false"); $(q[1]).hidden = q !== p; });
+    });
+  });
+
+  buildFilter();
+  fresh();
+  ukur();
+  window.addEventListener("resize", function () { ukur(); if (reduce) draw(0); });
+  mulai(MULAI);
+  if (!reduce) requestAnimationFrame(draw); else draw(0);
+})();
+</script>
+
+</body>
+</html>
