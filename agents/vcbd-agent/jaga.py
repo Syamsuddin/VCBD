@@ -71,12 +71,19 @@ def sha256(p):
 
 
 def berubah(base):
-    """path -> status (A/M/D/R) terhadap base, termasuk berkas baru yang belum di-track."""
+    """path -> status (A/M/D/R) terhadap base, termasuk berkas baru yang belum di-track.
+
+    Rename tetap dideteksi (-M) agar mengganti nama tes secara sah tidak dibaca sebagai tes dihapus,
+    tetapi path lama dicatat sebagai D kecuali rename tes -> tes. Tanpa itu, memindahkan
+    tests/x_test.py ke legacy/x.txt mematikan tes tanpa terlihat J1-J4, dan memindahkan dokumen
+    blueprint keluar docs/ lolos dari J5/J7."""
     out = {}
     for ln in git("diff", "--name-status", "-M", base).splitlines():
         bag = ln.split("\t")
         if len(bag) >= 2:
             out[bag[-1]] = bag[0][0]
+        if len(bag) == 3 and bag[0].startswith("R") and not (RX_UJI.search(bag[1]) and RX_UJI.search(bag[2])):
+            out[bag[1]] = "D"
     for f in git("ls-files", "--others", "--exclude-standard").splitlines():
         if f.strip() and not RX_ARTEFAK.search(f.strip()):
             out[f.strip()] = "A"

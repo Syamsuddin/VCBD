@@ -145,7 +145,12 @@ cek("backlog belum ada -> pembangun backlog", "vcbd-pembangun" in a, a)
 orc(R, "backlog", "--set", "Fitur Login")
 a, out = aksi(R)
 cek("lanjut menunjuk slice-mulai", "slice-mulai" in out, out)
+tulis(R, "docs/catatan rapat é.md", "x\n")
+tulis(R, "docs/app/[id]/page.md", "x\n")
 orc(R, "slice-mulai", "--slice", "Fitur Login")
+cek("komit orkestrator: nama berspasi, non-ASCII, dan [kurung] ikut dikomit",
+    jalan(R, "git", "status", "--porcelain")[1].strip() == ""
+    and "page.md" in jalan(R, "git", "ls-files", "docs/app")[1], jalan(R, "git", "status", "--porcelain")[1])
 basis = state(R)["aktif"]["basis"]
 
 M = ["python3", "scripts/meter.py"]
@@ -166,6 +171,17 @@ orc(R, "slice-dibangun")
 cek("slice dikomit + ledger ditutup -> menunggu gerbang", state(R)["aktif"]["menunggu"] == "gerbang", state(R)["aktif"])
 rc, out = orc(R, "gerbang", "fitur")
 cek("gerbang.sh + jaga.py lulus -> menunggu periksa auditor", state(R)["aktif"]["menunggu"] == "periksa", out)
+orc(R, "slice-diperiksa", "--verdik", "gagal", "--alasan", "uji: butir kriteria belum terbukti")
+jalan(R, *M, "fitur-mulai", "--fitur", "Fitur Login", "--rencana", "src/login.py")   # dibuka ulang, lupa ditutup
+orc(R, "slice-dibangun")
+cek("slice dibuka ulang di ledger tapi belum ditutup -> gagal (bukan lolos ke gerbang)",
+    state(R)["aktif"]["menunggu"] == "alternatif" and state(R)["aktif"]["percobaan"] == 3, state(R)["aktif"])
+jalan(R, *M, "fitur-selesai")
+orc(R, "slice-dibangun")
+rc, out = orc(R, "gerbang", "fitur")
+cek("setelah ditutup: gerbang lulus lagi -> periksa", state(R)["aktif"]["menunggu"] == "periksa", out)
+cek("artefak tes (__pycache__) tidak ikut dikomit orkestrator",
+    "__pycache__" not in jalan(R, "git", "ls-files")[1], jalan(R, "git", "ls-files")[1])
 orc(R, "slice-diperiksa", "--verdik", "lulus")
 s = state(R)
 cek("slice LULUS, aktif kosong", s["backlog"][0]["status"] == "lulus" and s["aktif"] is None, s["backlog"])
@@ -194,6 +210,13 @@ def coba_jaga(nama, ubah, peran="penambal", harus="FAIL", kode=None, slice_=None
 
 
 coba_jaga("J1 berkas tes dihapus", lambda: (R / "tests/test_login.py").unlink(), kode="J1")
+coba_jaga("J1 tes di-rename ke lokasi bukan-tes = dihapus",
+          lambda: (R / "legacy").mkdir(exist_ok=True) or jalan(R, "git", "mv", "tests/test_login.py", "legacy/old_login.txt"),
+          kode="J1")
+coba_jaga("J5 dokumen blueprint di-rename keluar docs/ tertangkap",
+          lambda: jalan(R, "git", "mv", "docs/_archive/23-fitur-login.md", "src/catatan.md"), kode="J5")
+coba_jaga("rename tes -> tes (sah) lulus",
+          lambda: jalan(R, "git", "mv", "tests/test_login.py", "tests/test_masuk.py"), harus="PASS")
 coba_jaga("J2 skip baru", lambda: tulis(R, "tests/test_login.py", (R / "tests/test_login.py").read_text()
                                         .replace("    def test_salah", "    @unittest.skip('x')\n    def test_salah")),
           kode="J2")
@@ -259,6 +282,8 @@ orc(R, "temuan-ditambal")
 rc, out = orc(R, "gerbang", "tambal")
 cek("gerbang tambal lulus -> menunggu periksa", state(R)["aktif"]["menunggu"] == "periksa", out)
 jalan(R, "python3", "scripts/pindai.py", "--root", ".", "--keluar", "docs/_TEMUAN.json")   # auditor menimpa dosir
+orc(R, "putuskan", "--dari", "vcbd-auditor", "--pertanyaan", "lanjut?", "--opsi", "ya|tidak", "--pilihan", "ya",
+    "--alasan", "auditor bertanya di tengah pemeriksaan")                                  # lalu bertanya
 orc(R, "temuan-diperiksa", "--verdik", "lulus")
 cek("auditor menimpa dosir -> dipulihkan dari segel + diulang",
     temuan(R)[EVAL]["status"] == "ditambal" and temuan(R)[DEBUG]["status"] == "disetujui"

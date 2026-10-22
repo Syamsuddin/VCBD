@@ -130,23 +130,31 @@ def cabang():
 def kotor(luar_docs=False):
     """Berkas berubah/baru (docs/_AGEN dikecualikan lewat info/exclude)."""
     out = []
-    for ln in subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"],
-                             capture_output=True, text=True).stdout.splitlines():
-        p = ln[3:].strip().strip('"')
-        if " -> " in p:
-            p = p.split(" -> ", 1)[1]
-        if ln.startswith("??") and RX_ARTEFAK.search(p):
+    # -z: path apa adanya (tanpa kutip/escape untuk spasi & non-ASCII); rename membawa path asal sesudahnya
+    isi = subprocess.run(["git", "status", "--porcelain", "-z", "--untracked-files=all"],
+                         capture_output=True, text=True).stdout.split("\0")
+    i = 0
+    while i < len(isi):
+        e = isi[i]
+        i += 1
+        if len(e) < 4:
             continue
-        if p and (not luar_docs or not p.startswith("docs/")):
+        xy, p = e[:2], e[3:]
+        if xy[0] in "RC":
+            i += 1
+        if xy == "??" and RX_ARTEFAK.search(p):
+            continue
+        if not luar_docs or not p.startswith("docs/"):
             out.append(p)
     return out
 
 
 def komit(pesan):
     """Komit semua perubahan (tanpa .env). Dipakai orkestrator untuk perubahan miliknya sendiri."""
-    if not kotor():
+    paths = kotor()   # sudah tersaring dari artefak build/tes — `git add -A` akan ikut mengomit __pycache__ dsb.
+    if not paths:
         return False
-    git("add", "-A", cek=True)
+    git("--literal-pathspecs", "add", "-A", "--", *paths, cek=True)   # [id].tsx bukan pola glob
     for env in [p for p in git("diff", "--cached", "--name-only").splitlines()
                 if Path(p).name == ".env" or Path(p).name.startswith(".env.")]:
         git("reset", "-q", "--", env)
@@ -175,11 +183,14 @@ def muat():
     return baca(STATE)
 
 
-def simpan(s):
-    """Simpan state + segel dosir temuan (patokan untuk jaga_temuan pada putaran berikutnya)."""
+def simpan(s, segel=True):
+    """Simpan state + segel dosir temuan (patokan untuk jaga_temuan pada putaran berikutnya).
+
+    segel=False untuk perintah yang bisa dipanggil SAAT subagen masih bekerja (putuskan, kebijakan,
+    lapor): menyegel di sana akan menjadikan perubahan auditor yang belum diperiksa sebagai patokan."""
     s["diperbarui"] = now()
     tulis(STATE, s)
-    if TEMUAN.exists():
+    if segel and TEMUAN.exists():
         shutil.copy2(TEMUAN, TERJAGA)
 
 
@@ -653,6 +664,13 @@ def gagal(s, alasan, log=None):
 
 def c_unit_gagal(a):
     s = muat()
+    ak = s.get("aktif") or {}
+    # periksa dulu kerja subagen yang buntu — gagal() lalu simpan() akan menyegel dosir
+    if ak.get("jenis") == "temuan" and ak.get("menunggu") in ("tambal", "perbaiki", "alternatif"):
+        cek_temuan(s, ak["id"])
+    elif ak.get("menunggu") == "periksa" or s["tahap"] == "SEHAT" or \
+            (s["tahap"] == "AUDIT" and s["audit"]["putaran"] > 0):
+        jaga_temuan(s, boleh_tolak=set(s["audit"].get("verifikasi", [])))
     gagal(s, a.alasan)
     simpan(s)
     return 0
@@ -729,7 +747,10 @@ def c_slice_dibangun(a):
         print("[FAIL] tak ada slice aktif.", file=sys.stderr)
         return 1
     led = baca(LEDGER, {})
-    ditutup = any(f.get("fitur", "").strip().lower() == ak["id"].strip().lower() for f in led.get("riwayat_fitur", []))
+    nama = ak["id"].strip().lower()
+    masih_terbuka = ((led.get("fitur_aktif") or {}).get("fitur") or "").strip().lower() == nama
+    ditutup = not masih_terbuka and any(f.get("fitur", "").strip().lower() == nama
+                                        for f in led.get("riwayat_fitur", []))
     kode_kotor = kotor(luar_docs=True)
     if not ditutup:
         gagal(s, "ledger belum mencatat slice ditutup (meter.py fitur-selesai belum dijalankan)")
@@ -1188,7 +1209,7 @@ def c_putuskan(a):
     s = muat()
     opsi = [x.strip() for x in a.opsi.split("|") if x.strip()]
     kid = catat_keputusan(s, a.dari, a.pertanyaan, opsi, a.pilihan, a.alasan, eskalasi=a.eskalasi)
-    simpan(s)
+    simpan(s, segel=False)
     print(f"[PASS] {kid} dicatat: {a.pilihan}")
     return 0
 
@@ -1206,7 +1227,7 @@ def c_kebijakan(a):
             s["kebijakan"][k] = v
         catat_keputusan(s, "pengguna", f"Ubah kebijakan {k}", [], json.dumps(s["kebijakan"][k]), "permintaan pengguna")
     if a.set:
-        simpan(s)
+        simpan(s, segel=False)
     print(json.dumps(s["kebijakan"], indent=2, ensure_ascii=False))
     return 0
 
@@ -1286,7 +1307,7 @@ def c_lapor(a):
     out.write_text("\n".join(L), encoding="utf-8")
     if s["tahap"] == "LAPOR":
         s["tahap"] = "SELESAI"
-    simpan(s)
+    simpan(s, segel=False)
     print(f"[PASS] laporan ditulis: {out} · status akhir {s.get('akhir')} · eskalasi {len(s.get('eskalasi', []))}")
     return 0
 
