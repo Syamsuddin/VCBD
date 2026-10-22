@@ -6,6 +6,15 @@ Entri terbaru di atas. Versi tiap skill mengikuti `metadata.version` di `SKILL.m
 
 ## Belum dirilis
 
+### Catatan rancangan
+
+- `catatan/simulasi-vcbd-agent.md`: simulasi logis satu proses `vcbd-agent` (Buku Tamu Kecamatan), bukan hasil run.
+- `catatan/rancangan-agen-vps-ojarvis.md`: rangkuman bahan implementasi. Isinya:
+  - arsitektur `vcbd-agent` (mesin tahap, perintah, kebijakan, penjaga, berkas state, gesekan dengan skill);
+  - pemasangan di VPS Ubuntu 24.04;
+  - rancangan konsol web oJARVIS (arsitektur, panel → sumber data, protokol WebSocket, keamanan, fase implementasi).
+- `catatan/ojarvis-prototipe.html`: prototipe tampilan oJARVIS dengan data simulasi.
+
 ### CI dan pemeriksaan repo
 
 - `.github/workflows/uji.yml` berjalan pada push ke `main`, setiap PR, dan manual. Izinnya `contents: read`, dan run lama dibatalkan bila ada push baru. Matriks dipilih untuk menguji janji INSTALL.md:

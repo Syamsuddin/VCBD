@@ -296,7 +296,7 @@ claude --agent vcbd-agent "Nama - Buku Tamu. Deskripsi - aplikasi buku tamu kant
 - Mode SPLIT belum diuji.
 - Satu proses penuh memanggil banyak subagen, jadi biaya tokennya besar.
 
-Pemasangan, izin, dan uji: [INSTALL.md](INSTALL.md#agen-otonom-vcbd-agent). Gambaran satu proses dari awal sampai akhir: [simulasi logis Buku Tamu Kecamatan](catatan/simulasi-vcbd-agent.md).
+Pemasangan, izin, dan uji: [INSTALL.md](INSTALL.md#agen-otonom-vcbd-agent). Gambaran satu proses dari awal sampai akhir: [simulasi logis Buku Tamu Kecamatan](catatan/simulasi-vcbd-agent.md). Rancangan lanjutan (pemasangan di VPS dan konsol web oJARVIS): [catatan/rancangan-agen-vps-ojarvis.md](catatan/rancangan-agen-vps-ojarvis.md).
 
 ---
 
@@ -321,7 +321,7 @@ VCBD/
 ├── scripts/kemas.sh              zip per skill → dist/ (untuk claude.ai)
 ├── scripts/uji.sh                seluruh pemeriksaan repo — sama persis dengan CI
 ├── scripts/cek_repo.py           konsistensi frontmatter, versi README/INSTALL, definisi agen
-├── catatan/simulasi-vcbd-agent.md  gambaran logis satu proses vcbd-agent (bukan hasil run)
+├── catatan/                      simulasi logis vcbd-agent · rancangan VPS & konsol oJARVIS · prototipe HTML oJARVIS
 ├── agents/                       vcbd-agent (khusus Claude Code; tidak ikut zip claude.ai)
 │   ├── vcbd-agent.md · vcbd-arsitek.md · vcbd-pembangun.md · vcbd-auditor.md · vcbd-penambal.md
 │   └── vcbd-agent/               orkestra.py · jaga.py · LICENSE · uji/uji_agen.py
