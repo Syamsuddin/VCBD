@@ -1,0 +1,182 @@
+<section class="bab" data-judul="coding-vcbd: Membangun Slice demi Slice">
+<h1><span class="nobab">Bab 4</span>coding-vcbd: Membangun Slice demi Slice</h1>
+<p class="lead">Blueprint yang bagus belum menjadi aplikasi. Skill <code>coding-vcbd</code> mengeksekusinya slice demi slice, dengan pemuatan dokumen yang hemat dan gerbang selesai yang diuji mesin. Di bab ini kita membangun fitur pertama PRESQU: pindai QR masuk/pulang.</p>
+
+<div class="tujuan"><b>Setelah membaca bab ini, Anda dapat:</b>
+<ul><li>menjalankan tujuh fase <code>coding-vcbd</code>, dari kunci sesi sampai aplikasi selesai;</li>
+<li>membaca dan menindaklanjuti delapan syarat <code>gerbang.sh</code>;</li>
+<li>membaca counter waktu dan token dengan jujur;</li>
+<li>menerbitkan kontrak serah-terima untuk auditor.</li></ul></div>
+
+<h2>4.1 Dua kegagalan yang dicegah</h2>
+<p><b>Agen yang mengarang.</b> Blueprint sudah menjawab skema, perintah, konvensi, dan kriteria terima. Agen yang menebak ulang menghasilkan kode yang benar secara sintaks tetapi salah secara kebutuhan.</p>
+<p><b>Agen yang mengaku selesai.</b> "Sudah saya implementasikan" tanpa keluaran perintah adalah klaim, bukan bukti. Di <code>coding-vcbd</code>, selesai berarti <code>gerbang.sh</code> berakhir dengan <i>exit</i> 0.</p>
+
+<h2>4.2 Empat Hukum Eksekusi</h2>
+<table class="hukum"><tbody>
+<tr><td class="nh">1</td><td><b>Blueprint adalah sumber kebutuhan; kode aktual adalah sumber keadaan.</b> Bila dokumen berbeda dengan kode, <b>kode menang</b>. Agen berhenti, melaporkan selisihnya, dan meminta keputusan. Ia tidak diam-diam memilih salah satu.</td></tr>
+<tr><td class="nh">2</td><td><b>Tidak ada kode di luar rencana slice.</b> Satu waktu satu slice, dengan daftar berkas yang diumumkan di muka. Berkas di luar daftar berarti berhenti dan minta izin.</td></tr>
+<tr><td class="nh">3</td><td><b>Selesai = diuji, bukan diakui.</b> Setiap klaim "berhasil" disertai perintah dari <code>11</code> dan keluarannya.</td></tr>
+<tr><td class="nh">4</td><td><b>Muat paling sedikit yang cukup.</b> Sebelum membuka berkas: "apakah rute INDEX menyuruh saya memuat ini?" <code>cat docs/*.md</code> adalah pelanggaran, bukan ketelitian.</td></tr>
+</tbody></table>
+
+<h2>4.3 Peta tujuh fase</h2>
+<div class="diagram">
+<svg viewBox="0 0 560 92" xmlns="http://www.w3.org/2000/svg" font-family="InterW" font-size="10">
+<g font-weight="700" fill="#fff" text-anchor="middle">
+<rect x="2" y="16" width="72" height="44" rx="7" fill="#15803D"/><text x="38" y="36">A</text><text x="38" y="50" font-weight="400" font-size="8.5">Kunci sesi</text>
+<rect x="82" y="16" width="72" height="44" rx="7" fill="#15803D"/><text x="118" y="36">B</text><text x="118" y="50" font-weight="400" font-size="8.5">Ambil slice</text>
+<rect x="162" y="16" width="72" height="44" rx="7" fill="#15803D"/><text x="198" y="36">C</text><text x="198" y="50" font-weight="400" font-size="8.5">Implementasi</text>
+<rect x="242" y="16" width="72" height="44" rx="7" fill="#15803D"/><text x="278" y="36">D</text><text x="278" y="50" font-weight="400" font-size="8.5">Verifikasi</text>
+<rect x="322" y="16" width="72" height="44" rx="7" fill="#C2410C"/><text x="358" y="36">E</text><text x="358" y="50" font-weight="400" font-size="8.5">Gerbang</text>
+<rect x="402" y="16" width="72" height="44" rx="7" fill="#15803D"/><text x="438" y="36">F</text><text x="438" y="50" font-weight="400" font-size="8.5">Tutup slice</text>
+<rect x="482" y="16" width="74" height="44" rx="7" fill="#0F4C81"/><text x="519" y="36">G</text><text x="519" y="50" font-weight="400" font-size="8.5">Aplikasi selesai</text></g>
+<path d="M438 62 V80 H118 V64" stroke="#5b6b7d" fill="none" stroke-dasharray="4 3" marker-end="url(#m2)"/>
+<defs><marker id="m2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#5b6b7d"/></marker></defs>
+<text x="278" y="77" fill="#5b6b7d" text-anchor="middle" font-size="8.5">ulangi B–F untuk slice berikutnya (sebaiknya di sesi baru)</text>
+</svg>
+<div class="cap-diagram">Diagram 4.1 — Fase A dijalankan sekali per sesi; B–F berulang per slice; G sekali di akhir.</div>
+</div>
+
+<h2>4.4 Fase A: Muat Tier-0 dan kunci sesi</h2>
+<p>Buka sesi Claude Code baru di root proyek PRESQU.</p>
+<div class="prompt"><span class="pill">Prompt</span>Mulai coding dari blueprint. Kerjakan slice pertama sesuai roadmap.</div>
+<p>Skill membaca <b>hanya tiga berkas</b>: <code>CLAUDE.md</code>, <code>INDEX.md</code>, dan <code>docs/_MANIFEST.json</code>. Lalu ia memastikan kesehatan blueprint dengan <code>validate.sh</code>. Bila ada <code>[FAIL]</code>, coding tidak dimulai, karena blueprint yang bertentangan akan melahirkan kode yang bertentangan.</p>
+<p>Berikutnya, meteran sesi dinyalakan, perintah dipanen, dan blueprint disegel:</p>
+<fig id="t-meter-awal">Membuka sesi: <code>init</code>, <code>perintah</code>, <code>segel</code>, dan <code>fitur-mulai</code>.</fig>
+<ol class="penjelas">
+<li><code>init</code> langsung mengingatkan bahwa tabel perintah masih kosong. Agen tidak boleh menebak perintah.</li>
+<li><code>perintah --set</code> menyimpan perintah dari <code>11_COMMANDS.md</code> ke ledger. <code>11</code> adalah satu-satunya dokumen yang dibaca penuh di luar rute INDEX. Setelah ini, perintah selalu diambil dari ledger.</li>
+<li><code>segel</code> mengunci sidik jari dokumen blueprint. Bila nanti dokumen bergeser tanpa disengaja, skill akan tahu.</li>
+<li><code>fitur-mulai</code> mengunci rencana slice: delapan berkas yang boleh disentuh. Rute INDEX yang dipakai adalah "Fitur baru (vertical slice)".</li>
+</ol>
+
+<h2>4.5 Fase B: Ambil satu slice dan rencanakan</h2>
+<p>Satu slice saja. Jangan memborong dua fitur "karena mirip". Untuk F1, dokumen dimuat menurut rute INDEX (01, 02, 06, 07, 11, 23, plus 26 karena menyentuh tampilan). Dari <code>23</code>, agen membaca <b>hanya blok F1</b> dengan <code>grep -n</code> lalu <code>sed -n 'a,bp'</code>, bukan seluruh berkas.</p>
+<p>Sebelum menulis kode, agen menyampaikan <b>Rencana Slice</b> kepada Anda:</p>
+<pre class="code">Rencana Slice — F1 Scan QR masuk/pulang
+Kriteria   : docs/23 §F1 (5 butir)
+Berkas     : app/{__init__,migrate,repo,service,server,templates}.py,
+             tests/{__init__,test_scan}.py
+Step       : 1 skema · 2 repo · 3 service · 4 rute · 5 UI · 6 tes · 7 gerbang
+Verifikasi : python3 -m unittest tests.test_scan
+Irreversibel: migrasi awal (tabel baru, tidak destruktif)</pre>
+<div class="kotak awas"><b>Gerbang scope.</b> Fitur dicocokkan dulu ke <code>02_SCOPE.md</code>. Bila Anda meminta "sekalian ekspor PDF" dan itu ada di out-of-scope, agen berhenti dan bertanya. <i>Scope creep</i> paling sering masuk lewat kata "sekalian".</div>
+
+<h2>4.6 Fase C: Implementasi berlapis</h2>
+<p>Slice dikerjakan dalam urutan baku. Tiap lapis adalah satu step, dan setiap step ditutup dengan laporan counter satu baris.</p>
+<table><thead><tr><th>Step</th><th>Lapis</th><th>Rumah aturan</th></tr></thead><tbody>
+<tr><td>1</td><td>Skema/migrasi</td><td>07 (+22 bila destruktif)</td></tr>
+<tr><td>2</td><td>Model/akses data</td><td>07, 12</td></tr>
+<tr><td>3</td><td>Service/logika domain</td><td>06, 12</td></tr>
+<tr><td>4</td><td>Endpoint/rute</td><td>06, 08, 21</td></tr>
+<tr><td>5</td><td>UI + empat state</td><td>26 (dilewati bila tanpa UI)</td></tr>
+<tr><td>6</td><td>Tes</td><td>13</td></tr>
+<tr><td>7</td><td>Gerbang fitur</td><td>23, 24</td></tr>
+</tbody></table>
+<fig id="t-steps">Tiga step pertama slice F1 beserta counter-nya.</fig>
+<ol class="penjelas">
+<li><code>step-mulai</code> membuka step dengan nama lapisnya.</li>
+<li>Baris waktu: durasi step, slice, dan sesi. Angka waktu bersifat <b>TERUKUR</b> dari jam dinding.</li>
+<li>Baris token: dihitung dari ukuran berkas yang benar-benar dimuat (<code>--muat</code>) dibagi 3,5 karakter per token. Karena itu ia diberi label <b>[ESTIMASI]</b>.</li>
+</ol>
+<div class="kotak catat"><b>Kejujuran angka.</b> Model tidak punya akses ke meteran token di sesi claude.ai. Angka <code>[ESTIMASI]</code> dihitung deterministik oleh skrip, bukan dikira-kira model. Angka <code>[TERUKUR]</code> hanya didapat lewat <code>token_ledger.py sync-cc</code> dari transkrip Claude Code. Keduanya tidak boleh dicampur.</div>
+<p>Pada step 5, halaman <code>/scan</code> dibangun dengan token dari <code>26</code> dan empat state wajib. Berikut halaman aslinya setelah aplikasi dijalankan:</p>
+<fig id="ui-grid" w="92">Empat state wajib halaman <code>/scan</code>: kosong (kiri atas), memuat (kanan atas), gagal (kiri bawah), sukses (kanan bawah).</fig>
+<p>Step 6 menulis tes untuk setiap alur kritikal di <code>13</code>, termasuk alur gagal dari <code>06</code>:</p>
+<fig id="t-tes">Empat tes alur kritikal F1 lulus.</fig>
+<ol class="penjelas">
+<li>Empat tes: pindai sah, kode salah (422), di luar jendela waktu (422), dan pindai ganda (409).</li>
+<li>Keluaran nyata ditempel apa adanya. Parafrase seperti "tes sudah lulus" tidak dihitung sebagai bukti.</li>
+</ol>
+
+<h2>4.7 Fase D: Verifikasi</h2>
+<p>Blok verifikasi <code>23</code> dan suite tes dijalankan, lalu ekor keluarannya ditempelkan. Bila gagal, perbaikan mengikuti <code>18_REPAIR_RULES.md</code>: reproduksi, akar masalah, perbaikan minimal, tes regresi. <b>Tiga kali gagal pada akar yang sama</b>, agen berhenti dan melapor: apa yang sudah dicoba, hipotesis akar masalah, dan dua opsi jalan keluar.</p>
+
+<h2>4.8 Fase E: Gerbang selesai fitur</h2>
+<p>Inilah momen kebenaran. Jalankan gerbang dengan nama fitur:</p>
+<fig id="t-gerbang-fail">Gerbang menolak slice F1 versi pertama.</fig>
+<ol class="penjelas">
+<li><b>S4 gagal.</b> Ada komentar <code>TODO</code> tertinggal di <code>service.py</code>: validasi peran pegawai belum dikerjakan. Gerbang menolak penanda kerja pada berkas yang disentuh.</li>
+<li><b>S5 gagal.</b> Kunci rahasia ditulis langsung di kode, padahal <code>21</code> mewajibkan rahasia dari <code>PRESQU_SECRET</code>.</li>
+<li><b>S7 lulus.</b> Semua berkas yang disentuh ada di rencana slice. Tidak ada perubahan liar.</li>
+<li>Kesimpulan tegas: <b>fitur belum selesai</b>, padahal tes S2 dan S3 hijau. Inilah alasan "tes lulus" tidak sama dengan "selesai".</li>
+</ol>
+<p>Perbaikannya kecil dan tepat sasaran: rahasia dibaca dari variabel lingkungan, dan <code>TODO</code> diganti implementasi pemeriksaan peran yang sebenarnya (pegawai tak dikenal atau bukan peran "pegawai" mendapat 403). Gerbang dijalankan ulang:</p>
+<fig id="t-gerbang-pass">Gerbang lulus setelah dua perbaikan.</fig>
+<ol class="penjelas">
+<li>S4 kini bersih pada kedelapan berkas.</li>
+<li>S5 bersih: tidak ada pola rahasia.</li>
+<li>S8 <code>[SKIP]</code>: templat UI PRESQU ditulis di berkas <code>.py</code>, sehingga tidak terdeteksi sebagai berkas UI. Ini batas nyata skrip. Empat state diperiksa manual (gambar sebelumnya), dan pengecualian ini <b>wajib dicatat</b> saat slice ditutup.</li>
+<li>Gerbang mesin lulus. Sisa yang harus dibuktikan manusia: S1 (kriteria 23) dan S6 (konvensi dan guardrail).</li>
+</ol>
+<table><thead><tr><th>Syarat</th><th>Yang diuji</th><th>Jenis</th></tr></thead><tbody>
+<tr><td>S1</td><td>Kriteria terima <code>23</code> terpenuhi</td><td>Manual</td></tr>
+<tr><td>S2</td><td>Tes fitur (blok verifikasi) lulus</td><td>Mesin</td></tr>
+<tr><td>S3</td><td>Suite penuh hijau, tanpa regresi</td><td>Mesin</td></tr>
+<tr><td>S4</td><td>Tanpa TODO/FIXME/<code>dd(</code>/<code>console.log</code> pada berkas tersentuh</td><td>Mesin</td></tr>
+<tr><td>S5</td><td>Tanpa rahasia ter-hardcode; <code>.env</code> tidak ter-track</td><td>Mesin</td></tr>
+<tr><td>S6</td><td>Konvensi <code>12</code>, guardrail <code>20</code>/<code>21</code></td><td>Manual</td></tr>
+<tr><td>S7</td><td>Berkas tersentuh ⊆ rencana slice</td><td>Mesin</td></tr>
+<tr><td>S8</td><td>Empat state pada berkas UI</td><td>Mesin (heuristik)</td></tr>
+</tbody></table>
+<div class="kotak awas"><b>Dilarang "hijau karena dihapus".</b> Melewatkan tes, melonggarkan asersi, menonaktifkan validasi atau otorisasi, atau mengubah skrip gerbang supaya lulus adalah kecurangan, bukan perbaikan. Bila gerbang hanya bisa lulus dengan cara itu, agen wajib berhenti dan bertanya.</div>
+
+<h2>4.9 Fase F: Tutup slice</h2>
+<p>Setelah lulus, ada empat langkah penutup:</p>
+<ol>
+<li><b>Arsipkan blok 23</b> ke <code>docs/_archive/23-F1-scan-qr.md</code>. <code>23</code> hanya memuat fitur aktif, sehingga slice ke-10 tidak ikut membayar token fitur ke-1.</li>
+<li><b>Perbarui status</b> fase di <code>03_ROADMAP.md</code> (kolom status saja).</li>
+<li><b>Satu slice, satu commit</b> bermakna, sesuai <code>22</code>.</li>
+<li><b>Catat yang tak terlihat dari kode</b> dengan <code>fitur-selesai</code>.</li>
+</ol>
+<pre class="code">$ python3 scripts/meter.py fitur-selesai \
+    --asumsi "Kode QR 8 karakter HMAC-SHA256; 21 tak menyebut panjang" \
+    --ditunda "Rekap harian — fase 2 roadmap" \
+    --warn-dilewati "S8: templates.py tak terdeteksi sebagai berkas UI, empat state diperiksa manual"</pre>
+<p>Ruas-ruas ini bukan formalitas. Inilah satu-satunya jalan bagi auditor di Bab 5 untuk mengetahui utang yang sengaja diambil. Opsi lain yang tersedia: <code>--deviasi</code>, <code>--dokumen-diperbarui</code>, dan <code>--landmine</code>.</p>
+<fig id="t-fitur-selesai">Menutup slice, melihat rekap, dan menerbitkan kontrak serah-terima.</fig>
+<ol class="penjelas">
+<li>Rekap slice: tujuh step, durasi, dan token estimasi. Angka juga dicatat ke ledger token VCBD.</li>
+<li><code>lapor</code> memisahkan waktu <code>[TERUKUR]</code> dan token <code>[ESTIMASI]</code>.</li>
+<li><code>serah</code> menulis <code>docs/_SERAH_BUILD.json</code>: satu slice, satu WARN dilewati, satu asumsi, satu pekerjaan ditunda.</li>
+<li>Peringatan jujur: blueprint bergeser sejak disegel. Penyebabnya penutupan slice tadi (arsip 23 dan status roadmap), jadi pergeseran ini disengaja. Meski begitu, skrip tetap meminta Anda memastikannya.</li>
+</ol>
+<div class="kotak tip"><b>Ganti sesi setelah tiap slice.</b> Sesi panjang adalah pembakar token terbesar. Blueprint dirancang agar sesi baru langsung produktif: <i>"Baca CLAUDE.md lalu INDEX.md, lanjutkan slice berikutnya dari 03_ROADMAP."</i></div>
+
+<h2>4.10 Fase G: Kapan aplikasi boleh disebut selesai</h2>
+<p>Lima syarat, semuanya wajib benar:</p>
+<ol>
+<li>semua fase <code>03_ROADMAP.md</code> berstatus selesai;</li>
+<li><code>23</code> tidak menyisakan fitur aktif;</li>
+<li>suite tes penuh hijau pada konteks bersih;</li>
+<li><code>validate.sh</code> <i>exit</i> 0, artinya dokumen masih segaris dengan kode;</li>
+<li><code>25_RELEASE_CHECKLIST.md</code> dijalankan berurutan dan tiap langkah lulus.</li>
+</ol>
+<p>Kurang satu pun, skill melaporkan "belum selesai" beserta sisanya. Setelah kelimanya benar, <code>meter.py serah</code> menerbitkan kontrak serah-terima final.</p>
+<fig id="e-serah">Potongan <code>docs/_SERAH_BUILD.json</code>.</fig>
+<ol class="penjelas">
+<li>Sidik jari blueprint di awal, saat disegel, dan saat serah, beserta penanda pergeseran.</li>
+<li>Perintah proyek ikut diwariskan, sehingga auditor tidak perlu menebak.</li>
+</ol>
+
+<h2>4.11 Diet token: aturan operasional</h2>
+<ul>
+<li>Yang permanen hanya Tier-0: <code>CLAUDE.md</code> dan <code>INDEX.md</code>.</li>
+<li>Cari sebelum baca: <code>Glob</code> → <code>Grep -n</code> → <code>Read</code> rentang yang ditunjuk saja.</li>
+<li>Jangan menyalin isi dokumen ke jawaban chat; rujuk <code>docs/NN_NAME.md §bagian</code>.</li>
+<li>Bukti berupa diff dan ekor keluaran, bukan berkas kode utuh.</li>
+<li>Dokumen di daftar <code>collapsed</code> adalah stub; jangan dibuka berharap isi.</li>
+</ul>
+
+<div class="latihan"><b>Latihan 4</b><ol>
+<li>Kerjakan slice F2 (rekap harian) PRESQU di sesi baru. Catat dokumen yang dimuat menurut rute INDEX.</li>
+<li>Sengaja sentuh satu berkas di luar rencana slice. Apa yang dilaporkan S7?</li>
+<li>Bandingkan angka token <code>[ESTIMASI]</code> dengan hasil <code>token_ledger.py sync-cc</code> di Claude Code.</li></ol></div>
+
+<div class="rangkuman"><b>Rangkuman Bab 4</b><ul>
+<li>Fase A sekali per sesi; B–F per slice; G sekali di akhir.</li>
+<li>Rencana slice dikunci di muka, dan S7 menjaganya.</li>
+<li>Tes hijau belum tentu selesai; gerbang S1–S8 yang menentukan.</li>
+<li>Utang yang sengaja diambil dicatat lewat <code>fitur-selesai</code> dan diwariskan lewat <code>_SERAH_BUILD.json</code>.</li></ul></div>
+</section>

@@ -1,0 +1,81 @@
+<section class="bab" data-judul="Merangkai Suite dalam Kerja Sehari-hari">
+<h1><span class="nobab">Bab 8</span>Merangkai Suite dalam Kerja Sehari-hari</h1>
+<p class="lead">Lima skill sudah kita kenal satu per satu. Bab ini merangkainya menjadi pola kerja: tiga jalur perjalanan proyek, ritme sesi yang hemat, cara bekerja dalam tim, dan cara keluar dari masalah yang paling sering muncul.</p>
+
+<h2>8.1 Tiga jalur perjalanan</h2>
+<table><thead><tr><th>Titik awal</th><th>Rantai skill</th><th>Kunci keberhasilan</th></tr></thead><tbody>
+<tr><td><b>Ide baru</b></td><td><code>vcbd</code> → <code>coding-vcbd</code> → <code>review-vcbd</code></td><td>Jangan lompati konfirmasi; slice kecil yang bisa didemokan</td></tr>
+<tr><td><b>Aplikasi warisan berkode</b></td><td><code>reverse-vcbd</code> → <code>review-vcbd</code> (PINDAI) → <code>coding-vcbd</code></td><td>Izin data read-only; jangan memperbaiki sambil mendokumentasikan</td></tr>
+<tr><td><b>Aplikasi web tanpa kode</b></td><td><code>reverse-web-vcbd</code> → <code>vcbd</code> → <code>coding-vcbd</code></td><td>Satu alur utuh per objek; putuskan "tulis ulang atau lanjutkan"</td></tr>
+</tbody></table>
+<p>Ketiganya bertemu di satu titik: setiap perubahan besar kembali ke <b>Mode Pembaruan <code>vcbd</code></b>, supaya dokumen tidak tertinggal dari kode.</p>
+
+<h2>8.2 Ritme satu sesi</h2>
+<p>Pola yang paling hemat dan paling aman adalah <b>satu slice per sesi</b>:</p>
+<ol>
+<li>Buka sesi baru di root proyek. Prompt pembuka: <i>"Baca CLAUDE.md lalu INDEX.md, lanjutkan slice berikutnya dari 03_ROADMAP."</i></li>
+<li>Biarkan agen menyampaikan Rencana Slice. Periksa daftar berkasnya, karena di situlah scope dijaga.</li>
+<li>Ikuti laporan counter di akhir tiap step.</li>
+<li>Jangan terima "selesai" sebelum <code>gerbang.sh</code> berakhir dengan <i>exit</i> 0 dan keluarannya ditempel.</li>
+<li>Tutup slice: arsip 23, status roadmap, satu commit, <code>fitur-selesai</code> beserta catatannya.</li>
+<li>Tutup sesi. Sesi berikutnya mulai dengan konteks bersih.</li>
+</ol>
+
+<h2>8.3 Meteran token</h2>
+<p>Blueprint dirancang agar hemat token, dan meteran membuktikannya. <code>token_ledger.py</code> mengakumulasi pemakaian sejak genesis paket:</p>
+<fig id="t-ledger">Buku besar token PRESQU sejak genesis.</fig>
+<ol class="penjelas">
+<li>Akumulasi sejak scaffold pertama, termasuk catatan dari <code>coding-vcbd</code>.</li>
+<li>Rincian per rute INDEX. Rute yang paling sering dipakai paling layak dioptimalkan.</li>
+<li>Angka <code>[TERUKUR]</code> belum ada. Skrip mengatakannya terus terang dan menunjukkan cara mendapatkannya: <code>sync-cc</code> dari dalam Claude Code.</li>
+</ol>
+
+<h2>8.4 Bekerja dalam tim</h2>
+<ul>
+<li><b>Commit blueprint bersama kode.</b> <code>docs/</code>, <code>CLAUDE.md</code>, <code>INDEX.md</code>, dan <code>scripts/</code> adalah bagian repo, bukan catatan pribadi.</li>
+<li><b>Jadikan <code>validate.sh</code> dan suite tes sebagai cek CI.</b> Dokumen yang bertentangan sebaiknya ditolak di <i>pull request</i>, bukan ditemukan agen berikutnya.</li>
+<li><b>Satu pemilik per dokumen kunci.</b> Misalnya <code>07</code> dipegang penanggung jawab basis data, dan <code>26</code> dipegang desainer.</li>
+<li><b>Review adversarial.</b> Setelah implementasi, minta subagen dengan konteks segar membandingkan diff terhadap dokumen terkait.</li>
+<li><b>Mode SPLIT untuk tim terpisah.</b> Backend dan frontend yang dikerjakan orang atau sesi berbeda dijembatani <code>kontrak/openapi.yaml</code> dan <code>validate-kontrak.sh</code>.</li>
+</ul>
+
+<h2>8.5 Masalah umum dan jalan keluarnya</h2>
+<table><thead><tr><th>Gejala</th><th>Penyebab umum</th><th>Jalan keluar</th></tr></thead><tbody>
+<tr><td><code>[FAIL] … jalankan skrip dari root proyek</code></td><td>Skrip gerbang dijalankan dari subfolder</td><td><code>cd</code> ke root proyek, lalu ulangi</td></tr>
+<tr><td><code>[FAIL] 8. Dokumen masih KERANGKA</code></td><td>Dokumen belum diisi atau penandanya lupa dihapus</td><td>Isi dokumen, hapus baris status, atau daftarkan ke <code>collapsed</code> bila memang stub</td></tr>
+<tr><td>Agen menebak perintah</td><td>Ledger perintah belum diisi</td><td><code>meter.py perintah --set …</code> dari <code>11</code></td></tr>
+<tr><td><code>[WARN] Blueprint BERUBAH</code></td><td>Dokumen bergeser sejak disegel</td><td>Pastikan disengaja, catat lewat <code>--dokumen-diperbarui</code>, jalankan <code>validate.sh</code></td></tr>
+<tr><td>S7 melapor berkas di luar rencana</td><td>Perubahan "sekalian lewat"</td><td>Jelaskan alasannya, atau kembalikan perubahannya</td></tr>
+<tr><td>S8 <code>[SKIP]</code> padahal ada UI</td><td>Templat UI tidak berekstensi UI yang dikenal</td><td>Periksa empat state manual dan catat di <code>--warn-dilewati</code></td></tr>
+<tr><td>Temuan mesin terasa salah</td><td><code>pindai.py</code> berbasis regex</td><td>Verifikasi, lalu <code>temuan.py tolak --alasan …</code></td></tr>
+<tr><td>Skill versi lama terpakai</td><td>Salinan ganda dari sinkron akun claude.ai</td><td>Samakan versi, atau blokir lewat <code>permissions.deny</code></td></tr>
+<tr><td>Laporan reverse-web tanpa transisi</td><td>Alur tidak ditangkap pada objek yang sama</td><td>Tangkap ulang satu alur utuh secara berurutan</td></tr>
+</tbody></table>
+
+<h2>8.6 Berkas state yang lahir di proyek</h2>
+<table><thead><tr><th>Berkas</th><th>Ditulis oleh</th><th>Isi</th></tr></thead><tbody>
+<tr><td><code>docs/_MANIFEST.json</code></td><td>vcbd / reverse-vcbd</td><td>State blueprint, pemilik fakta, <code>referenced_by</code>, flag</td></tr>
+<tr><td><code>docs/_MANIFEST.draft.json</code></td><td>reverse-web-vcbd</td><td>Draf manifest dari pengamatan kotak hitam</td></tr>
+<tr><td><code>docs/_TOKEN_LEDGER.json</code></td><td>vcbd / coding-vcbd</td><td>Akumulasi token per rute</td></tr>
+<tr><td><code>docs/_CODING_LEDGER.json</code></td><td>coding-vcbd</td><td>Perintah, rencana slice, counter</td></tr>
+<tr><td><code>docs/_archive/23-*.md</code></td><td>coding-vcbd</td><td>Kriteria fitur yang sudah diterima</td></tr>
+<tr><td><code>docs/_SERAH_BUILD.json</code></td><td>coding-vcbd</td><td>Kontrak serah-terima untuk auditor</td></tr>
+<tr><td><code>docs/_TEMUAN.json</code></td><td>review-vcbd</td><td>Dosir Temuan berjenjang</td></tr>
+<tr><td><code>docs/_RECON/</code>, <code>docs/_RECON_WEB/</code></td><td>reverse-vcbd, reverse-web-vcbd</td><td>Buku bukti mesin dan laporan cakupan</td></tr>
+<tr><td><code>kontrak/openapi.yaml</code></td><td>vcbd (mode split)</td><td>Rumah tunggal endpoint dan payload</td></tr>
+</tbody></table>
+
+<h2>8.7 Sepuluh kebiasaan baik</h2>
+<ol class="kebiasaan">
+<li>Beri nama dan deskripsi yang jelas di prompt pertama.</li>
+<li>Jawab wawancara dengan menyetujui atau mengoreksi default, bukan mengarang dari nol.</li>
+<li>Baca Ringkasan Kebutuhan dengan serius; itu satu-satunya gerbang sebelum 28 dokumen ditulis.</li>
+<li>Terjemahkan selera desain menjadi token, bukan kata sifat.</li>
+<li>Satu slice, satu sesi, satu commit.</li>
+<li>Tagih keluaran perintah, bukan klaim.</li>
+<li>Catat utang yang sengaja diambil saat menutup slice.</li>
+<li>Audit dimulai dari PINDAI; tambalan dimulai dari tes yang merah.</li>
+<li>Untuk kode warisan, biarkan data yang memutuskan jalur mana yang mati.</li>
+<li>Saat fakta berubah, ubah dokumen pemiliknya, lalu jalankan <code>validate.sh</code>.</li>
+</ol>
+</section>

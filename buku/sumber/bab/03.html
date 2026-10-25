@@ -1,0 +1,219 @@
+<section class="bab" data-judul="vcbd: Menyusun Blueprint">
+<h1><span class="nobab">Bab 3</span>vcbd: Menyusun Blueprint</h1>
+<p class="lead">Skill <code>vcbd</code> adalah akar rantai. Ia mengubah ide aplikasi menjadi paket blueprint 28+ dokumen yang konsisten, murah dimuat, dan bisa diverifikasi mesin. Di bab ini kita menyusun blueprint aplikasi PRESQU dari nol.</p>
+
+<div class="tujuan"><b>Setelah membaca bab ini, Anda dapat:</b>
+<ul><li>menjalankan lima fase <code>vcbd</code>, dari triase sampai serah terima;</li>
+<li>membaca struktur paket blueprint dan peran tiap klaster dokumen;</li>
+<li>memakai <code>scaffold.py</code> dan <code>validate.sh</code> sebagai gerbang mesin;</li>
+<li>memakai Mode Pembaruan, mode SPLIT, dan profil native.</li></ul></div>
+
+<h2>3.1 Empat Hukum vcbd</h2>
+<p>Seluruh perilaku skill ini diturunkan dari empat hukum yang tidak bisa ditawar. Hafalkan keempatnya; setiap kali skill "menolak" permintaan Anda, alasannya hampir selalu salah satu dari ini.</p>
+<table class="hukum"><tbody>
+<tr><td class="nh">1</td><td><b>Tidak ada generasi tanpa konfirmasi.</b> Skill mewawancarai Anda, menyajikan Ringkasan Kebutuhan, lalu menunggu jawaban "ya" sebelum menulis satu dokumen pun. Permintaan "langsung saja, tidak usah tanya" tidak membatalkan hukum ini; ia hanya memperpendek wawancara menjadi satu ringkasan asumsi dan satu kali konfirmasi.</td></tr>
+<tr><td class="nh">2</td><td><b>Satu fakta, satu rumah.</b> Setiap fakta ditulis penuh di satu dokumen pemiliknya. Dokumen lain cukup merujuk. Skema hanya hidup di <code>07</code>, istilah domain di <code>04</code>, perintah di <code>11</code>.</td></tr>
+<tr><td class="nh">3</td><td><b>INDEX me-rute, CLAUDE.md inti.</b> <code>INDEX.md</code> adalah router (jenis task → dokumen yang dimuat). <code>CLAUDE.md</code> adalah inti yang selalu aktif. Dengan begitu 28 dokumen tidak perlu dimuat sekaligus.</td></tr>
+<tr><td class="nh">4</td><td><b>Setiap baris membayar dirinya dan dapat diverifikasi.</b> Sebelum menulis baris apa pun: <i>"jika dihapus, apakah agen akan keliru?"</i> Kriteria terima harus berupa perintah dengan sinyal lulus/gagal, bukan "pastikan berfungsi".</td></tr>
+</tbody></table>
+
+<div class="kotak catat"><b>Scaffold tetap, isi adaptif.</b> "28 dokumen" adalah <em>kerangka alamat</em> yang tetap, bukan kewajiban menulis 28 halaman penuh. Dokumen yang isinya 100% mengikuti default didaftarkan di field <code>collapsed</code> manifest, dan stub-nya ditulis otomatis oleh skrip. Alamatnya stabil untuk agen, sementara isinya tetap hemat.</div>
+
+<h2>3.2 Anatomi paket blueprint</h2>
+<p>Paket VCBD terdiri atas dua berkas di root proyek dan dokumen bernomor di <code>docs/</code>.</p>
+<table><thead><tr><th>Klaster</th><th>Dokumen</th><th>Fungsi singkat</th></tr></thead><tbody>
+<tr><td>Root</td><td><code>CLAUDE.md</code>, <code>INDEX.md</code></td><td>Inti selalu-aktif dan router konteks</td></tr>
+<tr><td>Strategis</td><td>00–03</td><td>Ringkasan eksekutif, PRD, scope, roadmap (fase berupa <i>vertical slice</i>)</td></tr>
+<tr><td>Domain</td><td>04–07</td><td>Glosarium, peran &amp; matriks akses, proses bisnis, model data</td></tr>
+<tr><td>Fondasi teknis</td><td>08–12</td><td>Arsitektur, stack, lingkungan dev, perintah, struktur proyek</td></tr>
+<tr><td>Kualitas &amp; operasi</td><td>13–16</td><td>Pengujian, penanganan galat, observabilitas, panduan debugging</td></tr>
+<tr><td>Perilaku agen</td><td>17–22</td><td>Alur kerja agen, aturan perbaikan, templat task, guardrail, keamanan, kebijakan perubahan</td></tr>
+<tr><td>Gerbang selesai</td><td>23–25</td><td>Kriteria terima per fitur, definisi selesai, checklist rilis</td></tr>
+<tr><td>Kondisional</td><td>26, 27</td><td><code>26_UI_CONVENTIONS</code> untuk proyek ber-UI; <code>27_API_CONTRACT</code> untuk mode SPLIT</td></tr>
+</tbody></table>
+<p>Daftar lengkap ke-28 dokumen beserta pemilik faktanya ada di Lampiran A.</p>
+
+<h2>3.3 Fase 0: Triase</h2>
+<p>Semuanya dimulai dari satu prompt sederhana. Anda cukup memberi nama dan deskripsi umum.</p>
+<div class="prompt"><span class="pill">Prompt</span>Siapkan blueprint lengkap aplikasi PRESQU: pencatatan kehadiran pegawai via pindai kode QR harian. Satu kantor, dua peran (admin dan pegawai). Saya ingin Python murni tanpa framework, basis data SQLite.</div>
+<p>Pada fase triase, skill <b>mengumpulkan fakta tanpa bertanya</b>. Bila repo sudah punya <code>composer.json</code> atau <code>pubspec.yaml</code>, versi framework dibaca dari sana, bukan ditanyakan. Lalu skill menetapkan lima hal:</p>
+<ol>
+<li><b>Greenfield atau brownfield.</b> PRESQU dibangun dari nol, jadi greenfield.</li>
+<li><b>Ber-UI atau tidak.</b> PRESQU punya halaman pindai, jadi <code>ui.enabled = true</code>. Kategori wawancara K9 dan dokumen <code>26</code> ikut aktif.</li>
+<li><b>Mode SPLIT atau tunggal.</b> Satu deployable kecil, jadi tunggal. Skill tidak memaksakan pemisahan backend/frontend pada aplikasi kecil.</li>
+<li><b>Profil framework.</b> "Python murni tanpa framework" adalah keputusan sah. Skill merekam <code>stack.framework = "none"</code> dan mengaktifkan <b>profil native</b>: dokumen 12, 14, dan 21 wajib ditulis penuh karena blueprint memikul peran yang biasanya ditanggung framework.</li>
+<li><b>Jebakan (landmines)</b> untuk brownfield. Tidak relevan di PRESQU.</li>
+</ol>
+<div class="kotak tip"><b>Skill tidak akan "memperbaiki" pilihan Anda.</b> Bila Anda memilih tanpa framework, skill tidak diam-diam mengusulkan Flask atau Django. Pilihan sengaja dihormati, dan "framework" justru masuk daftar teknologi terlarang di <code>09</code>.</div>
+
+<h2>3.4 Fase 1: Wawancara penggalian</h2>
+<p>Wawancara memakai bank pertanyaan sepuluh kategori. Aturan mainnya: maksimal 3–4 pertanyaan per ronde, setiap pertanyaan disertai <b>usulan default</b>, dan hal yang sudah diketahui tidak ditanyakan ulang.</p>
+<table><thead><tr><th>Kode</th><th>Kategori</th><th>Mengisi dokumen</th></tr></thead><tbody>
+<tr><td>K1</td><td>Identitas &amp; tujuan</td><td>00, 01</td></tr>
+<tr><td>K2</td><td>Fitur &amp; scope</td><td>01, 02, 03</td></tr>
+<tr><td>K3</td><td>Aktor &amp; peran</td><td>05, 06, 21</td></tr>
+<tr><td>K4</td><td>Domain &amp; data</td><td>04, 07</td></tr>
+<tr><td>K5</td><td>Stack &amp; arsitektur</td><td>08, 09, 12</td></tr>
+<tr><td>K6</td><td>Lingkungan &amp; operasi</td><td>10, 11, 15</td></tr>
+<tr><td>K7</td><td>Kualitas &amp; keamanan</td><td>13, 14, 21, 23, 24</td></tr>
+<tr><td>K8</td><td>Kebijakan perubahan &amp; risiko</td><td>18, 20, 22, 25</td></tr>
+<tr><td>K9</td><td>Antarmuka (kondisional ber-UI)</td><td>26</td></tr>
+<tr><td>K10</td><td>Kontrak backend↔frontend (kondisional split)</td><td>27 + <code>kontrak/</code></td></tr>
+</tbody></table>
+<p>Contoh satu ronde pertanyaan yang disertai default:</p>
+<div class="chat"><div class="q"><b>Claude:</b> K3 — Peran. Saya sarankan dua peran: <i>admin</i> (kelola pegawai, lihat semua rekap, ekspor) dan <i>pegawai</i> (pindai, lihat rekap sendiri). Setuju? · K4 — Data sensitif: NIP saya tandai PII dan data kehadiran tanpa <i>hard-delete</i>. Setuju?</div>
+<div class="a"><b>Anda:</b> Setuju semua. Tambahkan: pegawai tidak boleh melihat rekap pegawai lain.</div></div>
+<p>Banyak dokumen (16–20, 22–25) tidak perlu pertanyaan terpisah. Skill menurunkannya dari jawaban lain ditambah konvensi, lalu meminta Anda mengonfirmasi bloknya sekaligus.</p>
+
+<h3>K9: kata sifat tidak bisa dieksekusi</h3>
+<p>Untuk proyek ber-UI, K9 adalah kategori yang paling sering diremehkan. "Modern, bersih, profesional" bukan spesifikasi. <code>#0F4C81</code>, radius 8 px, Inter 16/1.5 <em>adalah</em> spesifikasi. Tugas K9 adalah mengompilasi selera menjadi token yang bisa diuji mesin:</p>
+<ol>
+<li><b>Jangkar desain</b> dulu: design system yang sudah ada, aplikasi acuan, atau identitas instansi.</li>
+<li><b>Token inti</b> dalam tabel: warna (hex), huruf dan skala, radius, jarak. Aturan yang dikunci: nilai di luar tabel <b>terlarang</b>.</li>
+<li><b>Inventaris halaman → pola</b> (daftar, detail, formulir, dasbor, autentikasi).</li>
+<li><b>Empat state wajib</b> untuk setiap halaman ber-data: kosong, memuat, gagal, sukses.</li>
+<li><b>Larangan UI</b>: gradien tanpa alasan, emoji di antarmuka, ikon dari set berbeda-beda, dan seterusnya.</li>
+</ol>
+<p>Setelah token terkunci, skill menawarkan <b>sekali</b> preview desain. Preview dirender dari kerangka HTML beku; model hanya menyuntikkan nilai token.</p>
+<fig id="preview" w="88">Kerangka <code>contoh-preview.html</code> bawaan skill, dirender apa adanya. Hanya blok token <code>:root</code> dan teks <code>{ISI:}</code> yang diganti saat preview dibuat.</fig>
+
+<h2>3.5 Fase 2: Konfirmasi (gerbang keras)</h2>
+<p>Wawancara ditutup dengan <b>Ringkasan Kebutuhan</b>: tabel padat per kategori, ditambah dua daftar terpisah.</p>
+<pre class="code">## Ringkasan Kebutuhan — PRESQU
+| Kategori         | Ringkas                                              |
+|------------------|------------------------------------------------------|
+| Tujuan & metrik  | Hentikan absensi manual; 100% digital, &lt; 5 dtk/scan  |
+| Fitur MVP        | Scan QR masuk/pulang; rekap harian; ekspor CSV       |
+| Out-of-scope     | Payroll, cuti online, mobile native, multi-kantor    |
+| Peran & akses    | admin (kelola, semua rekap, ekspor); pegawai (scan)  |
+| Stack            | Python 3.12 stdlib + SQLite; Terlarang: framework    |
+| …                | …                                                    |
+
+[ASUMSI]  Jendela pindai masuk 06:00–09:00, pulang 14:00–18:00 WITA
+[TERBUKA] Notifikasi keterlambatan via WhatsApp — pasca-MVP
+
+Konfirmasi: generate 28 dokumen blueprint dengan ringkasan di atas?
+Jawab "ya" atau koreksi bagian yang salah.</pre>
+<p><code>[ASUMSI]</code> dipakai bila tidak Anda koreksi. <code>[TERBUKA]</code> sengaja ditunda. Koreksi memperbarui ringkasan, lalu skill meminta konfirmasi ulang hanya untuk bagian yang berubah. <b>Tidak ada dokumen yang ditulis sebelum Anda menjawab "ya".</b></p>
+
+<h2>3.6 Fase 3: Generasi</h2>
+<h3>Langkah 1: manifest lebih dulu</h3>
+<p>Sebelum dokumen apa pun, skill menulis <code>docs/_MANIFEST.json</code>: state bersama yang merekam ringkasan terkonfirmasi, peta pemilik fakta, dan graf rujukan.</p>
+<fig id="e-manifest">Potongan <code>_MANIFEST.json</code> PRESQU (dipadatkan).</fig>
+<ol class="penjelas">
+<li><code>ui.enabled</code> memicu <code>scaffold.py</code> menulis dokumen <code>26</code> dan rute UI di <code>INDEX.md</code>.</li>
+<li><code>referenced_by</code> adalah graf pemilik → perujuk. Bila skema (<code>07</code>) berubah, dokumen 06, 21, dan 23 ikut ditinjau. Graf inilah yang dipakai Mode Pembaruan.</li>
+<li><code>collapsed</code> mendaftar dokumen yang sengaja menjadi stub (di sini 17 dan 19).</li>
+</ol>
+
+<h3>Langkah 2: kerangka deterministik dengan scaffold.py</h3>
+<p>Skill tidak menulis <code>INDEX.md</code>, stub, atau kerangka dokumen dengan tangan. Itu membuang token dan rawan perbedaan format. Semuanya ditulis oleh skrip:</p>
+<fig id="t-scaffold">Menjalankan <code>scaffold.py</code> pada proyek PRESQU.</fig>
+<ol class="penjelas">
+<li>32 berkas terbentuk: dokumen 00–26, <code>CLAUDE.md</code>, <code>INDEX.md</code>, ledger token, serta salinan <code>validate.sh</code> dan <code>token_ledger.py</code> di <code>scripts/</code>.</li>
+<li>Dokumen 17 dan 19 langsung ditulis sebagai stub final karena terdaftar di <code>collapsed</code>.</li>
+<li>Skrip memberi tahu langkah berikutnya. Skrip bersifat anti-timpa: berkas yang sudah ada dilewati, kecuali dengan <code>--force</code>.</li>
+</ol>
+
+<h3>Langkah 3: gerbang mesin menangkap kerangka kosong</h3>
+<p>Coba jalankan validator sekarang, sebelum dokumen diisi. Inilah gunanya gerbang mesin: ia tidak bisa dibujuk.</p>
+<fig id="t-validate-fail"><code>validate.sh</code> menolak paket yang masih berupa kerangka.</fig>
+<ol class="penjelas">
+<li><code>[WARN] 6</code>: dokumen yang terlalu pendek dan tidak terdaftar di <code>collapsed</code>. Validator bertanya: lupa diisi, atau memang stub?</li>
+<li><code>[FAIL] 8</code>: masih ada penanda <code>Status: KERANGKA</code>. Ini yang mencegah paket setengah jadi diserahterimakan.</li>
+<li>Status akhir <code>GAGAL</code> dan <i>exit code</i> 1. Agen tidak boleh lanjut ke serah terima.</li>
+</ol>
+
+<h3>Langkah 4: mengisi substansi</h3>
+<p>Skill mengisi tiap dokumen dari manifest dengan rubrik ekonomi token: tabel lebih baik daripada narasi, path ditulis eksplisit, dan blok verifikasi konkret. Contoh dokumen pemilik skema:</p>
+<fig id="e-07"><code>07_DATA_MODEL.md</code>: satu-satunya rumah skema di seluruh paket.</fig>
+<ol class="penjelas">
+<li>Kolom, tipe, dan constraint ditulis dalam tabel. Dokumen lain yang butuh skema cukup menulis "lihat <code>docs/07_DATA_MODEL.md</code>".</li>
+<li>Aturan bisnis yang punya padanan di basis data (keunikan satu "masuk" per hari) ditulis sebagai constraint, bukan prosa.</li>
+</ol>
+<p>Dokumen kriteria terima menentukan kapan sebuah fitur boleh disebut selesai. Perhatikan blok verifikasinya: perintah dan sinyal lulusnya ditulis eksplisit.</p>
+<fig id="e-23">Blok fitur F1 di <code>23_ACCEPTANCE_CRITERIA.md</code>.</fig>
+<ol class="penjelas">
+<li>Satu blok per fitur MVP. Setiap butir bisa dibuktikan benar atau salah.</li>
+<li>Blok verifikasi berisi perintah yang akan dijalankan <code>coding-vcbd</code> beserta sinyal lulusnya.</li>
+</ol>
+<p>Untuk proyek ber-UI, dokumen <code>26</code> mengunci token desain:</p>
+<fig id="e-26"><code>26_UI_CONVENTIONS.md</code>: token beku, empat state, larangan.</fig>
+<ol class="penjelas">
+<li>Tabel token. Warna atau ukuran di luar tabel ini terlarang dan akan menjadi temuan saat audit (Bab 5).</li>
+<li>Empat state wajib untuk setiap halaman ber-data.</li>
+<li>Larangan UI yang dikonfirmasi saat wawancara K9.</li>
+</ol>
+
+<h3>Langkah 5: CLAUDE.md dan INDEX.md</h3>
+<p><code>CLAUDE.md</code> sengaja ramping; validator memberi peringatan bila lebih dari 50 baris.</p>
+<fig id="e-claude"><code>CLAUDE.md</code> PRESQU setelah slot <code>[ISI:]</code> diisi.</fig>
+<ol class="penjelas">
+<li>Lima prinsip kerja agen yang tidak bisa ditawar, termasuk "friksi sebanding irreversibilitas".</li>
+<li>Hanya perintah tersering, dengan simbol peringatan pada migrasi. Daftar lengkap tetap di <code>11</code>.</li>
+<li>Untuk apa pun di luar inti, agen diarahkan ke <code>INDEX.md</code>.</li>
+</ol>
+<p><code>INDEX.md</code> ditulis utuh dan final oleh <code>scaffold.py</code>. Model tidak menyuntingnya.</p>
+<fig id="e-index">Rute konteks di <code>INDEX.md</code>: jenis task menentukan dokumen yang dimuat.</fig>
+<ol class="penjelas">
+<li>Tabel rute adalah jantung hemat token: agen hanya memuat dokumen di kolom "Muat".</li>
+<li>Untuk fitur baru, cukup enam dokumen: 01, 02, 06, 07, 11, 23. Sisanya kondisional.</li>
+<li>Task irreversibel seperti migrasi skema diberi simbol peringatan dan wajib memuat <code>22</code>.</li>
+</ol>
+
+<h3>Langkah 6: pemangkasan dan validasi akhir</h3>
+<p>Lintasan terakhir menghapus baris yang gagal uji Hukum 4 dan memastikan tidak ada fakta yang tertulis dua kali. Setelah itu validator dijalankan lagi:</p>
+<fig id="t-validate-pass">Paket PRESQU lulus sebelas cek konsistensi.</fig>
+<ol class="penjelas">
+<li>Cek 3 memastikan tidak ada blok skema di luar <code>07</code>. Inilah Hukum 2 yang diuji mesin.</li>
+<li>Cek 11 khusus profil native: dokumen 12, 14, dan 21 tidak boleh di-<i>collapse</i>.</li>
+<li><code>LULUS BERSIH</code>: tidak ada FAIL maupun WARN.</li>
+</ol>
+<div class="kotak catat"><b>Sebelas cek validate.sh.</b> (1) manifest JSON valid · (2) semua rujukan <code>docs/NN_NAME.md</code> resolve · (3) tidak ada blok skema di luar 07 · (4) pemilik kanonik hadir · (5) <code>CLAUDE.md</code> ramping · (6) dokumen pendek terdaftar di <code>collapsed</code> · (7) dokumen 00–25 hadir · (8) tidak ada sisa KERANGKA · (9) flag UI ↔ 26 · (10) flag split ↔ 27 · (11) profil native.</div>
+
+<h2>3.7 Fase 4: Serah terima</h2>
+<p>Setelah validator lulus, skill menyampaikan cara memakai blueprint. Kalimat pembuka sesi baru selalu sama:</p>
+<div class="prompt"><span class="pill">Prompt</span>Baca CLAUDE.md lalu INDEX.md. Untuk task [nama task], muat hanya dokumen yang ditunjuk INDEX. Kerjakan, lalu jalankan blok verifikasinya.</div>
+<p>Tiga pengingat lain disampaikan pada tahap ini: (1) saat satu fakta berubah, perbarui dokumen pemiliknya dan manifest, lalu jalankan <code>validate.sh</code>; (2) setelah implementasi, minta subagen dengan konteks segar membandingkan diff terhadap dokumen; (3) meteran token opsional tersedia lewat <code>token_ledger.py</code>.</p>
+
+<h2>3.8 Mode Pembaruan</h2>
+<p>Bila paket sudah ada dan Anda minta perubahan, skill tidak mewawancarai ulang dari nol. Ia hanya menanyakan delta-nya, memperbarui manifest, lalu meregenerasi dokumen yang terdampak menurut graf <code>referenced_by</code>, bukan menurut tebakan dari prosa.</p>
+<div class="prompt"><span class="pill">Prompt</span>Ubah blueprint PRESQU: tambahkan kolom <code>unit_kerja</code> pada pegawai, dan rekap harian bisa difilter per unit kerja.</div>
+<p>Pada contoh ini, pemilik faktanya adalah <code>07</code>. Graf <code>referenced_by</code> menyebut 06, 21, dan 23 sebagai perujuk, jadi keempatnya ditinjau. Konfirmasi tetap berlaku untuk delta, dan <code>validate.sh</code> wajib lulus lagi.</p>
+<div class="kotak tip"><b>Paket warisan v1.2.</b> Proyek lama berformat 29 dokumen (<code>26_UI_DESIGN.md</code>) dimigrasikan lewat Mode Pembaruan: berkas diganti nama menjadi <code>26_UI_CONVENTIONS.md</code>, isinya diterjemahkan ke tabel token, lalu bagian yang belum ada dilengkapi.</div>
+
+<h2>3.9 Mode SPLIT: backend dan frontend terpisah</h2>
+<p>Bila frontend adalah deployable terpisah (aplikasi Flutter atau SPA) atau dikerjakan di sesi berbeda, aktifkan mode SPLIT. Dua agen di dua sesi tidak berbagi ingatan. Satu-satunya jembatan mereka adalah kontrak.</p>
+<pre class="code">monorepo/
+├── kontrak/
+│   ├── openapi.yaml        ← rumah tunggal endpoint + payload (SemVer)
+│   ├── KONTRAK.md          ← presedensi, glosarium bersama, envelope error
+│   └── scripts/validate-kontrak.sh
+├── backend/   (CLAUDE.md, INDEX.md, docs/ — split.role = backend)
+└── frontend/  (CLAUDE.md, INDEX.md, docs/ — split.role = frontend, 07 collapsed)</pre>
+<p>Urutannya: <code>scaffold.py --init-kontrak</code> sekali dari root monorepo, dua manifest dengan pin <code>split.contract_version</code> yang sama, lalu scaffold dan validasi per paket. Gerbang lintas paket <code>validate-kontrak.sh</code> memeriksa lima hal: kontrak sehat, kedua paket ber-<code>split.enabled</code> dengan peran yang saling melengkapi, pin versi kedua manifest sama, pin itu sama dengan <code>info.version</code> di <code>openapi.yaml</code>, dan <code>27</code> hadir di kedua paket.</p>
+<div class="kotak awas"><b>Jangan memecah aplikasi kecil "biar rapi".</b> Monolit ber-template di server tidak butuh dua paket. Seremoni ganda tanpa nilai adalah anti-pattern yang dicatat sendiri oleh skill.</div>
+
+<h2>3.10 Anti-pattern yang dicegah aktif</h2>
+<ul class="anti">
+<li>Menulis dokumen sebelum konfirmasi.</li>
+<li>Menyalin fakta yang sama ke beberapa dokumen.</li>
+<li>Paket tanpa INDEX, atau <code>CLAUDE.md</code> yang gemuk.</li>
+<li>Verifikasi kabur seperti "uji menyeluruh".</li>
+<li>Mengarang fakta tanpa label <code>[ASUMSI]</code>.</li>
+<li>Roadmap horizontal per lapisan; yang benar adalah <i>vertical slice</i> yang bisa didemokan.</li>
+<li>Nilai UI di luar tabel token, atau kata sifat estetika tanpa token konkret.</li>
+<li>Brownfield: menulis 07/09/11/12 dari jawaban wawancara alih-alih mengekstraknya dari kode.</li>
+</ul>
+
+<div class="latihan"><b>Latihan 3</b><ol>
+<li>Susun blueprint untuk aplikasi kecil milik Anda sendiri. Catat berapa ronde wawancara yang Anda butuhkan.</li>
+<li>Jalankan <code>validate.sh</code> sebelum dan sesudah pengisian. Bandingkan hasilnya dengan gambar di bab ini.</li>
+<li>Sengaja salin tabel skema ke <code>06</code>, lalu jalankan validator. Cek mana yang menangkapnya?</li></ol></div>
+
+<div class="rangkuman"><b>Rangkuman Bab 3</b><ul>
+<li><code>vcbd</code> berjalan dalam lima fase: triase, wawancara, konfirmasi, generasi, serah terima.</li>
+<li>Manifest ditulis lebih dulu; kerangka ditulis skrip; isi ditulis model; konsistensi diuji validator.</li>
+<li><code>INDEX.md</code> membuat paket besar tetap murah dimuat.</li>
+<li>Mode Pembaruan memakai graf <code>referenced_by</code> untuk tahu dokumen mana yang terdampak.</li></ul></div>
+</section>

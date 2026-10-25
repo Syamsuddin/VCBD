@@ -1,0 +1,84 @@
+<section class="bab" data-judul="Mengenal Vibe Coding dan VCBD">
+<h1><span class="nobab">Bab 1</span>Mengenal Vibe Coding dan VCBD</h1>
+<p class="lead">Bab ini menjelaskan masalah yang ingin dipecahkan VCBD, lima skill yang membentuk suite-nya, dan empat konvensi yang membuat kelimanya bisa saling menyambung.</p>
+
+<div class="tujuan"><b>Setelah membaca bab ini, Anda dapat:</b>
+<ul><li>menjelaskan dua kegagalan termahal dalam <i>vibe coding</i>;</li>
+<li>memilih skill VCBD yang tepat untuk titik awal proyek Anda;</li>
+<li>memahami empat konvensi bersama yang dipakai di seluruh buku.</li></ul></div>
+
+<h2>1.1 Vibe coding: cepat, menyenangkan, dan licin</h2>
+<p><i>Vibe coding</i> adalah cara membangun perangkat lunak dengan mendeskripsikan maksud kepada agen AI, lalu membiarkan agen itu menulis sebagian besar kodenya. Dengan Claude Code, Anda cukup mengetik "buatkan halaman pindai kehadiran", dan beberapa menit kemudian berkasnya sudah ada, tesnya jalan, dan aplikasinya bisa dibuka di peramban.</p>
+<p>Kecepatan itu nyata. Tetapi kecepatan juga memperbesar akibat dari kesalahan arah. Agen AI tidak lelah dan tidak ragu: ia akan membangun persis apa yang ia pahami, dengan nada sangat yakin, sekalipun pemahamannya keliru. Pengalaman di lapangan menunjukkan bahwa kesalahan termahal jarang berupa <em>kode yang salah</em>. Kode yang salah murah diperbaiki. Yang mahal adalah dua hal berikut.</p>
+
+<div class="dua-kolom">
+<div class="kartu-masalah"><div class="angka">1</div><h4>Membangun hal yang salah</h4><p>Kebutuhan tidak pernah digali. Agen mengisi kekosongan dengan tebakan yang masuk akal, dan tebakan itu baru ketahuan salah setelah puluhan berkas berdiri di atasnya.</p></div>
+<div class="kartu-masalah"><div class="angka">2</div><h4>Dokumen yang saling bertentangan</h4><p>Satu berkas menyebut MySQL, berkas lain menyebut PostgreSQL. Agen menerima dua sinyal yang bertabrakan, lalu memilih salah satu secara acak. Inilah <i>document drift</i>.</p></div>
+</div>
+
+<p>Kegagalan kedua sering mengejutkan. Kita biasanya berpikir "makin banyak dokumen, makin aman". Kenyataannya, dokumen yang kontradiktif <em>lebih buruk</em> daripada tanpa dokumen sama sekali, karena agen akan memperlakukan informasi basi sebagai kebenaran.</p>
+
+<h2>1.2 Jawaban VCBD dalam dua kalimat</h2>
+<p>VCBD (<i>Vibe Coding Blueprint Drafter</i>) menjawab kegagalan pertama dengan prinsip <b>"gali dan konfirmasi dulu, baru tulis"</b>, dan kegagalan kedua dengan prinsip <b>"satu fakta, satu rumah"</b>. Setelah itu, blueprint yang lahir dari kedua prinsip tadi disambungkan ke tahap pembangunan dan audit dengan disiplin yang sama, sehingga klaim "sudah selesai" selalu didukung oleh perintah yang benar-benar dijalankan.</p>
+
+<div class="kotak analogi"><b>Analogi rumah.</b> Bayangkan Anda menyuruh tukang membangun rumah. <b>vcbd</b> adalah pembuat gambar kerja yang lengkap dan tidak saling bertentangan. <b>coding-vcbd</b> adalah mandor yang memastikan rumah dibangun sesuai gambar, satu ruangan demi satu ruangan. <b>review-vcbd</b> adalah pengawas yang memeriksa dengan bukti. Untuk rumah yang sudah berdiri tanpa gambar, <b>reverse-vcbd</b> dan <b>reverse-web-vcbd</b> mengukur ulang bangunannya lalu menggambar ulang gambar kerjanya.</div>
+
+<h2>1.3 Lima skill, satu siklus hidup</h2>
+<p>Suite VCBD versi 2.6 terdiri atas lima skill Claude Code. Masing-masing punya satu tanggung jawab, dan keluaran satu skill menjadi masukan skill berikutnya.</p>
+
+<div class="diagram">
+<svg viewBox="0 0 560 205" xmlns="http://www.w3.org/2000/svg" font-family="InterW" font-size="10">
+<defs><marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#5b6b7d"/></marker></defs>
+<g fill="#3c4858"><text x="2" y="22">Aplikasi web lama</text><text x="2" y="35" font-size="8.5" fill="#5b6b7d">(hanya peramban)</text>
+<text x="2" y="107">Aplikasi lama</text><text x="2" y="120" font-size="8.5" fill="#5b6b7d">(ada kode)</text>
+<text x="2" y="186">Ide baru</text><text x="2" y="199" font-size="8.5" fill="#5b6b7d">(greenfield)</text></g>
+<rect x="104" y="10" width="116" height="30" rx="7" fill="#7C3AED"/><text x="162" y="29" fill="#fff" text-anchor="middle" font-weight="700">reverse-web-vcbd</text>
+<rect x="104" y="95" width="116" height="30" rx="7" fill="#0E7490"/><text x="162" y="114" fill="#fff" text-anchor="middle" font-weight="700">reverse-vcbd</text>
+<rect x="262" y="95" width="80" height="30" rx="7" fill="#0F4C81"/><text x="302" y="114" fill="#fff" text-anchor="middle" font-weight="700">vcbd</text>
+<rect x="366" y="95" width="90" height="30" rx="7" fill="#15803D"/><text x="411" y="114" fill="#fff" text-anchor="middle" font-weight="700">coding-vcbd</text>
+<rect x="468" y="95" width="90" height="30" rx="7" fill="#C2410C"/><text x="513" y="114" fill="#fff" text-anchor="middle" font-weight="700">review-vcbd</text>
+<g fill="#5b6b7d" font-size="8.5" text-anchor="middle"><text x="162" y="54">HAR/HTML → draf manifest</text><text x="162" y="139">dosir bukti → manifest</text><text x="302" y="86">blueprint 28+ dok</text></g>
+<g stroke="#5b6b7d" stroke-width="1.4" fill="none" marker-end="url(#m)">
+<path d="M220 25 C250 25 262 50 276 93"/><path d="M220 110H260"/><path d="M52 182H286V127"/><path d="M342 110H364"/><path d="M456 110H466"/>
+<path d="M513 125V158H320V127" stroke-dasharray="4 3" stroke="#C2410C"/></g>
+<text x="416" y="172" fill="#C2410C" text-anchor="middle" font-size="8.5">temuan &amp; perubahan → Mode Pembaruan vcbd</text>
+</svg>
+<div class="cap-diagram">Diagram 1.1 — Alur kerja VCBD Suite dari tiga titik awal yang berbeda.</div>
+</div>
+
+<table class="nw">
+<thead><tr><th>Skill</th><th>Peran</th><th>Mulai dari sini bila…</th></tr></thead>
+<tbody>
+<tr><td><code>vcbd</code></td><td>Menyusun paket blueprint 28+ dokumen lewat wawancara bertahap</td><td>Aplikasi belum ada, baru ide</td></tr>
+<tr><td><code>coding-vcbd</code></td><td>Mengeksekusi blueprint menjadi aplikasi, satu <i>vertical slice</i> demi slice</td><td>Blueprint sudah ada, coding belum mulai</td></tr>
+<tr><td><code>review-vcbd</code></td><td>Mengaudit, menguji, melacak bug, dan menambal terhadap blueprint</td><td>Kode sudah ada, ingin tahu di mana ia menyimpang</td></tr>
+<tr><td><code>reverse-vcbd</code></td><td>Membedah aplikasi yang ada kodenya menjadi dosir bukti, lalu blueprint</td><td>Aplikasi sudah ada, dokumennya tidak ada</td></tr>
+<tr><td><code>reverse-web-vcbd</code></td><td>Membedah aplikasi web kotak hitam (HAR/HTML) menjadi dosir dan draf manifest</td><td>Aplikasinya hanya bisa dibuka lewat peramban</td></tr>
+</tbody></table>
+
+<h2>1.4 Empat konvensi bersama</h2>
+<p>Kelima skill bisa saling menyambung karena mereka mematuhi empat konvensi yang sama. Anda akan melihat keempatnya muncul berulang kali di bab-bab berikutnya.</p>
+<ol class="konvensi">
+<li><b>Satu fakta, satu rumah.</b> <code>07</code> adalah rumah skema, <code>11</code> rumah perintah, <code>06</code> rumah alur proses, <code>26</code> rumah fakta antarmuka. Dokumen lain cukup merujuk, tidak menyalin.</li>
+<li><b>Gerbang keras sebelum menulis.</b> <code>vcbd</code> menunggu konfirmasi Ringkasan Kebutuhan; <code>reverse-vcbd</code> dan <code>reverse-web-vcbd</code> menunggu konfirmasi Ringkasan Temuan.</li>
+<li><b>Gerbang mesin, bukan harapan.</b> <code>validate.sh</code>, <code>gerbang.sh</code>, <code>pindai.py</code>, dan uji regresi <em>menguji</em> hal yang biasanya hanya <em>diharapkan</em>.</li>
+<li><b>Tidak ada klaim tanpa bukti.</b> Fakta membawa <code>path:baris</code>, <code>[KODE:]</code>, <code>[DATA:]</code>, atau <code>[AMATI:]</code>. Yang belum pasti diberi label <code>[USULAN]</code>, <code>[ASUMSI]</code>, <code>[TERBUKA]</code>, atau <code>[ISI:]</code>.</li>
+</ol>
+
+<h2>1.5 Kapan VCBD cocok, dan kapan tidak</h2>
+<p>Kejujuran dulu: VCBD bukan untuk semua proyek. Paket 28 dokumen adalah investasi, dan investasi hanya masuk akal bila ada yang dilindungi.</p>
+<div class="dua-kolom">
+<div class="kotak cocok"><b>Cocok untuk</b><ul><li>aplikasi yang akan dipelihara bertahun-tahun;</li><li>aplikasi dengan banyak peran atau tabel;</li><li>sistem lama yang mau dilanjutkan, tempat salah langkah itu mahal;</li><li>tim yang bergantian memakai agen AI pada repo yang sama.</li></ul></div>
+<div class="kotak tidak"><b>Kurang cocok untuk</b><ul><li>prototipe sekali buang;</li><li>skrip kecil satu berkas;</li><li>eksperimen yang belum jelas arah produknya.</li></ul></div>
+</div>
+<p>Untuk kasus di kolom kanan, prompt langsung ke Claude Code biasanya lebih efisien. Bila prototipe itu ternyata bertahan hidup, Anda selalu bisa menyusulkan blueprint-nya dengan <code>reverse-vcbd</code> (Bab 6).</p>
+
+<h2>1.6 Cara membaca buku ini</h2>
+<p>Buku ini bergaya tutorial. Setiap bab skill memakai dua proyek demo yang benar-benar dijalankan saat buku ini disusun:</p>
+<ul>
+<li><b>PRESQU</b>: aplikasi pencatatan kehadiran pegawai lewat kode QR harian, dibangun dari nol (Bab 3–5);</li>
+<li><b>SI-CUTI</b>: aplikasi pengajuan cuti bergaya Laravel yang sudah "berjalan" tanpa dokumen, dibedah ulang (Bab 6–7).</li>
+</ul>
+<p>Semua tangkapan layar terminal di buku ini adalah keluaran asli skrip VCBD v2.6, hanya dipangkas (<i>crop</i>) agar fokus. Lingkaran kuning bernomor <span class="b-in">1</span> <span class="b-in">2</span> <span class="b-in">3</span> pada gambar menunjuk baris yang dibahas di teks sesudahnya.</p>
+<div class="kotak catat"><b>Konvensi penulisan.</b> Perintah yang diketik di terminal diawali <code>$</code>. Kalimat yang diketik ke Claude Code ditampilkan dalam kotak <span class="pill">Prompt</span>. Nama berkas dan perintah memakai <code>huruf rata</code>. Angka dua digit seperti <code>07</code> atau <code>23</code> merujuk ke dokumen blueprint bernomor tersebut.</div>
+</section>

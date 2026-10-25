@@ -1,0 +1,47 @@
+<section class="halaman-judul-paruh">
+<div class="hj-paruh">Vibe Coding VCBD<br>dengan Claude AI</div>
+</section>
+<div class="kosong"></div>
+
+<section class="halaman-judul">
+<div class="hj-atas">
+<div class="hj-judul">Vibe Coding VCBD<br>dengan Claude AI</div>
+<div class="hj-sub">Panduan Praktis Menyusun Blueprint, Membangun, dan Mengaudit Aplikasi dengan VCBD Suite</div>
+</div>
+<div class="hj-penulis">Syams Ideris</div>
+<div class="hj-bawah">Edisi Pertama · 2026<br>Berdasarkan VCBD Suite v2.6</div>
+</section>
+
+<section class="hak-cipta">
+<p><b>Vibe Coding VCBD dengan Claude AI</b><br>Panduan Praktis Menyusun Blueprint, Membangun, dan Mengaudit Aplikasi dengan VCBD Suite</p>
+<p>Penulis: Syams Ideris<br>Edisi Pertama, Oktober 2026<br>Ukuran: 6 × 9 inci (15,24 × 22,86 cm)</p>
+<p>Hak Cipta © 2026 Syams Ideris</p>
+<p>Buku ini adalah dokumen bebas: Anda boleh menyebarluaskan dan/atau mengubahnya di bawah ketentuan <b>GNU General Public License versi 3</b> sebagaimana diterbitkan oleh Free Software Foundation, atau (sesuai pilihan Anda) versi yang lebih baru. Buku ini disebarkan dengan harapan dapat bermanfaat, tetapi TANPA JAMINAN APA PUN; bahkan tanpa jaminan tersirat atas KELAYAKAN DIPERDAGANGKAN atau KESESUAIAN UNTUK TUJUAN TERTENTU. Teks lengkap lisensi tercantum di Lampiran F, dan juga tersedia di <span class="url">https://www.gnu.org/licenses/gpl-3.0.html</span>.</p>
+<p>Perangkat lunak VCBD Suite yang dibahas dalam buku ini dilisensikan secara terpisah di bawah GNU General Public License versi 2 (GPL-2.0), sebagaimana tercantum pada berkas <code>LICENSE</code> di tiap folder skill. Kode sumbernya tersedia di <span class="url">https://github.com/Syamsuddin/VCBD</span>.</p>
+<p>Claude dan Claude Code adalah merek dagang Anthropic. Penyebutan merek dalam buku ini hanya untuk keperluan identifikasi dan tidak menyiratkan dukungan atau afiliasi.</p>
+<p>Seluruh keluaran terminal dalam buku ini diperoleh dari menjalankan skrip VCBD Suite v2.6 pada proyek demo PRESQU dan SI-CUTI, kemudian dipangkas agar fokus. Data pada proyek demo adalah data rekaan; nama, NIP, dan kode yang tampak tidak merujuk pada orang atau instansi nyata.</p>
+<p>ISBN: —<br><span class="kecil-abu">(belum diterbitkan dengan ISBN)</span></p>
+<p>Huruf isi: Source Serif 4 · Judul: Inter · Kode: JetBrains Mono</p>
+</section>
+
+<section class="pengantar" data-judul="Kata Pengantar">
+<h1 class="judul-depan">Kata Pengantar</h1>
+<p>Beberapa tahun terakhir, cara kita membangun perangkat lunak berubah lebih cepat daripada kebiasaan kita mengikutinya. Hari ini, seorang analis di kantor pemerintahan, seorang guru, atau seorang pengembang tunggal bisa mendeskripsikan aplikasi dalam bahasa sehari-hari, lalu melihat agen AI menuliskan kodenya. Orang menyebutnya <i>vibe coding</i>. Rasanya seperti sihir, sampai aplikasinya harus dipelihara.</p>
+<p>Buku ini lahir dari pengalaman yang cukup sering terulang: aplikasi yang dibangun dengan cepat ternyata membangun hal yang sedikit keliru, dan dokumen yang mestinya menjadi pegangan justru saling bertentangan. Agen AI tidak bersalah dalam hal ini. Ia mengerjakan persis apa yang ia pahami. Yang kurang adalah gambar kerja yang jelas, konsisten, dan bisa diperiksa.</p>
+<p>VCBD Suite adalah upaya menjawab kekurangan itu. Lima skill Claude Code di dalamnya bekerja sebagai satu rantai: menggali kebutuhan sebelum menulis, menyusun blueprint yang tidak saling bertentangan, membangun aplikasi slice demi slice, mengaudit hasilnya terhadap blueprint, dan membedah aplikasi lama yang tidak punya dokumen. Prinsipnya sederhana, walau tidak selalu mudah: <b>gali dan konfirmasi dulu, baru tulis</b>; <b>satu fakta, satu rumah</b>; dan <b>selesai berarti diuji, bukan diakui</b>.</p>
+<p>Buku ini ditulis sebagai tutorial. Setiap bab skill memakai proyek demo yang benar-benar dijalankan, dan setiap tangkapan layar terminal adalah keluaran asli skrip, bukan rekaan. Saya sengaja mempertahankan bagian yang "tidak mulus": gerbang yang menolak, temuan palsu yang harus ditolak, tes regresi yang ternyata belum menangkap celah, dan sebuah bug sungguhan yang muncul saat buku ini disusun. Justru di bagian-bagian itulah cara kerja VCBD paling terlihat.</p>
+<p>Buku ini ditujukan bagi pengembang yang memakai Claude Code, pengelola aplikasi di instansi yang mewarisi sistem tanpa dokumentasi, dan siapa pun yang ingin agen AI-nya bekerja dengan disiplin. Pengetahuan dasar tentang terminal, Git, dan satu bahasa pemrograman akan membantu, tetapi tidak wajib.</p>
+<p>Buku ini dirilis di bawah GNU General Public License versi 3. Silakan salin, ubah, dan bagikan. Bila Anda menemukan kekeliruan, perbaikan Anda akan sangat berharga bagi pembaca berikutnya.</p>
+<p>Terima kasih kepada semua yang telah mencoba versi-versi awal VCBD dan dengan sabar melaporkan di mana ia tersandung. Setiap laporan itu kini menjadi satu baris aturan, satu cek validator, atau satu anti-pattern yang dicegah.</p>
+<p class="ttd">Oktober 2026<br><b>Syams Ideris</b></p>
+</section>
+
+<section class="daftar-isi" data-judul="Daftar Isi">
+<h1 class="judul-depan">Daftar Isi</h1>
+{{TOC}}
+</section>
+
+<section class="daftar-gambar" data-judul="Daftar Gambar">
+<h1 class="judul-depan">Daftar Gambar</h1>
+{{LOF}}
+</section>

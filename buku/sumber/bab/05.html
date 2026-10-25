@@ -1,0 +1,153 @@
+<section class="bab" data-judul="review-vcbd: Audit, Uji, Lacak, Tambal">
+<h1><span class="nobab">Bab 5</span>review-vcbd: Audit, Uji, Lacak, Tambal</h1>
+<p class="lead">Kode yang lulus tes belum tentu kode yang dimaksud. Skill <code>review-vcbd</code> menjawab satu pertanyaan: <b>di mana kode dan blueprint sudah tidak lagi bercerita hal yang sama?</b> Di bab ini kita mengaudit PRESQU, menemukan celah keamanan, melacak bug yang muncul sungguhan saat buku ini disusun, lalu menambal keduanya dengan tes regresi.</p>
+
+<div class="tujuan"><b>Setelah membaca bab ini, Anda dapat:</b>
+<ul><li>menjalankan lima mode: PINDAI, REVIEW, UJI, LACAK, TAMBAL;</li>
+<li>membaca dan mengelola Dosir Temuan berjenjang;</li>
+<li>memverifikasi temuan mesin, termasuk menolak <i>false positive</i>;</li>
+<li>menambal dengan tes regresi merah→hijau.</li></ul></div>
+
+<h2>5.1 Empat Hukum Audit</h2>
+<table class="hukum"><tbody>
+<tr><td class="nh">1</td><td><b>Selisih kode ↔ blueprint adalah TEMUAN,</b> bukan urusan yang dibereskan diam-diam. Skill melapor dan mengusulkan arah; keputusan (sesuaikan kode, atau perbarui dokumen) milik manusia.</td></tr>
+<tr><td class="nh">2</td><td><b>Tidak ada temuan tanpa bukti.</b> Setiap temuan membawa <code>path:baris</code> atau keluaran perintah. "Kemungkinan ada masalah di lapisan service" adalah firasat, bukan temuan.</td></tr>
+<tr><td class="nh">3</td><td><b>Tambalan tidak melebihi temuan.</b> Satu temuan = satu perbaikan minimal + satu tes regresi. Kode jelek di sebelahnya dicatat sebagai temuan baru, bukan dirapikan sekalian.</td></tr>
+<tr><td class="nh">4</td><td><b>Pindai lebar dengan skrip, baca dalam dengan model.</b> Skrip membaca 100% repo tanpa biaya token; model hanya membuka berkas yang ditunjuk temuan.</td></tr>
+</tbody></table>
+
+<h2>5.2 Lima mode</h2>
+<table><thead><tr><th>Mode</th><th>Untuk</th><th>Keluaran</th></tr></thead><tbody>
+<tr><td><b>PINDAI</b></td><td>Memotret seluruh repo (selalu langkah pertama)</td><td><code>docs/_TEMUAN.json</code> + ringkasan</td></tr>
+<tr><td><b>REVIEW</b></td><td>Kesesuaian kode ↔ blueprint pada delapan sumbu</td><td>Temuan berjenjang + usulan arah</td></tr>
+<tr><td><b>UJI</b></td><td>Menjalankan dan melengkapi pengujian, termasuk uji asap HTTP</td><td>Hasil suite, celah tes</td></tr>
+<tr><td><b>LACAK</b></td><td>Menemukan akar masalah satu gejala</td><td>Akar masalah + bukti reproduksi</td></tr>
+<tr><td><b>TAMBAL</b></td><td>Memperbaiki temuan yang disetujui</td><td>Patch minimal + tes regresi + gerbang</td></tr>
+</tbody></table>
+
+<h2>5.3 Skenario: kode yang masuk lewat pintu samping</h2>
+<p>Bayangkan beberapa hari setelah slice F1 ditutup, seseorang menambahkan fungsi pencarian pegawai ke <code>app/repo.py</code> di luar rencana slice mana pun:</p>
+<pre class="code">def cari_nama(conn, nama):
+    return conn.execute("SELECT id, name FROM employees WHERE name LIKE '%"
+                        + nama + "%'").fetchall()</pre>
+<p>Kodenya berjalan. Tidak ada tes yang merah. Tetapi <code>21_SECURITY_RULES.md</code> mewajibkan kueri terparameter. Mari lihat apakah audit menangkapnya.</p>
+
+<h2>5.4 Mode PINDAI</h2>
+<div class="prompt"><span class="pill">Prompt</span>Audit kode PRESQU terhadap blueprint. Mulai dari pemindaian penuh.</div>
+<p>Skill memastikan ini paket VCBD, membaca Tier-0, menjalankan <code>validate.sh</code> (blueprint yang bengkok akan menghasilkan temuan palsu), lalu membaca <code>_SERAH_BUILD.json</code> bila ada. Setelah itu, pemindaian penuh:</p>
+<fig id="t-pindai">Pemindaian penuh PRESQU dalam mode audit terarah.</fig>
+<ol class="penjelas">
+<li>Kontrak serah-terima dari Bab 4 terbaca, sehingga audit berjalan <b>terarah</b>: deviasi, WARN yang dilewati, dan asumsi diperiksa lebih dulu.</li>
+<li>Temuan KRITIS: dugaan penggabungan string pada kueri SQL. Fungsi pintu samping tadi tertangkap.</li>
+<li>Pengingat penting dari skrip itu sendiri: keluaran ini regex, bukan vonis.</li>
+</ol>
+<p>Pada tahap PINDAI, skill <b>tidak membuka berkas apa pun</b>. Ia hanya menyampaikan ringkasan: mode audit, jumlah berkas dan baris, temuan per tingkat, dan lima temuan teratas.</p>
+
+<h2>5.5 Mode REVIEW: verifikasi temuan</h2>
+<p>Sekarang model bekerja. Ia membuka <b>hanya</b> berkas yang ditunjuk temuan, memverifikasi, lalu menaikkan, menurunkan, atau menolak.</p>
+<fig id="t-temuan-daftar">Daftar temuan beserta buktinya.</fig>
+<ol class="penjelas">
+<li><b>TEM-001</b> menunjuk <code>app/repo.py:20</code>. Setelah dibuka, terbukti: masukan pengguna digabung langsung ke SQL. Temuan ini <b>sah</b>.</li>
+<li><b>TEM-004</b> mengira "Verifikasi" adalah nama fitur, padahal itu sub-judul di dalam blok F1 di <code>23</code>. Tes penjaganya ada di <code>tests/test_scan.py</code>. Ini <b><i>false positive</i></b>.</li>
+<li><b>TEM-002</b> menyatakan blueprint bergeser tanpa satu pun dokumen tercatat diperbarui. Ini temuan sah tentang <em>pencatatan</em>: saat menutup slice F1 kita mengubah <code>03</code> dan <code>23</code>, tetapi tidak mengisi <code>--dokumen-diperbarui</code>. Kalimatnya menyebut "0 kali" karena riwayat pergeseran tidak tercatat.</li>
+</ol>
+<p>Temuan dikelola lewat <code>temuan.py</code>. Yang palsu ditolak dengan alasan tertulis; yang sah disetujui untuk ditambal.</p>
+<fig id="t-temuan-kelola">Menolak <i>false positive</i> dan menyetujui temuan yang akan ditambal.</fig>
+<ol class="penjelas">
+<li>TEM-004 ditolak, dengan alasan yang tersimpan di dosir.</li>
+<li>TEM-001 disetujui. Hanya temuan yang disetujui yang boleh ditambal.</li>
+</ol>
+
+<h3>Delapan sumbu REVIEW</h3>
+<table><thead><tr><th>Sumbu</th><th>Patokan</th><th>Contoh temuan</th></tr></thead><tbody>
+<tr><td>Skema</td><td>07</td><td>Tabel/kolom di kode tak ada di 07, atau sebaliknya</td></tr>
+<tr><td>Struktur &amp; penamaan</td><td>12</td><td>Logika bisnis di controller; SQL di luar <code>repo.py</code></td></tr>
+<tr><td>Keamanan</td><td>20, 21</td><td>Concat SQL, rahasia ter-hardcode, otorisasi dilewati</td></tr>
+<tr><td>Peran &amp; akses</td><td>05</td><td>Endpoint tanpa pemeriksaan peran yang dijanjikan</td></tr>
+<tr><td>Alur proses</td><td>06</td><td>Hanya <i>happy path</i>; cabang gagal tak ada</td></tr>
+<tr><td>Kriteria terima</td><td>23 + <code>_archive/</code></td><td>Fitur diterima tanpa tes penjaga</td></tr>
+<tr><td>UI</td><td>26</td><td>Hex/px di luar tabel token; state wajib kurang</td></tr>
+<tr><td>Scope &amp; stack</td><td>02, 09</td><td>Fitur out-of-scope terlanjur dibangun; dependensi asing</td></tr>
+</tbody></table>
+<div class="kotak catat"><b>Empat tingkat temuan.</b> <b>KRITIS</b> (rusak, tidak aman, melanggar kriteria terima) dan <b>TINGGI</b> (menyimpang pada sumbu berdampak) wajib nol sebelum rilis. <b>SEDANG</b> boleh ditunda dengan alasan tertulis. <b>RENDAH</b> cukup dicatat.</div>
+
+<h2>5.6 Mode UJI</h2>
+<p>Tiga lapis, dari yang termurah: (1) suite yang sudah ada, (2) celah tes, yaitu alur kritikal di <code>13</code> yang belum punya tes, dan (3) uji dinamis, yaitu aplikasi benar-benar dijalankan. Untuk lapis ketiga, daftar rute <b>diturunkan</b> dari <code>06</code> dan <code>23</code>, bukan dikarang:</p>
+<pre class="code">{"rute": [
+  {"path": "/health",    "harap": 200},
+  {"path": "/scan",      "harap": 200, "catatan": "06 alur F1"},
+  {"path": "/api/rekap", "harap": 403, "catatan": "05: tanpa peran admin"},
+  {"path": "/api/scan",  "metode": "POST", "harap": 422, "catatan": "badan kosong"}
+]}</pre>
+<fig id="t-asap">Uji asap empat rute PRESQU yang sedang berjalan.</fig>
+<ol class="penjelas">
+<li>Keempat rute memberi status sesuai harapan.</li>
+<li>Rute rekap menolak permintaan tanpa peran admin dengan 403. Ini bukti otorisasi ditegakkan di server, sesuai matriks <code>05</code>.</li>
+<li>Hasil disimpan; dengan <code>--temuan</code>, masalah langsung disuntikkan ke dosir.</li>
+</ol>
+<p><code>asap.py</code> juga memeriksa kebocoran jejak galat (<i>stack trace</i>) di badan respons.</p>
+
+<h2>5.7 Mode LACAK: sebuah bug sungguhan</h2>
+<p>Saat tangkapan layar Bab 4 diambil, aplikasi PRESQU sempat menolak pindaian yang sah dengan pesan "Terjadi kesalahan". Bug ini tidak direkayasa untuk buku; ia muncul sendiri. Mari lacak dengan protokol yang benar.</p>
+<h3>Langkah 1: reproduksi dulu</h3>
+<fig id="t-lacak">Reproduksi: pindaian gagal yang diikuti pindaian sah menghasilkan galat.</fig>
+<ol class="penjelas">
+<li>Pindaian dengan kode salah ditolak sebagaimana mestinya (422).</li>
+<li>Pindaian berikutnya dengan kode yang <i>benar</i> malah gagal. Respons hanya berisi pesan umum, tanpa <i>stack trace</i>. Itu sesuai aturan <code>14</code>.</li>
+<li>Log server mengungkap penyebab langsungnya: <code>database is locked</code>.</li>
+</ol>
+<h3>Langkah 2: baca 16 lebih awal</h3>
+<p>Rute INDEX untuk perbaikan bug memuat 11, 13, 14, 16, 18. Di <code>16_DEBUGGING_GUIDE.md</code> PRESQU, jebakan ini ternyata sudah tercatat sejak blueprint disusun: <i>"database is locked — dua koneksi menulis — satu koneksi per permintaan"</i>. Inilah alasan skill menyuruh membaca <code>16</code> lebih awal: sering kali gejalanya sudah tertulis.</p>
+<h3>Langkah 3: akar masalah dalam satu kalimat</h3>
+<p><i>Fungsi <code>koneksi()</code> menulis baris awal tanpa <code>commit</code>, dan koneksi tidak pernah ditutup ketika pindaian ditolak, sehingga transaksi yang menggantung mengunci basis data untuk permintaan berikutnya.</i></p>
+<h3>Langkah 4: tes yang gagal, lalu tambalan minimal</h3>
+<fig id="t-lacak-fix">Tes regresi merah, tambalan enam baris, lalu suite penuh hijau.</fig>
+<ol class="penjelas">
+<li>Gejala dibekukan menjadi tes: dua pindaian berturut-turut tidak boleh menghasilkan 500. Tes ini merah sebelum tambalan.</li>
+<li>Tambalan hanya menyentuh <code>server.py</code>: <code>commit</code> setelah baris awal, dan koneksi ditutup di blok <code>finally</code>.</li>
+<li>Tujuh tes lulus, termasuk tes regresi yang baru.</li>
+</ol>
+<div class="kotak awas"><b>Tiga kali gagal, berhenti.</b> Bila tiga percobaan pada akar yang sama gagal, skill berhenti dan melapor: apa yang sudah dicoba, hipotesis tersisa, dan dua opsi jalan keluar. Hipotesis yang dilabeli fakta adalah cara tercepat menambal hal yang salah.</div>
+
+<h2>5.8 Mode TAMBAL: menutup TEM-001</h2>
+<p>Kembali ke celah SQL. Aturannya: hanya temuan yang disetujui, perbaikan minimal, dan tes regresi yang <b>gagal sebelum tambalan dan lulus sesudahnya</b>.</p>
+<pre class="code">def test_masukan_jahat_tidak_membocorkan_semua_baris(self):
+    self.assertEqual(repo.cari_nama(self.conn, "%' OR 1=1 --"), [])</pre>
+<fig id="t-regresi">Siklus TAMBAL lengkap untuk TEM-001.</fig>
+<ol class="penjelas">
+<li>Sebelum tambalan, tes gagal: masukan jahat membocorkan <em>seluruh</em> pegawai. Celahnya terbukti, bukan diduga.</li>
+<li>Baris lama yang menggabungkan string ke SQL.</li>
+<li>Baris baru dengan placeholder <code>?</code>. Hanya satu baris yang berubah.</li>
+<li>Temuan ditutup dengan bukti berupa perintah dan hasilnya.</li>
+</ol>
+<div class="kotak tip"><b>Sebuah pelajaran kecil.</b> Versi pertama tes regresi untuk buku ini memakai masukan <code>x' OR '1'='1</code>, dan tes itu ternyata <em>lulus</em> pada kode yang rentan, karena sisa pola <code>LIKE</code> membuat kondisinya tetap salah. Tes regresi yang tidak pernah merah tidak membuktikan apa pun. Itulah sebabnya protokol mewajibkan melihat tes gagal <em>sebelum</em> menambal.</div>
+<p>Setelah tambalan, gerbang milik <code>coding-vcbd</code> dijalankan ulang untuk fitur terdampak. Bila tambalan mengubah fakta milik dokumen, hanya dokumen pemiliknya yang diperbarui, lalu <code>validate.sh</code>.</p>
+
+<h2>5.9 Laporan dan syarat sehat</h2>
+<fig id="e-laporan">Laporan temuan setelah satu tambalan dan satu penolakan.</fig>
+<ol class="penjelas">
+<li>Status tegas: <b>belum sehat</b>, karena masih ada temuan TINGGI terbuka. Rilis ditahan.</li>
+<li>TEM-002 menunggu keputusan: catat dokumen yang diperbarui di kontrak serah-terima, lalu tutup temuannya.</li>
+</ol>
+<p>Aplikasi dinyatakan <b>sehat</b> bila kelima syarat ini terpenuhi berurutan: (1) tidak ada temuan KRITIS/TINGGI terbuka, (2) suite penuh hijau pada konteks bersih, (3) tiap fitur di 23 dan arsipnya punya tes penjaga, (4) <code>validate.sh</code> <i>exit</i> 0, (5) checklist rilis lulus.</p>
+
+<h2>5.10 Anti-pattern audit</h2>
+<ul class="anti">
+<li>Membaca berkas satu per satu "untuk memahami aplikasi" tanpa PINDAI lebih dulu.</li>
+<li>Menganggap keluaran <code>pindai.py</code> sebagai vonis final.</li>
+<li>Mengubah dokumen agar cocok dengan kode yang salah tanpa keputusan manusia. Itu memalsukan patokan.</li>
+<li>Menyatakan aplikasi teruji padahal tidak ada satu pun rute nyata yang disentuh.</li>
+<li>Menutup temuan dengan melonggarkan tes.</li>
+</ul>
+
+<div class="latihan"><b>Latihan 5</b><ol>
+<li>Tambahkan satu warna hex di luar tabel token ke templat PRESQU. Sumbu mana yang seharusnya menangkapnya?</li>
+<li>Tutup TEM-002 dengan cara yang benar: catat dokumen yang diperbarui, lalu jalankan PINDAI ulang.</li>
+<li>Tulis entri <code>_ASAP.json</code> untuk rute rekap dengan peran admin.</li></ol></div>
+
+<div class="rangkuman"><b>Rangkuman Bab 5</b><ul>
+<li>PINDAI selalu pertama; model hanya membuka berkas yang ditunjuk temuan.</li>
+<li>Temuan mesin diverifikasi; <i>false positive</i> ditolak dengan alasan tertulis.</li>
+<li>LACAK dimulai dari reproduksi dan <code>16_DEBUGGING_GUIDE</code>.</li>
+<li>TAMBAL selalu dengan tes regresi yang terbukti merah lebih dulu.</li></ul></div>
+</section>

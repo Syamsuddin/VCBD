@@ -1,0 +1,63 @@
+@font-face {
+  font-family: 'InterW';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(8a589d96e7.woff) format('woff');
+}
+@font-face {
+  font-family: 'InterW';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(0f47c3ef0a.woff) format('woff');
+}
+@font-face {
+  font-family: 'InterW';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(8a4384c29b.woff) format('woff');
+}
+@font-face {
+  font-family: 'InterW';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url(14e980c49a.woff) format('woff');
+}
+@font-face {
+  font-family: 'InterW';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(4f1a2d0b17.woff) format('woff');
+}
+@font-face {
+  font-family: 'SerifW';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(68534c58cf.woff) format('woff');
+}
+@font-face {
+  font-family: 'SerifW';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(b54e38e73b.woff) format('woff');
+}
+@font-face {
+  font-family: 'SerifW';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(1ee1094780.woff) format('woff');
+}
+@font-face {
+  font-family: 'SerifW';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(1290112430.woff) format('woff');
+}

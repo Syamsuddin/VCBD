@@ -1,0 +1,138 @@
+<section class="bab lampiran" data-judul="Lampiran A — Peta 28 Dokumen">
+<h1><span class="nobab">Lampiran A</span>Peta 28 Dokumen dan Pemilik Fakta</h1>
+<table class="rapat"><thead><tr><th>No</th><th>Dokumen</th><th>Pemilik fakta</th><th>Digali dari</th></tr></thead><tbody>
+<tr><td>—</td><td><code>CLAUDE.md</code></td><td>Inti selalu-aktif: prinsip, stack ringkas, perintah tersering, guardrail inti</td><td>Ringkasan semua</td></tr>
+<tr><td>—</td><td><code>INDEX.md</code></td><td>Rute task → dokumen; aturan emas</td><td>Ditulis <code>scaffold.py</code></td></tr>
+<tr><td>00</td><td>EXECUTIVE_SUMMARY</td><td>Tujuan dan nilai produk</td><td>K1</td></tr>
+<tr><td>01</td><td>PRD</td><td>Fitur dan user story (MVP vs later)</td><td>K1, K2</td></tr>
+<tr><td>02</td><td>SCOPE</td><td>Batas in-scope dan out-of-scope</td><td>K2</td></tr>
+<tr><td>03</td><td>ROADMAP</td><td>Fase berupa <i>vertical slice</i></td><td>K2</td></tr>
+<tr><td>04</td><td>DOMAIN_MODEL</td><td>Istilah dan entitas konseptual</td><td>K4</td></tr>
+<tr><td>05</td><td>USER_ROLE</td><td>Peran dan matriks akses</td><td>K3</td></tr>
+<tr><td>06</td><td>BUSINESS_PROCESS</td><td>Alur happy path dan alur gagal</td><td>K3</td></tr>
+<tr><td>07</td><td>DATA_MODEL</td><td>Skema fisik — <b>dilarang disalin</b></td><td>K4</td></tr>
+<tr><td>08</td><td>ARCHITECTURE</td><td>Pola arsitektur dan lapisan</td><td>K5</td></tr>
+<tr><td>09</td><td>STACK</td><td>Teknologi, versi, dan yang terlarang</td><td>K5</td></tr>
+<tr><td>10</td><td>DEV_ENV</td><td>Prasyarat dan variabel lingkungan</td><td>K6</td></tr>
+<tr><td>11</td><td>COMMANDS</td><td>Semua perintah run/test/migrasi/build/deploy</td><td>K6</td></tr>
+<tr><td>12</td><td>PROJECT_STRUCTURE</td><td>Pohon folder dan penamaan</td><td>K5</td></tr>
+<tr><td>13</td><td>TESTING</td><td>Strategi dan cakupan tes</td><td>K7</td></tr>
+<tr><td>14</td><td>ERROR_HANDLING</td><td>Pola penanganan galat</td><td>K7</td></tr>
+<tr><td>15</td><td>OBSERVABILITY</td><td>Logging dan metrik</td><td>K6</td></tr>
+<tr><td>16</td><td>DEBUGGING_GUIDE</td><td>Langkah debug dan jebakan (<i>landmines</i>)</td><td>Turunan</td></tr>
+<tr><td>17</td><td>AGENT_WORKFLOW</td><td>Alur per-task agen</td><td>Turunan</td></tr>
+<tr><td>18</td><td>REPAIR_RULES</td><td>Aturan perbaikan bug</td><td>K8</td></tr>
+<tr><td>19</td><td>TASK_TEMPLATE</td><td>Format task</td><td>Turunan</td></tr>
+<tr><td>20</td><td>GUARDRAILS</td><td>Larangan operasional</td><td>K8</td></tr>
+<tr><td>21</td><td>SECURITY_RULES</td><td>Aturan keamanan</td><td>K3, K7</td></tr>
+<tr><td>22</td><td>CHANGE_POLICY</td><td>Git, rollback, operasi irreversibel</td><td>K8</td></tr>
+<tr><td>23</td><td>ACCEPTANCE_CRITERIA</td><td>Kriteria per fitur aktif + blok verifikasi</td><td>K2, K7</td></tr>
+<tr><td>24</td><td>DEFINITION_OF_DONE</td><td>Definisi selesai universal</td><td>K7</td></tr>
+<tr><td>25</td><td>RELEASE_CHECKLIST</td><td>Langkah rilis berurutan + rollback</td><td>K8</td></tr>
+<tr><td>26</td><td>UI_CONVENTIONS <i>(kondisional)</i></td><td>Token desain, inventaris, empat state, larangan UI</td><td>K9</td></tr>
+<tr><td>27</td><td>API_CONTRACT <i>(kondisional)</i></td><td>Aturan kontrak sisi paket</td><td>K10</td></tr>
+</tbody></table>
+</section>
+
+<section class="bab lampiran" data-judul="Lampiran B — Rujukan Perintah">
+<h1><span class="nobab">Lampiran B</span>Rujukan Cepat Perintah Skrip</h1>
+<h3>vcbd</h3>
+<pre class="code">python3 scripts/scaffold.py --root . [--force]       # kerangka + INDEX + CLAUDE + validator
+python3 scripts/scaffold.py --init-kontrak --root .  # mode split: kerangka kontrak/
+bash scripts/validate.sh                             # 11 cek konsistensi paket
+bash kontrak/scripts/validate-kontrak.sh             # gerbang lintas-paket (split)
+python3 scripts/token_ledger.py log --route "&lt;rute&gt;"
+python3 scripts/token_ledger.py report | sync-cc | estimate</pre>
+<h3>coding-vcbd</h3>
+<pre class="code">python3 scripts/meter.py init
+python3 scripts/meter.py perintah --set test="…" test_satu="…" run="…" migrate="…"
+python3 scripts/meter.py segel
+python3 scripts/meter.py fitur-mulai --fitur "&lt;nama&gt;" --rencana "a.py,b.py"
+python3 scripts/meter.py step-mulai --nama "&lt;lapis&gt;"
+python3 scripts/meter.py step-selesai --muat "&lt;berkas dimuat&gt;"
+python3 scripts/meter.py fitur-selesai [--deviasi …] [--warn-dilewati …] [--asumsi …]
+        [--dokumen-diperbarui …] [--landmine …] [--ditunda …]
+python3 scripts/meter.py lapor | serah
+bash scripts/gerbang.sh --fitur "&lt;nama&gt;" [--skip-suite] [--base &lt;ref&gt;]</pre>
+<h3>review-vcbd</h3>
+<pre class="code">python3 scripts/pindai.py --root . --keluar docs/_TEMUAN.json [--ringkas]
+python3 scripts/asap.py --basis http://localhost:8000 --dari docs/_ASAP.json [--temuan docs/_TEMUAN.json]
+python3 scripts/temuan.py daftar | lapor
+python3 scripts/temuan.py tambah …
+python3 scripts/temuan.py setujui --id TEM-001
+python3 scripts/temuan.py tolak --id TEM-004 --alasan "…"
+python3 scripts/temuan.py tutup --id TEM-001 --bukti "…"</pre>
+<h3>reverse-vcbd</h3>
+<pre class="code">python3 scripts/recon.py --root &lt;repo&gt; --nama "&lt;Nama&gt;"
+python3 scripts/db_recon.py --dosir docs/_RECON/dosir-recon.json --dari-env &lt;repo&gt;/.env
+python3 scripts/db_recon.py --dosir … --dsn "mysql://…" | "pgsql://…" | "sqlite:///…"
+python3 scripts/rakit_manifest.py --dosir docs/_RECON/dosir-recon.json --root &lt;repo&gt; [--split]</pre>
+<h3>reverse-web-vcbd</h3>
+<pre class="code">python3 scripts/jalankan.py --nama "&lt;Nama&gt;" --root &lt;proyek&gt; \
+        pegawai=pegawai.har admin=admin.har operator=simpanan/operator/ [--origin host]
+python3 uji/uji_regresi.py                           # 32 cek, wajib lulus semua</pre>
+</section>
+
+<section class="bab lampiran" data-judul="Lampiran C — Label dan Status">
+<h1><span class="nobab">Lampiran C</span>Label Bukti dan Status</h1>
+<table class="rapat"><thead><tr><th>Label</th><th>Dipakai di</th><th>Arti</th></tr></thead><tbody>
+<tr><td><code>[ASUMSI]</code></td><td>vcbd</td><td>Dipakai bila tidak dikoreksi pengguna</td></tr>
+<tr><td><code>[TERBUKA]</code></td><td>vcbd, reverse-web</td><td>Sengaja ditunda</td></tr>
+<tr><td><code>[ISI:]</code></td><td>semua</td><td>Hanya manusia yang tahu; sengaja dikosongkan</td></tr>
+<tr><td><code>[USULAN]</code></td><td>reverse-*</td><td>Rekonstruksi penalaran, belum terbukti</td></tr>
+<tr><td><code>[KODE: path:baris]</code></td><td>reverse-vcbd</td><td>Terbaca di berkas</td></tr>
+<tr><td><code>[DATA: kueri]</code></td><td>reverse-vcbd</td><td>Terbukti dari agregat basis data</td></tr>
+<tr><td><code>[AMATI: har:berkas#n]</code></td><td>reverse-web</td><td>Teramati langsung di lalu lintas</td></tr>
+<tr><td><code>[AMATI-KORELASI]</code></td><td>reverse-web</td><td>Objek sama berubah status lintas peran</td></tr>
+<tr><td><code>[AMATI-JS]</code></td><td>reverse-web</td><td>Ada di bundle JS, belum pernah dipanggil</td></tr>
+<tr><td><code>[INFER]</code></td><td>reverse-web</td><td>Disimpulkan dari pola teramati</td></tr>
+<tr><td><code>[ESTIMASI]</code> / <code>[TERUKUR]</code></td><td>coding, ledger</td><td>Token dihitung dari ukuran berkas / diukur dari transkrip</td></tr>
+<tr><td><code>[PASS] [WARN] [FAIL] [SKIP]</code></td><td>skrip gerbang</td><td>Lulus / perlu pertimbangan / gagal / tidak berlaku</td></tr>
+</tbody></table>
+<h3>Tingkat temuan review-vcbd</h3>
+<table class="rapat"><thead><tr><th>Tingkat</th><th>Arti</th><th>Batas rilis</th></tr></thead><tbody>
+<tr><td><b>KRITIS</b></td><td>Rusak, tidak aman, atau melanggar kriteria terima</td><td>Wajib nol</td></tr>
+<tr><td><b>TINGGI</b></td><td>Menyimpang dari blueprint pada sumbu berdampak</td><td>Wajib nol</td></tr>
+<tr><td><b>SEDANG</b></td><td>Menyimpang tapi terlokalisasi</td><td>Boleh ditunda dengan alasan tertulis</td></tr>
+<tr><td><b>RENDAH</b></td><td>Kerapian, utang teknis kecil</td><td>Dicatat</td></tr>
+</tbody></table>
+</section>
+
+<section class="bab lampiran" data-judul="Lampiran D — Glosarium">
+<h1><span class="nobab">Lampiran D</span>Glosarium</h1>
+<dl class="glosarium">
+<dt>Blueprint</dt><dd>Paket dokumen VCBD (CLAUDE.md, INDEX.md, docs/00–27) yang menjadi sumber kebutuhan bagi agen coding.</dd>
+<dt>Brownfield</dt><dd>Proyek yang mengubah atau melanjutkan sistem yang sudah berjalan.</dd>
+<dt>Collapsed</dt><dd>Dokumen yang sengaja menjadi stub karena isinya sepenuhnya mengikuti default.</dd>
+<dt>Dosir</dt><dd>Buku bukti hasil pemindaian mesin (JSON) yang menjadi bahan blueprint atau audit.</dd>
+<dt>Drift (document drift)</dt><dd>Keadaan ketika dokumen saling bertentangan atau tertinggal dari kode.</dd>
+<dt>Empat state</dt><dd>Kosong, memuat, gagal, sukses: state wajib setiap halaman ber-data.</dd>
+<dt>Gerbang keras</dt><dd>Titik berhenti yang menunggu konfirmasi eksplisit manusia sebelum menulis.</dd>
+<dt>Gerbang mesin</dt><dd>Skrip yang menguji syarat dan berakhir dengan <i>exit code</i> bukan nol bila gagal.</dd>
+<dt>Greenfield</dt><dd>Proyek yang dibangun dari nol.</dd>
+<dt>HAR</dt><dd>HTTP Archive: rekaman lalu lintas jaringan peramban dalam format JSON.</dd>
+<dt>Landmine (jebakan)</dt><dd>Kejutan pada sistem eksisting yang bisa menyesatkan agen; rumahnya dokumen 16.</dd>
+<dt>Manifest</dt><dd><code>docs/_MANIFEST.json</code>: state bersama blueprint.</dd>
+<dt>Profil native</dt><dd>Proyek tanpa framework; blueprint memikul peran framework.</dd>
+<dt>Rute INDEX</dt><dd>Pemetaan jenis task ke daftar dokumen yang boleh dimuat.</dd>
+<dt>Slice (vertical slice)</dt><dd>Satu fitur yang dibangun utuh dari skema sampai tampilan dan bisa didemokan.</dd>
+<dt>Tier-0</dt><dd>Berkas yang selalu dimuat: CLAUDE.md dan INDEX.md (plus manifest saat kunci sesi).</dd>
+<dt>Token desain</dt><dd>Nilai visual konkret (hex, px, huruf) yang dikunci di dokumen 26.</dd>
+<dt>Vibe coding</dt><dd>Membangun perangkat lunak dengan mendeskripsikan maksud kepada agen AI yang menulis sebagian besar kodenya.</dd>
+</dl>
+</section>
+
+<section class="bab lampiran" data-judul="Lampiran E — Kode Demo PRESQU">
+<h1><span class="nobab">Lampiran E</span>Kode Sumber Inti Demo PRESQU</h1>
+<p>Berikut kode logika domain PRESQU setelah semua tambalan di Bab 4 dan Bab 5. Kode lengkap demo berukuran kurang dari 250 baris dan hanya memakai pustaka standar Python.</p>
+<h3>app/service.py</h3>
+<pre class="code kecil">{{SERVICE}}</pre>
+<h3>app/repo.py</h3>
+<pre class="code kecil">{{REPO}}</pre>
+</section>
+
+<section class="bab lampiran gpl" data-judul="Lampiran F — GNU GPL v3">
+<h1><span class="nobab">Lampiran F</span>GNU General Public License versi 3</h1>
+<p>Teks buku ini dilisensikan di bawah GNU General Public License versi 3. Teks lisensi resmi berbahasa Inggris dicantumkan utuh di bawah ini, sebagaimana disyaratkan lisensi tersebut.</p>
+<pre class="lisensi">{{GPL}}</pre>
+</section>

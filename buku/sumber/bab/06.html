@@ -1,0 +1,113 @@
+<section class="bab" data-judul="reverse-vcbd: Membedah Kode Warisan">
+<h1><span class="nobab">Bab 6</span>reverse-vcbd: Membedah Kode Warisan</h1>
+<p class="lead">Kebanyakan aplikasi yang kita warisi tidak datang dengan gambar kerja. Skill <code>reverse-vcbd</code> mengubah repo yang sudah berjalan menjadi dosir bukti, lalu menjadi paket blueprint yang sah dipakai agen coding, dengan syarat mutlak: setiap fakta bisa ditunjuk asalnya.</p>
+
+<div class="tujuan"><b>Setelah membaca bab ini, Anda dapat:</b>
+<ul><li>menjalankan pemindaian statis dan pemindaian data <i>read-only</i>;</li>
+<li>membedakan apa yang <i>mungkin</i> (dari kode) dan apa yang <i>terjadi</i> (dari data);</li>
+<li>membaca derajat bukti <code>[KODE]</code>, <code>[DATA]</code>, <code>[USULAN]</code>, <code>[ISI:]</code>;</li>
+<li>merakit manifest dan kerangka blueprint dari dosir.</li></ul></div>
+
+<h2>6.1 Mengapa butuh alat khusus?</h2>
+<p><code>vcbd</code> sudah mewajibkan <i>grounding</i> untuk proyek brownfield: skema, perintah, struktur, dan stack harus <b>diekstrak dari sumber aktual</b>, bukan ditanyakan. Tetapi mandat tanpa alat berakhir sama: model menebak lalu menuliskannya dengan nada pasti, dan <code>coding-vcbd</code> di hilir memperlakukan tebakan itu sebagai kebenaran. <code>reverse-vcbd</code> memasok lapisan buktinya.</p>
+
+<h2>6.2 Lima Hukum</h2>
+<table class="hukum"><tbody>
+<tr><td class="nh">1</td><td><b>Tidak ada klaim tanpa bukti yang bisa ditunjuk.</b> Tiap fakta membawa <code>path:baris</code> atau <code>[DATA: kueri]</code>. Yang tak berbukti ditulis <code>[USULAN]</code> atau <code>[ISI:]</code>.</td></tr>
+<tr><td class="nh">2</td><td><b>Kode dan data menang atas ingatan; niat tetap milik manusia.</b> Mengapa aplikasi ini ada dan apa yang mau dipertahankan hanya manusia yang tahu, dan itu ditanyakan.</td></tr>
+<tr><td class="nh">3</td><td><b>Kode bicara soal yang MUNGKIN; data bicara soal yang TERJADI.</b> Tanpa bukti data, dilarang menyatakan sebuah jalur mati atau fitur tak terpakai.</td></tr>
+<tr><td class="nh">4</td><td><b>Cakupan dilaporkan apa adanya.</b> Blueprint yang mengaku lengkap padahal baru 60% adalah kegagalan termahal skill ini.</td></tr>
+<tr><td class="nh">5</td><td><b>Rahasia dan data pribadi tidak pernah masuk dokumen.</b> Penegakannya ada di <code>redaksi.py</code>, bukan pada kedisiplinan model.</td></tr>
+</tbody></table>
+
+<h2>6.3 Tiga mode</h2>
+<table><thead><tr><th>Mode</th><th>Keluaran</th><th>Pakai ketika</th></tr></thead><tbody>
+<tr><td><b>RECON</b></td><td><code>docs/_RECON/dosir-recon.json</code> + <code>laporan-cakupan.md</code></td><td>Hanya ingin tahu isi perut aplikasi</td></tr>
+<tr><td><b>PETA</b></td><td><code>docs/06_BUSINESS_PROCESS.md</code> lepas</td><td>Hanya butuh peta alur proses</td></tr>
+<tr><td><b>BLUEPRINT</b></td><td>Paket VCBD lengkap</td><td>Aplikasi akan dilanjutkan, ditulis ulang, atau diserahkan ke agen</td></tr>
+</tbody></table>
+<p>Mode PETA dan BLUEPRINT sama-sama menjalankan RECON lebih dulu. Tidak ada jalan pintas melewati pengumpulan bukti.</p>
+
+<h2>6.4 Proyek contoh: SI-CUTI</h2>
+<p>SI-CUTI adalah aplikasi pengajuan cuti bergaya Laravel 10: tujuh rute, tiga tabel migrasi, dua model, satu controller, satu jadwal cron, satu <i>queue job</i>, dan satu integrasi keluar ke SIMPEG. Ada juga berkas <code>.env</code> berisi sandi basis data, serta basis data SQLite berisi 40 pegawai dan 312 pengajuan.</p>
+<div class="prompt"><span class="pill">Prompt</span>Buatkan blueprint dari kode SI-CUTI yang sudah ada. Basis data boleh dibaca read-only.</div>
+
+<h2>6.5 Fase 0: Triase dan izin</h2>
+<p>Skill mendeteksi profil (Laravel, PHP native, Flutter, atau campuran; campuran adalah hal normal), lalu <b>meminta izin basis data secara eksplisit</b>, dengan sifat yang ditegaskan: read-only, agregat saja, kredensial tidak disimpan. Bila ditolak, skill tetap jalan, tetapi semua klaim "jalur mati" terkunci oleh Hukum 3. Bila <code>docs/</code> atau <code>CLAUDE.md</code> sudah ada, skill menawarkan cadangan <code>.bak</code>, mode merge, atau subfolder. Ia tidak menimpa diam-diam.</p>
+
+<h2>6.6 Fase 1 dan 2: Pindai statis dan pindai data</h2>
+<fig id="t-recon">Pemindaian statis lalu pemindaian data SI-CUTI.</fig>
+<ol class="penjelas">
+<li>Adapter Laravel terpilih otomatis dari <code>composer.json</code>.</li>
+<li>Ringkasan mesin: 7 rute, 3 entitas, 1 mesin status, 2 proses tak kasat mata (cron dan <i>queue job</i>), 3 aturan validasi.</li>
+<li>Pengingat Hukum 3: tanpa bukti data, jalur mati belum boleh diklaim.</li>
+<li>Setelah membaca basis data: satu tabel kosong dan satu nilai status yang tidak pernah terjadi.</li>
+</ol>
+<div class="kotak tip"><b>Jangan membaca repo manual dulu.</b> Baca dosirnya. Membaca ratusan berkas sendiri membakar token untuk pekerjaan yang sudah deterministik, dan hasilnya justru kurang lengkap.</div>
+<p>Laporan cakupan ditulis untuk manusia:</p>
+<fig id="e-cakupan">Laporan cakupan SI-CUTI dengan angka apa adanya.</fig>
+<ol class="penjelas">
+<li>Persentase berkas terpindai ditulis tanpa pembulatan.</li>
+<li>Status bukti data ditulis jujur. Laporan ini dibuat oleh <code>recon.py</code> sebelum <code>db_recon.py</code> berjalan; bukti data masuk ke dosir JSON.</li>
+<li><code>.env</code> sengaja tidak dibaca karena berisi kredensial. Keberadaannya dicatat, isinya tidak. Pemeriksaan setelah demo: kata sandi di <code>.env</code> tidak muncul di satu pun berkas keluaran.</li>
+</ol>
+
+<h2>6.7 Kode vs data: siklus status pengajuan</h2>
+<p>Inilah contoh terbaik Hukum 3. Potongan dosir berikut memperlihatkan mesin status kolom <code>pengajuans.status</code>:</p>
+<fig id="e-dosir">Mesin status di dosir: gabungan bukti kode dan bukti data.</fig>
+<ol class="penjelas">
+<li>Migrasi mendefinisikan empat nilai, termasuk <code>dibatalkan</code>. Ini yang <i>mungkin</i>.</li>
+<li>Transisi ke <code>disetujui</code> dan <code>ditolak</code> ditemukan di controller, lengkap dengan <code>path:baris</code> dan derajat <code>KODE</code>. Status asalnya <code>[ISI: asal]</code>, karena kode tidak menyebutkannya.</li>
+<li>Data membuktikan <code>dibatalkan</code> <b>tidak pernah terjadi</b> di 312 baris. Ini yang <i>terjadi</i>.</li>
+</ol>
+<p>Temuan seperti ini tidak langsung dianggap "fitur mati". Di Fase 3, skill bertanya kepada manusia: <b>dibuang, dipertahankan, atau dipakai kanal lain?</b></p>
+
+<h2>6.8 Fase 3 dan 4: Wawancara kilat dan gerbang Ringkasan Temuan</h2>
+<p>Model merakit alur proses dari bahan dosir: siklus status, rute, penjaga akses, dan proses terjadwal. Urutan yang tidak berbukti tetap berlabel <code>[USULAN]</code>. Lalu wawancara kilat, <b>hanya</b> untuk hal yang tak terbaca mesin: tujuan aplikasi, batas perubahan, apa yang dipertahankan atau dibuang, roadmap, dan larangan teknologi. Skema, rute, stack, dan perintah dilarang ditanyakan, karena semuanya sudah ada di dosir.</p>
+<p>Fase 4 adalah gerbang keras. Bedanya dengan <code>vcbd</code>: yang dikonfirmasi bukan kebutuhan yang digali, melainkan <b>kondisi eksisting yang ditemukan</b>.</p>
+<p>Contoh ringkasan yang disusun dari dosir SI-CUTI:</p>
+<pre class="code">Ringkasan Temuan — SI-CUTI
+Cakupan   : 8/8 berkas (100%), bukti data: ya (read-only, agregat)
+Profil    : Laravel 10
+Rute 7 · Entitas 3 · Alur 3 · Proses tersembunyi 2 · Integrasi 1
+Berisiko  : /lama/ekspor tanpa penjaga akses; tabel cuti_lama kosong;
+            status 'dibatalkan' tak pernah terjadi
+[ISI:]    : 15 slot menunggu jawaban manusia
+
+Konfirmasi: rakit paket blueprint dari temuan di atas?
+Jawab 'ya' atau koreksi bagian yang salah.</pre>
+
+<h2>6.9 Fase 5: Generasi dan gerbang mesin</h2>
+<fig id="t-rakit">Dosir dirakit menjadi <code>_MANIFEST.json</code>.</fig>
+<ol class="penjelas">
+<li>Lima belas slot <code>[ISI:]</code> dihitung terang-terangan. Itulah bagian yang hanya bisa diisi manusia.</li>
+</ol>
+<p>Setelah manifest, <code>scaffold.py</code> <b>milik <code>vcbd</code></b> menulis kerangka dan <code>INDEX.md</code>. <code>reverse-vcbd</code> tidak pernah menulis format sendiri. Satu penulis format berarti satu format.</p>
+<pre class="code">$ python3 ~/.claude/skills/vcbd/scripts/scaffold.py --root .
+$ bash scripts/validate.sh        # bereskan tiap [FAIL]</pre>
+
+<h2>6.10 Derajat bukti</h2>
+<table><thead><tr><th>Label</th><th>Artinya</th><th>Contoh</th></tr></thead><tbody>
+<tr><td><code>[KODE: path:baris]</code></td><td>Terbaca di berkas, bisa diperiksa ulang siapa pun</td><td><code>[KODE: routes/web.php:7]</code></td></tr>
+<tr><td><code>[DATA: kueri]</code></td><td>Terbukti dari agregat basis data</td><td><code>[DATA: GROUP BY status pada pengajuans]</code></td></tr>
+<tr><td><code>[USULAN]</code></td><td>Rekonstruksi penalaran dari bahan berbukti</td><td>Urutan langkah yang belum terbukti</td></tr>
+<tr><td><code>[ISI:]</code></td><td>Hanya manusia yang tahu; sengaja dikosongkan</td><td>Alasan aturan, rencana ke depan</td></tr>
+</tbody></table>
+<p>Label <code>[TERVALIDASI]</code> sengaja tidak dipakai: label itu tidak memberi tahu pembaca <em>di mana</em> harus memeriksa ulang.</p>
+
+<h2>6.11 Fase 6: Serah terima</h2>
+<p>Skill menyampaikan lokasi dosir dan laporan, persen cakupan apa adanya, daftar <code>[ISI:]</code> yang menunggu, dan tiga temuan paling berisiko. Satu pengingat penting: <b>dokumen ini merekam keadaan SEKARANG, bukan keadaan yang diinginkan.</b> Keputusan mengubahnya adalah pekerjaan berikutnya, lewat Mode Pembaruan <code>vcbd</code>.</p>
+<div class="kotak awas"><b>Jangan "memperbaiki" sambil mendokumentasikan.</b> Mengganti nama tabel yang jelek atau merapikan alur yang aneh saat menulis <code>07</code> adalah anti-pattern. Usulan perbaikan hidup di <code>open_questions</code>, bukan diselundupkan ke dokumen.</div>
+<p>Rantai yang disarankan untuk aplikasi warisan: <code>reverse-vcbd</code> → <code>review-vcbd</code> (mode PINDAI) → <code>coding-vcbd</code>.</p>
+
+<div class="latihan"><b>Latihan 6</b><ol>
+<li>Jalankan <code>recon.py</code> pada salah satu repo lama Anda. Berapa persen cakupannya?</li>
+<li>Temukan satu nilai status yang hanya ada di kode. Apa jawaban pemilik aplikasi: dibuang, dipertahankan, atau dipakai kanal lain?</li>
+<li>Cari di keluaran dosir apakah ada nilai dari <code>.env</code> yang bocor. Seharusnya tidak ada.</li></ol></div>
+
+<div class="rangkuman"><b>Rangkuman Bab 6</b><ul>
+<li>RECON selalu lebih dulu; dosir adalah buku bukti mesin.</li>
+<li>Kode menunjukkan yang mungkin; data menunjukkan yang terjadi.</li>
+<li>Gerbang Ringkasan Temuan mengonfirmasi kondisi eksisting sebelum dokumen ditulis.</li>
+<li>Format blueprint tetap ditulis oleh <code>scaffold.py</code> milik <code>vcbd</code>.</li></ul></div>
+</section>

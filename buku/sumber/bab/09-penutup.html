@@ -1,0 +1,22 @@
+<section class="bab tanpa-nomor" data-judul="Penutup">
+<h1>Penutup</h1>
+<p class="lead">Buku ini dimulai dengan dua kegagalan termahal dalam <i>vibe coding</i>: membangun hal yang salah, dan dokumen yang saling bertentangan. Kita menutupnya dengan melihat apa yang sebenarnya diberikan VCBD, dan apa yang tidak.</p>
+
+<h2>Yang sudah kita lihat bekerja</h2>
+<p>Sepanjang buku, setiap klaim ditopang keluaran yang benar-benar dijalankan. <code>validate.sh</code> menolak blueprint yang masih kerangka. <code>gerbang.sh</code> menolak fitur yang testnya hijau tetapi masih menyimpan <code>TODO</code> dan kunci rahasia. <code>pindai.py</code> menangkap kueri SQL yang masuk lewat pintu samping, dan tes regresi membuktikan celahnya sebelum ditambal. <code>db_recon.py</code> menunjukkan nilai status yang tidak pernah terjadi selama 312 pengajuan. <code>jalankan.py</code> menemukan rute yang mengubah data lewat GET hanya dari rekaman peramban.</p>
+<p>Bagian yang paling berkesan bagi penulis justru yang tidak direncanakan: bug <code>database is locked</code> yang muncul sendiri saat tangkapan layar diambil. Jebakan itu sudah tercatat di <code>16_DEBUGGING_GUIDE</code> sejak blueprint disusun. Protokol LACAK membawanya dari gejala ke akar masalah ke tes regresi dalam beberapa langkah yang bisa diulang siapa pun. Itulah inti VCBD: bukan menghilangkan kesalahan, melainkan membuat kesalahan cepat terlihat dan murah diperbaiki.</p>
+
+<h2>Yang tidak dijanjikan</h2>
+<p>VCBD tidak membuat agen AI menjadi tidak pernah salah. Skrip gerbang berbasis heuristik dan regex; kita sudah melihat <i>false positive</i> yang harus ditolak dengan alasan, dan syarat S8 yang terlewat karena templat UI berada di berkas Python. Gerbang manual (S1 dan S6) tetap membutuhkan mata manusia. Paket 28 dokumen juga merupakan investasi yang tidak sepadan untuk prototipe sekali buang.</p>
+<p>Batas-batas itu ditulis terang-terangan oleh skill-nya sendiri, dan menurut penulis itulah alasan terbaik untuk memercayainya: alat yang mengakui batasnya lebih mudah dipakai dengan benar daripada alat yang mengaku sempurna.</p>
+
+<h2>Langkah Anda berikutnya</h2>
+<ol>
+<li>Pilih satu aplikasi kecil yang sungguh Anda butuhkan, dan susun blueprint-nya dengan <code>vcbd</code>.</li>
+<li>Bangun slice pertamanya dengan <code>coding-vcbd</code>, dan rasakan bedanya ketika "selesai" berarti <i>exit</i> 0.</li>
+<li>Ambil satu aplikasi warisan di tempat kerja Anda, dan jalankan <code>reverse-vcbd</code> dalam mode RECON saja. Laporan cakupannya hampir pasti mengejutkan.</li>
+<li>Bila menemukan kekurangan pada skill, perbaiki dan bagikan. VCBD adalah perangkat lunak bebas.</li>
+</ol>
+<p>Semoga buku ini membantu Anda membangun aplikasi yang benar, dengan cara yang bisa dibuktikan.</p>
+<p class="ttd">Oktober 2026<br><b>Syams Ideris</b></p>
+</section>

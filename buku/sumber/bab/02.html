@@ -1,0 +1,96 @@
+<section class="bab" data-judul="Menyiapkan Bengkel Kerja">
+<h1><span class="nobab">Bab 2</span>Menyiapkan Bengkel Kerja</h1>
+<p class="lead">Sebelum menyusun blueprint pertama, kita pasang kelima skill, memastikan semuanya terbaca oleh Claude Code, lalu memeriksa bahwa skrip gerbangnya bisa berjalan di mesin Anda.</p>
+
+<div class="tujuan"><b>Setelah membaca bab ini, Anda dapat:</b>
+<ul><li>memasang VCBD Suite di Claude Code (lokal) maupun claude.ai;</li>
+<li>memahami mengapa kelima folder skill harus bersebelahan;</li>
+<li>memverifikasi instalasi dengan uji asap singkat.</li></ul></div>
+
+<h2>2.1 Kebutuhan sistem</h2>
+<p>VCBD sengaja dibuat ringan. Seluruh skripnya hanya memakai pustaka standar Python dan Bash, jadi tidak ada <code>pip install</code> yang wajib.</p>
+<table><thead><tr><th>Kebutuhan</th><th>Untuk</th><th>Catatan</th></tr></thead><tbody>
+<tr><td><b>Python 3.8+</b></td><td>Semua skrip <code>.py</code></td><td>Hanya pustaka standar; diuji pada 3.12 dan 3.14</td></tr>
+<tr><td><b>Bash</b></td><td><code>validate.sh</code>, <code>validate-kontrak.sh</code>, <code>gerbang.sh</code></td><td>Kompatibel bash 3.2 bawaan macOS</td></tr>
+<tr><td><code>zip</code></td><td><code>scripts/kemas.sh</code></td><td>Hanya untuk membuat paket claude.ai</td></tr>
+<tr><td><code>pymysql</code> <i>(opsional)</i></td><td><code>reverse-vcbd</code> membaca MySQL/MariaDB</td><td>Cadangan: klien <code>mysql</code> di PATH</td></tr>
+<tr><td><code>psycopg2-binary</code> <i>(opsional)</i></td><td><code>reverse-vcbd</code> membaca PostgreSQL</td><td>SQLite tidak butuh tambahan</td></tr>
+<tr><td>Claude Code</td><td>Menjalankan skill</td><td>CLI, aplikasi desktop, web, atau ekstensi IDE</td></tr>
+</tbody></table>
+
+<h2>2.2 Memasang di Claude Code</h2>
+<div class="langkah"><span class="nl">Langkah 1</span> Clone repositori, lalu salin isi folder <code>skills/</code> ke folder skill global Anda, <code>~/.claude/skills/</code>.</div>
+<pre class="code">$ git clone https://github.com/Syamsuddin/VCBD.git
+$ mkdir -p ~/.claude/skills &amp;&amp; cp -r VCBD/skills/* ~/.claude/skills/</pre>
+<p>Gambar berikut memperlihatkan hasilnya pada mesin uji.</p>
+<fig id="t-install">Memasang kelima skill ke <code>~/.claude/skills</code> dan memeriksa prasyaratnya.</fig>
+<ol class="penjelas">
+<li>Perintah salin. Untuk instalasi per proyek, ganti tujuannya menjadi <code>.claude/skills/</code> di root proyek.</li>
+<li>Kelima folder harus muncul berdampingan dengan nama persis seperti ini.</li>
+<li>Setiap skill membawa <code>SKILL.md</code> (instruksi untuk agen), <code>references/</code> (dibaca saat dibutuhkan), dan <code>scripts/</code> (dieksekusi, bukan dibaca).</li>
+<li>Versi Python dan Bash cukup diperiksa sekali.</li>
+</ol>
+
+<div class="langkah"><span class="nl">Langkah 2</span> Mulai sesi Claude Code baru. Skill baru terbaca otomatis. Bila belum muncul, keluar lalu buka lagi sesinya.</div>
+
+<h2>2.3 Mengapa harus bersebelahan?</h2>
+<p>Beberapa skrip dipakai lintas skill. Daripada menyalin kode yang sama ke lima tempat (yang akan melanggar prinsip "satu fakta, satu rumah"), skill di hilir mencari skrip di folder saudaranya.</p>
+<table class="nw"><thead><tr><th>Skill</th><th>Memakai dari skill lain</th></tr></thead><tbody>
+<tr><td><code>reverse-vcbd</code></td><td><code>vcbd/scripts/scaffold.py</code> dan <code>validate.sh</code></td></tr>
+<tr><td><code>coding-vcbd</code></td><td><code>vcbd/scripts/token_ledger.py</code> dan <code>validate.sh</code></td></tr>
+<tr><td><code>review-vcbd</code></td><td><code>coding-vcbd/scripts/gerbang.sh</code> dan <code>meter.py</code></td></tr>
+<tr><td><code>reverse-web-vcbd</code></td><td><code>vcbd</code> (lewat draf manifest)</td></tr>
+</tbody></table>
+<div class="kotak awas"><b>Jebakan umum.</b> Memasang sebagian skill saja, misalnya hanya <code>coding-vcbd</code>, membuat gerbang mesinnya gagal mencari <code>validate.sh</code>. Pasang kelimanya, walaupun Anda baru berencana memakai satu.</div>
+
+<h2>2.4 Menyalin skrip ke proyek</h2>
+<p><code>scaffold.py</code> otomatis menyalin <code>validate.sh</code> dan <code>token_ledger.py</code> ke folder <code>scripts/</code> proyek saat blueprint dibuat. Salin juga skrip <code>coding-vcbd</code> dan <code>review-vcbd</code>, supaya proyek bisa memeriksa dirinya sendiri tanpa bergantung pada folder skill:</p>
+<pre class="code">$ cd /path/proyek
+$ cp ~/.claude/skills/coding-vcbd/scripts/{meter.py,gerbang.sh} scripts/
+$ cp ~/.claude/skills/review-vcbd/scripts/*.py scripts/</pre>
+<div class="kotak tip"><b>Selalu jalankan gerbang dari root proyek.</b> <code>validate.sh</code>, <code>validate-kontrak.sh</code>, dan <code>gerbang.sh</code> membaca berkas secara relatif. Bila dijalankan dari folder lain, ketiganya melapor <code>[FAIL] … jalankan skrip dari root proyek</code>.</div>
+
+<h2>2.5 Memasang di claude.ai</h2>
+<p>Di claude.ai, skill diunggah sebagai berkas zip. Zip per skill tersedia di halaman rilis v2.6, atau bisa Anda buat sendiri dari root repositori:</p>
+<fig id="t-kemas">Mengemas lima zip skill untuk diunggah ke claude.ai.</fig>
+<ol class="penjelas">
+<li><code>kemas.sh</code> menyusun tiap folder skill menjadi zip yang berisi <code>SKILL.md</code>, <code>README.md</code>, <code>LICENSE</code>, <code>references/</code>, dan <code>scripts/</code>.</li>
+<li>Kelima zip ini diunggah satu per satu lewat <b>Settings → Capabilities → Skills</b>.</li>
+</ol>
+<p>Unggah <b>kelimanya</b>. Di claude.ai, <code>reverse-vcbd</code> mencari <code>vcbd</code> di <code>/mnt/skills/user/vcbd/</code>. Bila akun Anda sudah punya skill bernama sama, hapus dulu versi lamanya supaya tidak ada dua versi yang berbeda.</p>
+
+<h2>2.6 Bila salinan skill ganda</h2>
+<p>Skill yang diunggah ke akun claude.ai ikut tersinkron ke Claude Code dan tampil sebagai <code>anthropic-skills:&lt;nama&gt;</code>, di samping salinan lokal. Bila versinya berbeda, agen bisa memakai versi yang salah. Solusi yang disarankan adalah menyamakan keduanya. Alternatifnya, blokir salinan sinkron di <code>~/.claude/settings.json</code>:</p>
+<pre class="code">{
+  "permissions": {
+    "deny": [
+      "Skill(anthropic-skills:vcbd)",
+      "Skill(anthropic-skills:coding-vcbd)",
+      "Skill(anthropic-skills:review-vcbd)",
+      "Skill(anthropic-skills:reverse-vcbd)",
+      "Skill(anthropic-skills:reverse-web-vcbd)"
+    ]
+  }
+}</pre>
+
+<h2>2.7 Memeriksa instalasi</h2>
+<p>Tiga perintah berikut memastikan semua skrip valid secara sintaks dan uji regresi <code>reverse-web-vcbd</code> lulus:</p>
+<pre class="code">$ cd ~/.claude/skills
+$ for f in vcbd/scripts/*.sh coding-vcbd/scripts/*.sh; do bash -n "$f" &amp;&amp; echo "OK $f"; done
+$ for f in */scripts/*.py; do python3 -m py_compile "$f" &amp;&amp; echo "OK $f"; done
+$ python3 reverse-web-vcbd/uji/uji_regresi.py      # harus: 32/32 lulus</pre>
+<p>Anda akan melihat hasil uji regresi itu di Bab 7. Untuk sekarang, cukup pastikan tidak ada baris yang gagal.</p>
+
+<h2>2.8 Memperbarui dan mencopot</h2>
+<pre class="code">$ cd VCBD &amp;&amp; git pull
+$ for d in vcbd coding-vcbd review-vcbd reverse-vcbd reverse-web-vcbd; do
+    rm -rf ~/.claude/skills/$d &amp;&amp; cp -r skills/$d ~/.claude/skills/
+  done</pre>
+<p>Proyek yang sudah menyalin skrip ke <code>scripts/</code> tidak ikut terbarui otomatis. Salin ulang bila <code>CHANGELOG.md</code> menyebut ada perubahan skrip. Untuk mencopot, cukup hapus kelima folder skill. Berkas yang sudah lahir di proyek (<code>docs/</code>, <code>CLAUDE.md</code>, <code>INDEX.md</code>, <code>scripts/</code>) tidak tersentuh.</p>
+
+<div class="rangkuman"><b>Rangkuman Bab 2</b><ul>
+<li>VCBD hanya butuh Python 3.8+ dan Bash; dependensi lain opsional.</li>
+<li>Pasang kelima skill sekaligus dan biarkan foldernya bersebelahan.</li>
+<li>Salin skrip gerbang ke <code>scripts/</code> proyek agar proyek bisa memeriksa dirinya sendiri.</li>
+<li>Jalankan setiap skrip gerbang dari root proyek.</li></ul></div>
+</section>

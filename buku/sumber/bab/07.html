@@ -1,0 +1,81 @@
+<section class="bab" data-judul="reverse-web-vcbd: Membedah Kotak Hitam">
+<h1><span class="nobab">Bab 7</span>reverse-web-vcbd: Membedah Kotak Hitam</h1>
+<p class="lead">Banyak aplikasi instansi hanya bisa dibuka lewat peramban: buatan vendor yang sudah pergi, kodenya tidak diserahkan, atau servernya milik pihak lain. <code>reverse-web-vcbd</code> membedahnya dari luar, cukup dari rekaman lalu lintas peramban, lalu berhenti di dosir. Penulisan blueprint tetap tugas <code>vcbd</code>.</p>
+
+<div class="tujuan"><b>Setelah membaca bab ini, Anda dapat:</b>
+<ul><li>menangkap HAR per peran secara etis dan efektif;</li>
+<li>membedah semua bahan dengan satu perintah <code>jalankan.py</code>;</li>
+<li>membaca matriks akses dengan benar ("tak teramati" ≠ "dilarang");</li>
+<li>menyerahkan draf manifest ke <code>vcbd</code>.</li></ul></div>
+
+<h2>7.1 Lima Hukum</h2>
+<table class="hukum"><tbody>
+<tr><td class="nh">1</td><td><b>Tak ada klaim tanpa bukti.</b> Label <code>[AMATI: har:berkas#n]</code>, <code>[AMATI-KORELASI]</code>, <code>[AMATI-JS]</code>, <code>[AMATI-URUTAN]</code>, <code>[INFER]</code>, <code>[USULAN]</code>, <code>[ISI:]</code>. Label tidak pernah dinaikkan hanya karena kalimatnya terdengar masuk akal.</td></tr>
+<tr><td class="nh">2</td><td><b>Kotak hitam punya batas, dan batasnya ditulis.</b> Skema basis data fisik, aturan server yang tak terpicu, proses latar, dan integrasi server-ke-server tidak terlihat dari peramban. Semuanya <code>[ISI:]</code>.</td></tr>
+<tr><td class="nh">3</td><td><b>"Tak teramati" ≠ "tidak ada" ≠ "dilarang".</b> Larangan hanya disimpulkan dari 401/403 nyata.</td></tr>
+<tr><td class="nh">4</td><td><b>Mesin membaca HAR, model membaca laporan.</b> HAR bisa puluhan MB; membacanya manual membakar token dan hasilnya lebih buruk.</td></tr>
+<tr><td class="nh">5</td><td><b>Pasif, berwenang, dan bersih data pribadi.</b> Tanpa fuzzing, tanpa tebak URL, tanpa aksi destruktif. Nilai rahasia dan PII disaring <code>redaksi.py</code>.</td></tr>
+</tbody></table>
+
+<div class="kotak awas"><b>Batas etis.</b> Gunakan hanya pada aplikasi yang Anda berwenang telaah: milik instansi Anda, buatan Anda sendiri, atau milik vendor yang kontraknya mengizinkan. Temuan keamanan di bab ini adalah efek samping pengamatan pasif (header, bendera cookie), bukan hasil uji penetrasi, dan tidak boleh "dibuktikan" dengan mencoba celahnya.</div>
+
+<h2>7.2 Menangkap HAR per peran</h2>
+<p>Kualitas dosir hampir seluruhnya ditentukan saat menangkap bahan. Aturannya: <b>satu HAR = satu peran = satu sesi</b>.</p>
+<div class="langkah"><span class="nl">Langkah 1</span> Buka jendela Incognito baru. Tekan <kbd>F12</kbd>, buka tab <b>Network</b>, lalu centang <b>Preserve log</b> dan <b>Disable cache</b>.</div>
+<div class="langkah"><span class="nl">Langkah 2</span> Login dengan akun peran pertama, lalu jalankan rencana jelajah (15–30 menit): klik setiap menu sekali; di tiap tabel buka satu detail; buka setiap formulir; kirim formulir kosong <b>satu kali</b> untuk menangkap bentuk galat validasi.</div>
+<div class="langkah"><span class="nl">Langkah 3</span> Jalankan <b>satu alur utuh pada objek yang sama</b>: ajukan (peran A) → buka daftar → logout → setujui (peran B) → buka daftar lagi. Dari sinilah transisi status <code>[AMATI-KORELASI]</code> terbaca.</div>
+<div class="langkah"><span class="nl">Langkah 4</span> Klik kanan di daftar permintaan → <b>Save all as HAR with content</b>. Simpan sebagai <code>&lt;peran&gt;.har</code>, logout, ulangi untuk peran berikutnya.</div>
+<div class="kotak tip"><b>Jangan klik tombol hapus atau kirim-final pada data produksi.</b> Skrip menangkap label tombol dari HTML tanpa perlu diklik. Bila HAR tidak memungkinkan, jalur cadangannya adalah halaman tersimpan (<kbd>Ctrl</kbd>+<kbd>S</kbd>, <i>HTML only</i>), satu folder per peran.</div>
+
+<h2>7.3 Bedah dan rakit dengan satu perintah</h2>
+<p>Untuk demo ini, bahan diambil dari <i>fixture</i> uji bawaan skill: HAR peran pegawai dan admin dari aplikasi cuti bergaya Laravel, plus satu halaman tersimpan. <i>Fixture</i> ini sengaja ditanami NIP, nama, email, sandi, dan token agar penyaringan data pribadinya bisa dibuktikan.</p>
+<fig id="t-jalankan">Satu perintah membedah tiga bahan dan mencetak ringkasan ≤15 baris.</fig>
+<ol class="penjelas">
+<li>Per bahan: jumlah entri HAR dan endpoint yang dikenali. Semua bahan dibedah dengan garam hash yang sama, sehingga objek yang sama dikenali lintas peran.</li>
+<li>Cakupan halaman 73%, dilaporkan apa adanya. Patokan kasar: di bawah 70% sebaiknya tangkap ulang terarah.</li>
+<li>Temuan berisiko pasif: ada rute yang <b>mengubah data lewat GET</b>. Rute seperti ini berbahaya bila di-<i>prefetch</i> atau di-<i>crawl</i>.</li>
+<li>Sisa yang belum tertangkap: tiga halaman dan satu formulir. Inilah daftar untuk tangkap ulang terarah.</li>
+</ol>
+<p>Keluarannya: <code>docs/_RECON_WEB/</code> (dosir dan laporan cakupan) dan <code>docs/_MANIFEST.draft.json</code>. Draf ini <b>tidak pernah menimpa</b> <code>_MANIFEST.json</code> resmi.</p>
+<div class="kotak catat"><b>Bukti tidak bocor.</b> Setelah demo, folder <code>docs/</code> keluaran dicari untuk NIP, nama, dan sandi yang ditanam di <i>fixture</i>. Hasilnya nihil.</div>
+
+<h2>7.4 Membaca laporan cakupan</h2>
+<p>Model bekerja dari laporan, bukan dari HAR mentah. Bagian terpenting adalah matriks akses dan transisi status:</p>
+<fig id="e-matriks">Matriks akses per modul, transisi status, dan alur lintas peran.</fig>
+<ol class="penjelas">
+<li>Legenda yang wajib dipahami: <code>—</code> berarti <b>tak teramati</b>, bukan dilarang. Hanya simbol larangan (lingkaran merah) yang berarti ditolak nyata.</li>
+<li>Pegawai mendapat 403 nyata saat membuka halaman verifikasi admin. Ini bukti larangan yang sah.</li>
+<li>Transisi <code>diajukan → disetujui</code> teramati sungguhan: objek yang sama berubah status setelah aksi admin.</li>
+<li>Transisi lain baru berstatus kandidat (bertanda tanya). Agar terbukti, alurnya perlu ditangkap ulang pada objek yang sama.</li>
+</ol>
+<p>Sinyal yang perlu Anda periksa di Fase 3:</p>
+<ul>
+<li><b>HAR tanpa isi respons</b>: ekspor ulang dengan opsi "with content".</li>
+<li><b>Transisi 0 atau alur lintas peran 0</b>: peran ditangkap tanpa menjalankan alur utuh pada objek yang sama.</li>
+<li><b>Banyak endpoint <code>[AMATI-JS]</code></b>: fitur tersembunyi di SPA yang belum pernah diklik.</li>
+</ul>
+<p>Maksimal dua putaran tambal. Sisanya dicatat jujur sebagai <code>[TERBUKA]</code>. Cakupan sempurna bukan syarat; cakupan yang dilaporkan apa adanya adalah syarat.</p>
+
+<h2>7.5 Wawancara kilat dan serah ke vcbd</h2>
+<p>Pertanyaan terpenting di Fase 4 adalah: <b>tulis ulang atau lanjutkan?</b> Jawabannya mengubah arti setiap <code>[AMATI]</code>. Bila ditulis ulang, perilaku teramati menjadi acuan yang boleh diperbaiki; bila dilanjutkan, ia menjadi kontrak yang harus dijaga. Setelah Ringkasan Temuan dikonfirmasi, koreksi masuk ke <code>_MANIFEST.draft.json</code> (dosir adalah buku bukti mesin dan tidak disunting tangan), lalu <code>vcbd</code> dimuat dalam mode brownfield. <code>vcbd</code> memperlakukan draf itu sebagai fakta diketahui, dan hanya mewawancarai celahnya.</p>
+<div class="prompt"><span class="pill">Prompt</span>Susun blueprint dari docs/_MANIFEST.draft.json hasil reverse-web-vcbd. Perlakukan sebagai brownfield; wawancarai hanya celahnya.</div>
+<p>Rantai yang disarankan: <code>reverse-web-vcbd</code> → <code>vcbd</code> → <code>coding-vcbd</code>.</p>
+
+<h2>7.6 Uji regresi skill</h2>
+<p>Bila Anda mengubah skrip skill ini, misalnya menambah pola PII atau parameter router baru, jalankan uji regresinya. Semua cek wajib lulus.</p>
+<fig id="t-regresi-web">Uji regresi <code>reverse-web-vcbd</code>: 32 dari 32 cek lulus.</fig>
+<ol class="penjelas">
+<li>Termasuk uji skala: 40 modul × 4 endpoint × 4 peran tetap menghasilkan laporan di bawah 4.000 token.</li>
+</ol>
+
+<div class="latihan"><b>Latihan 7</b><ol>
+<li>Tangkap HAR dua peran dari aplikasi instansi yang Anda kelola. Berapa persen cakupan halamannya?</li>
+<li>Temukan satu sel <code>—</code> di matriks akses. Apa yang harus dilakukan untuk mengubahnya menjadi bukti?</li>
+<li>Jalankan tangkap ulang terarah hanya untuk halaman di daftar "belum".</li></ol></div>
+
+<div class="rangkuman"><b>Rangkuman Bab 7</b><ul>
+<li>Satu HAR per peran, dengan satu alur utuh pada objek yang sama.</li>
+<li><code>jalankan.py</code> adalah cara utama; ringkasannya sering sudah cukup.</li>
+<li>"Tak teramati" bukan larangan; larangan hanya dari 401/403 nyata.</li>
+<li>Skill berhenti di dosir dan draf manifest; <code>vcbd</code> yang menulis blueprint.</li></ul></div>
+</section>
