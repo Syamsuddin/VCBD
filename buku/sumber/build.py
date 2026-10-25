@@ -239,9 +239,9 @@ def main():
         (BUILD / f"sampul-{jenis}.html").write_text(sampul.halaman(jenis))
         render(BUILD / f"sampul-{jenis}.html", BUILD / f"sampul-{jenis}.pdf")
     (BUILD / "sampul-bentang.html").write_text(sampul.halaman("bentang", tebal))
-    render(BUILD / "sampul-bentang.html", OUT / "Sampul-Cetak-Bentang.pdf")
+    render(BUILD / "sampul-bentang.html", BUILD / "sampul-bentang.pdf")
 
-    # buku digital lengkap: sampul depan, kosong, isi, (kosong), kosong, sampul belakang
+    # SATU berkas: sampul depan, kosong, isi, (kosong), kosong, sampul belakang, lalu sampul bentang untuk percetakan
     akhir = PdfWriter()
     akhir.append(str(BUILD / "sampul-depan.pdf"))
     akhir.add_blank_page(width=432, height=648)
@@ -251,6 +251,8 @@ def main():
         akhir.add_blank_page(width=432, height=648)
     akhir.add_blank_page(width=432, height=648)
     akhir.append(str(BUILD / "sampul-belakang.pdf"))
+    hal_bentang = len(akhir.pages)
+    akhir.append(str(BUILD / "sampul-bentang.pdf"))
     akhir.add_outline_item("Sampul", 0)
     for sid, nama in [("F1", "Kata Pengantar"), ("F2", "Daftar Isi"), ("F3", "Daftar Gambar")]:
         akhir.add_outline_item(nama, off + pos[sid] - 1)
@@ -261,6 +263,8 @@ def main():
             induk = akhir.add_outline_item((t["label"] + ": " if t["label"] else "") + t["teks"], hal)
         else:
             akhir.add_outline_item(t["teks"], hal, parent=induk)
+    akhir.add_outline_item("Sampul Belakang", hal_bentang - 1)
+    akhir.add_outline_item("Sampul Cetak (bentang, bleed 0,125 in)", hal_bentang)
     akhir.add_metadata({"/Title": JUDUL, "/Author": "Syams Ideris",
                         "/Subject": "Panduan praktis VCBD Suite untuk Claude Code", "/Keywords": "VCBD, vibe coding, Claude Code, blueprint",
                         "/Creator": "Chromium + pypdf"})
@@ -268,9 +272,6 @@ def main():
     akhir.compress_identical_objects(remove_identicals=True, remove_orphans=True)
     with open(OUT / "Vibe-Coding-VCBD-dengan-Claude-AI.pdf", "wb") as f:
         akhir.write(f)
-    # isi cetak (tanpa sampul) untuk percetakan
-    import shutil
-    shutil.copy(isi_bernomor, OUT / "Isi-Cetak-6x9.pdf")
     json.dump(dict(halaman_isi=n, tebal_punggung_in=tebal, bab1=bab1), open(OUT / "info.json", "w"), indent=1)
     print(f"selesai: isi {n} hal, punggung {tebal} in")
 

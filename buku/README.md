@@ -3,15 +3,19 @@
 Panduan praktis menyusun blueprint, membangun, dan mengaudit aplikasi dengan VCBD Suite v2.6.
 Penulis: **Syams Ideris** · Edisi Pertama, Oktober 2026 · Lisensi buku: **GNU GPL v3** (lihat `LICENSE`).
 
-| Berkas | Untuk |
-|---|---|
-| `Vibe-Coding-VCBD-dengan-Claude-AI.pdf` | Buku digital lengkap (sampul depan, isi, sampul belakang, bookmark), 122 halaman |
-| `cetak/Isi-Cetak-6x9.pdf` | Isi siap cetak, trim 6 × 9 inci, margin cermin, 117 halaman, semua font tertanam (TrueType) |
-| `cetak/Sampul-Cetak-Bentang.pdf` | Sampul bentang (belakang + punggung + depan), bleed 0,125 inci, punggung 0,2635 inci |
+Semua bagian buku ada dalam **satu berkas**: `Vibe-Coding-VCBD-dengan-Claude-AI.pdf` (123 halaman).
 
-Lebar punggung dihitung dari 117 halaman × 0,002252 inci (kertas putih). Bila percetakan memakai kertas lain,
-ubah `PAPER_IN_PER_PAGE` di `sumber/build.py`, lalu bangun ulang. Ruang ISBN/kode batang di sampul belakang
-sengaja dikosongkan untuk diisi penerbit.
+| Halaman PDF | Isi |
+|---|---|
+| 1 | Sampul depan (6 × 9 inci) |
+| 2 | Halaman kosong (balik sampul depan) |
+| 3–119 | Isi buku: halaman depan, Kata Pengantar, Daftar Isi, Bab 1–8, Penutup, Lampiran A–F (trim 6 × 9 inci, margin cermin, font tertanam) |
+| 120–121 | Halaman kosong (penggenap dan balik sampul belakang) |
+| 122 | Sampul belakang |
+| 123 | Sampul cetak bentang (belakang + punggung + depan), bleed 0,125 inci, punggung 0,2635 inci |
+
+Untuk percetakan: halaman 3–119 adalah isi cetak (117 halaman), dan halaman 123 adalah berkas sampulnya.
+Bookmark PDF menunjuk ke setiap bagian.
 
 ## Isi
 
@@ -29,7 +33,7 @@ Butuh Python 3 + `pypdf`, Node.js + Playwright dengan Chromium.
 
 ```bash
 cd buku/sumber
-python3 build.py        # hasil di sumber/dist/
+python3 build.py        # hasil: sumber/dist/Vibe-Coding-VCBD-dengan-Claude-AI.pdf
 ```
 
 `build.py` merender HTML lewat Chromium, menyisipkan halaman kosong agar tiap bab mulai di halaman kanan,
